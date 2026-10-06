@@ -1,0 +1,143 @@
+---
+updatedAt: 2026-06-09T06:22:19.000Z
+agentTools:
+  projectIndex: https://developers.zuper.co/llms.txt
+---
+
+# Delete Customer
+
+# OpenAPI definition
+
+```json
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "zuper-pro-api",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://{dc-region}.zuperpro.com/api",
+      "variables": {
+        "dc-region": {
+          "default": "dc-region"
+        }
+      }
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/customers/{customer_uid}": {
+      "delete": {
+        "summary": "Delete Customer",
+        "description": "",
+        "operationId": "get-all-customers-copy-4",
+        "parameters": [
+          {
+            "name": "customer_uid",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "remarks": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n    \"type\": \"success\",\n    \"title\": \"Customer Deleted\",\n    \"message\": \"Customer has been successfully deleted\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "title": {
+                      "type": "string",
+                      "example": "Customer Deleted"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Customer has been successfully deleted"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "404",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n    \"message\": \"No Customer found for given UID\",\n    \"title\": \"Invalid Customer UID\",\n    \"type\": \"error\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "No Customer found for given UID"
+                    },
+                    "title": {
+                      "type": "string",
+                      "example": "Invalid Customer UID"
+                    },
+                    "type": {
+                      "type": "string",
+                      "example": "error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": false
+  },
+  "x-readme-fauxas": true
+}
+```

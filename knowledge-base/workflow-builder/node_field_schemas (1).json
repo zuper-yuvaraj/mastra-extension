@@ -1,0 +1,3608 @@
+{
+  "version": "1",
+  "generated_at": "2026-06-26",
+  "purpose": "Authoritative, mode-aware node form-field schema mined from the workflow-builder FRONTEND (zuper-webapp-v3/projects/workflow-builder) + backend consumption. Backs two MCP tools: get_node_field_schema (read) and construct_node_fields (build). Encodes per node → which fields exist, what each is for (what/why/when), value source + exact shape, and DEPENDENCIES: the mode selector, per-mode required/dependent/clear sets, and live-resolved data (meta/filter, custom-field defs). The agent must never guess these — read this + the live catalogue.",
+  "value_envelope_note": "Almost every form_fields key is a {type, value} group where type ∈ {FIXED, EXPRESSION}. Collections (custom_fields, <module>_fields, conditions, trigger_rules.value) are arrays. 'fixed_or_expression' below says which is allowed.",
+  "nodes": {
+    "trigger": {
+      "kind": "TRIGGER",
+      "applies_to": "Zuper-event triggers (job.*, customer.*, …). Webhook/Schedule triggers have NO trigger_rules.",
+      "trigger_types": {
+        "ZUPER_EVENT": "A Zuper platform event (job.create, job.status_update, customer.update, …). HAS a per-module trigger filter (trigger_rules).",
+        "EXTERNAL_WEBHOOK": "Incoming HTTP webhook. NO trigger_rules — filter the payload with a downstream if_else.",
+        "SCHEDULE": "Cron/recurrence. NO trigger_rules."
+      },
+      "filter_catalogue": {
+        "what": "The set of filterable fields is SERVER-DRIVEN and DIFFERENT PER MODULE — never hardcode it. Fetch the module's catalogue and copy each rule's (key,type,field_type,operators) verbatim.",
+        "endpoint_rule": "customers/organization → GET /v2/<key>/meta/filter ; every other module → GET /<key>/meta/filter (mirrors FE trigger.component getFilterUrl). Use node-registry triggerFilterPath(module).",
+        "supported_modules_and_keys": {
+          "JOB": "jobs",
+          "PROJECT": "projects",
+          "REQUEST": "request",
+          "ORGANIZATION": "v2/organization",
+          "CUSTOMER": "v2/customers",
+          "PROPERTY": "property",
+          "TIMESHEET": "timesheets",
+          "PRODUCTS": "product",
+          "ESTIMATES": "estimate",
+          "INVOICE": "invoice",
+          "SERVICE_CONTRACTS": "service_contract",
+          "USER": "users",
+          "ASSETS": "assets",
+          "PAYMENTS": "payments/transactions"
+        },
+        "note": "These 14 modules support a Zuper-event trigger filter. The endpoint key here is the FULL path key (CUSTOMER/ORGANIZATION already include the v2 prefix). construct_node_fields fetches the right one automatically."
+      },
+      "form_fields": {
+        "trigger_rules": {
+          "what": "The trigger FILTER — only fire when the triggering record matches these rules.",
+          "why": "Narrows a high-volume event (e.g. every job.status_update) to the cases the workflow cares about (e.g. status = Completed).",
+          "when": "Whenever the user names a condition on the TRIGGERING entity (status is X, category is Y, priority HIGH). On a webhook/schedule trigger this becomes an if_else instead (no trigger filter).",
+          "value_type": "array of RULE objects under {type:'FIXED', value:[ RULE… ]}",
+          "fixed_or_expression": "FIXED (the array is fixed; rule VALUES are resolved UIDs/enums)",
+          "depends_on": "Each rule's (key,type,field_type,operator) MUST be copied VERBATIM from a GET /{module}/meta/filter catalogue entry — see grounding below.",
+          "rule_shape": {
+            "key": "catalogue field's fieldDataKey, verbatim (e.g. JOB status = 'status_uid', NOT 'current_job_status.status_uid')",
+            "type": "catalogue field's `type`, verbatim — one of default_field | nested_field | custom_field. NEVER derived from lookup-ness; read it from the catalogue.",
+            "field_type": "catalogue field's `fieldType` (LOOKUP | DROPDOWN | MULTI_ITEM | NUMBER | DECIMAL | DATE | DATETIME | TIME | BOOLEAN | TAGS | TEXT)",
+            "operator": "one of the field's catalogue operators[] (EQUAL_TO | NOT_EQUAL_TO | CONTAINS | NOT_CONTAINS | IS_EMPTY | IS_NOT_EMPTY | GREATER_THAN | LESS_THAN | BETWEEN …)",
+            "value": "formatted by field_type: LOOKUP → array of UIDs; DROPDOWN/enum → array of enum values; DATE → [fromISO,toISO] with operator BETWEEN; scalar → the value. Omitted for IS_EMPTY/IS_NOT_EMPTY.",
+            "module": "raw module string (JOB, CUSTOMER, …)",
+            "displayKeyValue": "human labels of the selected values (e.g. ['Completed']) — for chip rendering; include for robustness",
+            "rangeKey": "(DATE relative-range only) optional",
+            "filterKey": "(additionalFilters only) optional"
+          },
+          "grounding": "construct_node_fields fetches GET /{metaApiKey}/meta/filter, finds the field by human name → copies (fieldDataKey→key, type→type, fieldType→field_type, operators→pick operator), resolves the value (LOOKUP name→uid via the field's data.url/dataKey). The FE prefill matches a stored rule to a field ONLY by key===fieldDataKey, so a wrong key renders the filter BLANK on edit even though it executes.",
+          "gotchas": [
+            "JOB job-status field is FLAT: key='status_uid', type='nested_field', field_type='LOOKUP'. The dotted 'current_job_status.status_uid' is PROJECT's key ('project_current_status.status_uid'), NOT JOB's.",
+            "No payload-vs-API distinction exists in the FE — the catalogue is event-agnostic. Always use the meta/filter fieldDataKey.",
+            "status_type (NEW/COMPLETED/…) is a separate DROPDOWN field ('current_job_status.status_type'); a NAMED status (e.g. 'Completed' as a specific status_uid) uses status_uid + LOOKUP."
+          ],
+          "example": {
+            "key": "status_uid",
+            "type": "nested_field",
+            "field_type": "LOOKUP",
+            "operator": "CONTAINS",
+            "value": [
+              "<status_uid>"
+            ],
+            "module": "JOB",
+            "displayKeyValue": [
+              "Completed"
+            ]
+          }
+        },
+        "excluded_user_uids": {
+          "what": "Users whose actions should NOT fire the workflow (e.g. exclude the automation/system user).",
+          "value_type": "array of user_uid",
+          "fixed_or_expression": "FIXED",
+          "value_source": "ACCOUNT_LOOKUP user_uid via list_users",
+          "depends_on": "optional"
+        },
+        "filter_rule_operator": {
+          "what": "How multiple trigger rules combine.",
+          "value_source": "STATIC enum.",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "AND",
+            "OR"
+          ],
+          "depends_on": "optional (default AND)"
+        }
+      }
+    },
+    "zuper_update": {
+      "kind": "ACTION",
+      "what": "Edit an existing Zuper record (status, native fields, custom fields, assignment, schedule, service tasks).",
+      "mode_key": "operator_type",
+      "mode_key_ui_label": "Operation Type",
+      "inert_fields": {
+        "operation_type": "Dead dispatcher placeholder — emit {type:'FIXED',value:''}; never use it to select the mode.",
+        "source_type": "Inert (HTML commented out) but Validators.required — emit {type:'FIXED',value:''}."
+      },
+      "record_selection": {
+        "what": "Which record to edit.",
+        "source_node": {
+          "what": "Upstream zuper node_uid whose emitted record is the target, OR the literal 'CUSTOM'.",
+          "fixed_or_expression": "FIXED",
+          "value_source": "an upstream node_uid of the SAME module, or 'CUSTOM'"
+        },
+        "module_uid": {
+          "what": "The record UID — used ONLY when source_node='CUSTOM'.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "value_source": "fixed uid OR expression e.g. {{ $.getLatestNodeData('<Trigger>').data.body.job_uid }}",
+          "depends_on": "source_node='CUSTOM'"
+        }
+      },
+      "common_fields": {
+        "module": {
+          "what": "Target module.",
+          "fixed_or_expression": "FIXED",
+          "value_source": "STATIC enum JOB|CUSTOMER|INVOICE|ESTIMATES|ASSET|PROPERTY|CONTRACT|REQUEST|PROJECT",
+          "required_always": true
+        },
+        "operator_type": {
+          "what": "The MODE (what you edit). Selects which dependent block is active and which sibling collections must be cleared.",
+          "fixed_or_expression": "FIXED",
+          "required_always": true
+        }
+      },
+      "custom_fields_entry": {
+        "what": "One custom-field write. Setting a CUSTOM field uses operator_type=FIELD (JOB has no FIELD_CUSTOM mode).",
+        "identity": "id (= def.display_order || def.id) + label (= def.field_name). NOT the custom_field_uid.",
+        "shape": {
+          "key": "the field's GROUP NAME, or the literal 'Default' for ungrouped fields. NEVER the custom_field_uid.",
+          "id": "def.display_order || def.id",
+          "label": "def.field_name || def.label",
+          "type": "def.field_type (SINGLE_LINE|MULTI_LINE|SINGLE_ITEM|MULTI_ITEM|RADIO|DATE|TIME|DATETIME|…)",
+          "read_only": "def.read_only",
+          "hide_field": "def.hide_field",
+          "hide_to_fe": "def.hide_to_fe",
+          "module_name": "the module literal (JOB/INVOICE/…). NOTE FE bug: CUSTOMER writes 'INVOICE' — backend tolerant; emit the correct module unless byte-matching the FE.",
+          "dependent_on": "def.dependent_on",
+          "dependent_options": "def.dependent_options",
+          "group_name": "(only if the def has a group) def.group.group_name",
+          "group_uid": "(only if the def has a group) def.group.group_uid",
+          "is_required": "(ASSET module only) def.is_required",
+          "value": "{ type:'FIXED'|'EXPRESSION', value:<new value> }"
+        },
+        "grounding": "construct_node_fields fetches the module's custom-field definitions (list_custom_field_definitions / GET /settings/custom_fields?module_name=<M>), matches the field by label (or custom_field_uid), and fills the envelope from the def. The agent supplies only {field: <label or uid>, value:<new value>}."
+      },
+      "native_fields_entry": {
+        "what": "One native-field write. Collection key = <module>_fields (job_fields, customer_fields, invoice_fields, estimate_fields, asset_fields, property_fields, project_fields, request_fields, contract_fields).",
+        "shape": "{ field_key:'<key>', '<key>': { type:'FIXED'|'EXPRESSION', value } } — the value subkey name EQUALS field_key.",
+        "notes": "Address fields carry a structured object value; tags an array; REQUEST preferred-date uses {date,startTime,endTime}."
+      },
+      "modules": {
+        "JOB": {
+          "operator_type": [
+            "UPDATE_STATUS",
+            "ASSIGN",
+            "UNASSIGN",
+            "SCHEDULE",
+            "FIELD_DEFAULT",
+            "FIELD_CUSTOM",
+            "FIELD",
+            "SERVICE_TASK"
+          ],
+          "native_fields_key": "job_fields",
+          "native_field_keys": [
+            "job_title",
+            "job_category",
+            "prefix",
+            "job_type",
+            "job_priority",
+            "job_tags",
+            "job_skills",
+            "job_description",
+            "job_billing_address",
+            "job_service_address"
+          ],
+          "modes": {
+            "FIELD_DEFAULT": {
+              "required_any": [
+                "job_fields"
+              ],
+              "dependent": [
+                "job_fields"
+              ],
+              "clear": [
+                "custom_fields"
+              ],
+              "notes": "native fields only"
+            },
+            "FIELD_CUSTOM": {
+              "required_any": [
+                "custom_fields"
+              ],
+              "dependent": [
+                "custom_fields"
+              ],
+              "clear": [
+                "job_fields"
+              ],
+              "notes": "custom fields only"
+            },
+            "FIELD": {
+              "required_any": [
+                "job_fields",
+                "custom_fields"
+              ],
+              "dependent": [
+                "job_fields",
+                "custom_fields"
+              ],
+              "clear": [],
+              "notes": "LEGACY both — avoid for new builds"
+            },
+            "UPDATE_STATUS": {
+              "required": [
+                "status_category",
+                "job_status"
+              ],
+              "dependent": [
+                "status_category",
+                "job_status",
+                "job_status_name"
+              ],
+              "clear": [
+                "job_fields",
+                "custom_fields",
+                "sub_operator_type",
+                "team",
+                "users",
+                "schedule_type",
+                "schedule_value",
+                "service_task"
+              ],
+              "notes": "job_status_name auto-derived"
+            },
+            "ASSIGN": {
+              "required": [
+                "sub_operator_type"
+              ],
+              "dependent": [
+                "sub_operator_type",
+                "team",
+                "users"
+              ],
+              "clear": [
+                "status_category",
+                "job_status",
+                "job_fields",
+                "custom_fields",
+                "schedule_type",
+                "schedule_value",
+                "service_task"
+              ]
+            },
+            "UNASSIGN": {
+              "required": [
+                "sub_operator_type"
+              ],
+              "dependent": [
+                "sub_operator_type",
+                "team",
+                "users"
+              ],
+              "clear": [
+                "status_category",
+                "job_status",
+                "job_fields",
+                "custom_fields",
+                "schedule_type",
+                "schedule_value",
+                "service_task"
+              ]
+            },
+            "SCHEDULE": {
+              "required": [
+                "schedule_type",
+                "schedule_value"
+              ],
+              "dependent": [
+                "schedule_type",
+                "schedule_value",
+                "offset_type",
+                "duration_type",
+                "days",
+                "hours",
+                "minutes",
+                "date",
+                "time"
+              ],
+              "clear": [
+                "status_category",
+                "job_status",
+                "sub_operator_type",
+                "team",
+                "users",
+                "job_fields",
+                "custom_fields",
+                "service_task"
+              ],
+              "notes": "JOB-only family"
+            },
+            "SERVICE_TASK": {
+              "required": [
+                "service_task"
+              ],
+              "dependent": [
+                "service_task"
+              ],
+              "clear": [
+                "status_category",
+                "job_status",
+                "sub_operator_type",
+                "team",
+                "users",
+                "schedule_type",
+                "schedule_value",
+                "job_fields",
+                "custom_fields"
+              ]
+            }
+          }
+        },
+        "CUSTOMER": {
+          "operator_type": [
+            "FIELD_DEFAULT",
+            "FIELD_CUSTOM",
+            "FIELD"
+          ],
+          "native_fields_key": "customer_fields",
+          "custom_field_module_name_fe_bug": "INVOICE",
+          "modes": {
+            "FIELD_DEFAULT": {
+              "required_any": [
+                "customer_fields"
+              ],
+              "dependent": [
+                "customer_fields"
+              ],
+              "clear": [
+                "custom_fields"
+              ],
+              "notes": "native fields only"
+            },
+            "FIELD_CUSTOM": {
+              "required_any": [
+                "custom_fields"
+              ],
+              "dependent": [
+                "custom_fields"
+              ],
+              "clear": [
+                "customer_fields"
+              ],
+              "notes": "custom fields only"
+            },
+            "FIELD": {
+              "required_any": [
+                "customer_fields",
+                "custom_fields"
+              ],
+              "dependent": [
+                "customer_fields",
+                "custom_fields"
+              ],
+              "clear": [],
+              "notes": "LEGACY both — avoid for new builds"
+            }
+          }
+        },
+        "PROPERTY": {
+          "operator_type": [
+            "FIELD_DEFAULT",
+            "FIELD_CUSTOM",
+            "FIELD"
+          ],
+          "native_fields_key": "property_fields",
+          "native_field_keys": [
+            "property_name",
+            "property_description",
+            "property_address"
+          ],
+          "modes": {
+            "FIELD_DEFAULT": {
+              "required_any": [
+                "property_fields"
+              ],
+              "dependent": [
+                "property_fields"
+              ],
+              "clear": [
+                "custom_fields"
+              ],
+              "notes": "native fields only"
+            },
+            "FIELD_CUSTOM": {
+              "required_any": [
+                "custom_fields"
+              ],
+              "dependent": [
+                "custom_fields"
+              ],
+              "clear": [
+                "property_fields"
+              ],
+              "notes": "custom fields only"
+            },
+            "FIELD": {
+              "required_any": [
+                "property_fields",
+                "custom_fields"
+              ],
+              "dependent": [
+                "property_fields",
+                "custom_fields"
+              ],
+              "clear": [],
+              "notes": "LEGACY both — avoid for new builds"
+            }
+          }
+        },
+        "INVOICE": {
+          "operator_type": [
+            "FIELD_DEFAULT",
+            "FIELD_CUSTOM",
+            "FIELD",
+            "UPDATE_STATUS"
+          ],
+          "native_fields_key": "invoice_fields",
+          "native_field_keys": [
+            "reference_number",
+            "tags",
+            "invoice_date",
+            "invoice_due_date",
+            "description",
+            "prefix",
+            "invoice_payment_term",
+            "invoice_template"
+          ],
+          "status_key": "invoice_status",
+          "modes": {
+            "FIELD_DEFAULT": {
+              "required_any": [
+                "invoice_fields"
+              ],
+              "dependent": [
+                "invoice_fields"
+              ],
+              "clear": [
+                "custom_fields"
+              ],
+              "notes": "native fields only"
+            },
+            "FIELD_CUSTOM": {
+              "required_any": [
+                "custom_fields"
+              ],
+              "dependent": [
+                "custom_fields"
+              ],
+              "clear": [
+                "invoice_fields"
+              ],
+              "notes": "custom fields only"
+            },
+            "FIELD": {
+              "required_any": [
+                "invoice_fields",
+                "custom_fields"
+              ],
+              "dependent": [
+                "invoice_fields",
+                "custom_fields"
+              ],
+              "clear": [],
+              "notes": "LEGACY both — avoid for new builds"
+            },
+            "UPDATE_STATUS": {
+              "required": [
+                "invoice_status"
+              ],
+              "dependent": [
+                "invoice_status"
+              ],
+              "clear": [
+                "invoice_fields",
+                "custom_fields"
+              ]
+            }
+          }
+        },
+        "ESTIMATES": {
+          "operator_type": [
+            "FIELD_DEFAULT",
+            "FIELD_CUSTOM",
+            "FIELD",
+            "UPDATE_STATUS",
+            "CONVERT_TO_INVOICE"
+          ],
+          "native_fields_key": "estimate_fields",
+          "native_field_keys": [
+            "quote_expiry_date",
+            "tags",
+            "description",
+            "reference_number",
+            "prefix",
+            "title",
+            "quote_date"
+          ],
+          "status_key": "quote_status",
+          "extra_field": "module_type (Quote|Proposal)",
+          "modes": {
+            "FIELD_DEFAULT": {
+              "required_any": [
+                "estimate_fields"
+              ],
+              "dependent": [
+                "estimate_fields"
+              ],
+              "clear": [
+                "custom_fields"
+              ],
+              "notes": "native fields only"
+            },
+            "FIELD_CUSTOM": {
+              "required_any": [
+                "custom_fields"
+              ],
+              "dependent": [
+                "custom_fields"
+              ],
+              "clear": [
+                "estimate_fields"
+              ],
+              "notes": "custom fields only"
+            },
+            "FIELD": {
+              "required_any": [
+                "estimate_fields",
+                "custom_fields"
+              ],
+              "dependent": [
+                "estimate_fields",
+                "custom_fields"
+              ],
+              "clear": [],
+              "notes": "LEGACY both — avoid for new builds"
+            },
+            "UPDATE_STATUS": {
+              "required": [
+                "quote_status"
+              ],
+              "dependent": [
+                "quote_status",
+                "module_type"
+              ],
+              "clear": [
+                "estimate_fields",
+                "custom_fields"
+              ]
+            },
+            "CONVERT_TO_INVOICE": {
+              "required": [
+                "invoice_payment_term",
+                "invoice_template"
+              ],
+              "dependent": [
+                "invoice_payment_term",
+                "invoice_template"
+              ],
+              "clear": [
+                "estimate_fields",
+                "custom_fields",
+                "quote_status"
+              ],
+              "notes": "Quote module_type only"
+            }
+          }
+        },
+        "ASSET": {
+          "operator_type": [
+            "FIELD_DEFAULT",
+            "FIELD_CUSTOM",
+            "FIELD",
+            "UPDATE_STATUS"
+          ],
+          "native_fields_key": "asset_fields",
+          "status_key": "asset_status",
+          "custom_field_extra_key": "is_required",
+          "modes": {
+            "FIELD_DEFAULT": {
+              "required_any": [
+                "asset_fields"
+              ],
+              "dependent": [
+                "asset_fields"
+              ],
+              "clear": [
+                "custom_fields"
+              ],
+              "notes": "native fields only"
+            },
+            "FIELD_CUSTOM": {
+              "required_any": [
+                "custom_fields"
+              ],
+              "dependent": [
+                "custom_fields"
+              ],
+              "clear": [
+                "asset_fields"
+              ],
+              "notes": "custom fields only"
+            },
+            "FIELD": {
+              "required_any": [
+                "asset_fields",
+                "custom_fields"
+              ],
+              "dependent": [
+                "asset_fields",
+                "custom_fields"
+              ],
+              "clear": [],
+              "notes": "LEGACY both — avoid for new builds"
+            },
+            "UPDATE_STATUS": {
+              "required": [
+                "asset_status"
+              ],
+              "dependent": [
+                "asset_status"
+              ],
+              "clear": [
+                "asset_fields",
+                "custom_fields"
+              ]
+            }
+          }
+        },
+        "REQUEST": {
+          "operator_type": [
+            "FIELD_DEFAULT",
+            "FIELD_CUSTOM",
+            "FIELD",
+            "UPDATE_STATUS"
+          ],
+          "native_fields_key": "request_fields",
+          "native_field_keys": [
+            "request_title",
+            "request_description",
+            "request_due_date",
+            "request_preferred_date_1",
+            "request_preferred_date_2",
+            "request_source",
+            "request_priority"
+          ],
+          "status_key": "request_status",
+          "modes": {
+            "FIELD_DEFAULT": {
+              "required_any": [
+                "request_fields"
+              ],
+              "dependent": [
+                "request_fields"
+              ],
+              "clear": [
+                "custom_fields"
+              ],
+              "notes": "native fields only"
+            },
+            "FIELD_CUSTOM": {
+              "required_any": [
+                "custom_fields"
+              ],
+              "dependent": [
+                "custom_fields"
+              ],
+              "clear": [
+                "request_fields"
+              ],
+              "notes": "custom fields only"
+            },
+            "FIELD": {
+              "required_any": [
+                "request_fields",
+                "custom_fields"
+              ],
+              "dependent": [
+                "request_fields",
+                "custom_fields"
+              ],
+              "clear": [],
+              "notes": "LEGACY both — avoid for new builds"
+            },
+            "UPDATE_STATUS": {
+              "required": [
+                "request_status"
+              ],
+              "dependent": [
+                "request_status"
+              ],
+              "clear": [
+                "request_fields",
+                "custom_fields"
+              ]
+            }
+          }
+        },
+        "CONTRACT": {
+          "operator_type": [
+            "FIELD_DEFAULT",
+            "FIELD_CUSTOM",
+            "FIELD",
+            "UPDATE_STATUS"
+          ],
+          "native_fields_key": "contract_fields",
+          "status_key": "contract_status",
+          "modes": {
+            "FIELD_DEFAULT": {
+              "required_any": [
+                "contract_fields"
+              ],
+              "dependent": [
+                "contract_fields"
+              ],
+              "clear": [
+                "custom_fields"
+              ],
+              "notes": "native fields only"
+            },
+            "FIELD_CUSTOM": {
+              "required_any": [
+                "custom_fields"
+              ],
+              "dependent": [
+                "custom_fields"
+              ],
+              "clear": [
+                "contract_fields"
+              ],
+              "notes": "custom fields only"
+            },
+            "FIELD": {
+              "required_any": [
+                "contract_fields",
+                "custom_fields"
+              ],
+              "dependent": [
+                "contract_fields",
+                "custom_fields"
+              ],
+              "clear": [],
+              "notes": "LEGACY both — avoid for new builds"
+            },
+            "UPDATE_STATUS": {
+              "required": [
+                "contract_status"
+              ],
+              "dependent": [
+                "contract_status"
+              ],
+              "clear": [
+                "contract_fields",
+                "custom_fields"
+              ]
+            }
+          }
+        },
+        "PROJECT": {
+          "operator_type": [
+            "FIELD_DEFAULT",
+            "FIELD_CUSTOM",
+            "FIELD",
+            "UPDATE_STATUS"
+          ],
+          "native_fields_key": "project_fields",
+          "native_field_keys": [
+            "name",
+            "description",
+            "tags",
+            "project_start_date",
+            "project_due_date",
+            "project_end_date",
+            "project_priority",
+            "project_service_address",
+            "project_billing_address",
+            "project_category"
+          ],
+          "status_triad": [
+            "project_status_category",
+            "project_status",
+            "project_status_name"
+          ],
+          "modes": {
+            "FIELD_DEFAULT": {
+              "required_any": [
+                "project_fields"
+              ],
+              "dependent": [
+                "project_fields"
+              ],
+              "clear": [
+                "custom_fields"
+              ],
+              "notes": "native fields only"
+            },
+            "FIELD_CUSTOM": {
+              "required_any": [
+                "custom_fields"
+              ],
+              "dependent": [
+                "custom_fields"
+              ],
+              "clear": [
+                "project_fields"
+              ],
+              "notes": "custom fields only"
+            },
+            "FIELD": {
+              "required_any": [
+                "project_fields",
+                "custom_fields"
+              ],
+              "dependent": [
+                "project_fields",
+                "custom_fields"
+              ],
+              "clear": [],
+              "notes": "LEGACY both — avoid for new builds"
+            },
+            "UPDATE_STATUS": {
+              "required": [
+                "project_status_category",
+                "project_status"
+              ],
+              "dependent": [
+                "project_status_category",
+                "project_status",
+                "project_status_name"
+              ],
+              "clear": [
+                "project_fields",
+                "custom_fields"
+              ]
+            }
+          }
+        }
+      },
+      "mode_options": {
+        "_field": "operator_type",
+        "_ui_label": "Operation Type",
+        "_what": "Picks WHICH aspect of the record you edit; each option reveals a different sub-form and clears the others.",
+        "FIELD_DEFAULT": {
+          "what": "Edit NATIVE fields only → <module>_fields[].",
+          "when_to_use": "Change built-in fields (title, priority, dates, address, …). PREFER this for native-field edits."
+        },
+        "FIELD_CUSTOM": {
+          "what": "Edit CUSTOM fields only → custom_fields[].",
+          "when_to_use": "Set a custom field (e.g. mark \"Finished\"=Yes). PREFER this for custom-field edits."
+        },
+        "FIELD": {
+          "what": "LEGACY combined native+custom edit (renders only if already selected).",
+          "when_to_use": "Do NOT emit for new builds — use FIELD_DEFAULT and/or FIELD_CUSTOM. (Kept for back-compat with old workflows.)"
+        },
+        "UPDATE_STATUS": {
+          "what": "Change the record's status.",
+          "when_to_use": "Status transitions (job→Completed, invoice→CLOSED). Not available for CUSTOMER/PROPERTY."
+        },
+        "ASSIGN": {
+          "what": "Assign user(s)/team(s) — JOB only.",
+          "when_to_use": "Add an assignee (via sub_operator_type)."
+        },
+        "UNASSIGN": {
+          "what": "Remove an assignment — JOB only.",
+          "when_to_use": "Take a user/team off the job."
+        },
+        "SCHEDULE": {
+          "what": "Set/clear schedule or due date — JOB only.",
+          "when_to_use": "Schedule/reschedule the job or set offsets."
+        },
+        "SERVICE_TASK": {
+          "what": "Add service task(s) — JOB only.",
+          "when_to_use": "Attach checklist/service items."
+        },
+        "CONVERT_TO_INVOICE": {
+          "what": "Convert a Quote to an invoice — ESTIMATES (module_type=Quote) only.",
+          "when_to_use": "Turn an accepted quote into an invoice."
+        }
+      },
+      "fields": {
+        "status_category": {
+          "what": "The status CATEGORY that owns the target status.",
+          "value_source": "ACCOUNT_LOOKUP category_uid (list_job_categories).",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "operator_type=UPDATE_STATUS (JOB)"
+        },
+        "job_status": {
+          "what": "The new job status to set.",
+          "value_source": "ACCOUNT_LOOKUP status_uid WITHIN status_category (list_job_statuses(category_uid)).",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "operator_type=UPDATE_STATUS + status_category"
+        },
+        "job_status_name": {
+          "what": "The status NAME — auto-derived from job_status (read-only mirror).",
+          "value_source": "auto (set by the FE from the picked status).",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "operator_type=UPDATE_STATUS"
+        },
+        "project_status_category": {
+          "what": "PROJECT status category.",
+          "value_source": "ACCOUNT_LOOKUP category_uid (project categories).",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "operator_type=UPDATE_STATUS (PROJECT)"
+        },
+        "project_status": {
+          "what": "New PROJECT status.",
+          "value_source": "ACCOUNT_LOOKUP status_uid within project category.",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "UPDATE_STATUS + project_status_category"
+        },
+        "project_status_name": {
+          "what": "PROJECT status NAME (auto-derived).",
+          "value_source": "auto.",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "UPDATE_STATUS (PROJECT)"
+        },
+        "invoice_status": {
+          "what": "New invoice status.",
+          "value_source": "STATIC enum.",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "DRAFT",
+            "AWAIT_PAYMENT",
+            "BAD_DEBT",
+            "CANCELED",
+            "ARCHIVED",
+            "CLOSED"
+          ],
+          "depends_on": "INVOICE UPDATE_STATUS"
+        },
+        "quote_status": {
+          "what": "New estimate/quote status.",
+          "value_source": "STATIC enum (APPROVED only when module_type=Quote).",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "DRAFT",
+            "AWAIT_RESPONSE",
+            "APPROVED",
+            "DECLINED",
+            "ARCHIVED",
+            "CLOSED",
+            "CANCELED"
+          ],
+          "depends_on": "ESTIMATES UPDATE_STATUS"
+        },
+        "asset_status": {
+          "what": "New asset status.",
+          "value_source": "STATIC enum (mapAssetStatus).",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "READY_TO_INSTALL",
+            "INSTALLED",
+            "UNDER_SERVICE",
+            "REMOVED",
+            "OBSOLETE"
+          ],
+          "depends_on": "ASSET UPDATE_STATUS"
+        },
+        "request_status": {
+          "what": "New request status.",
+          "value_source": "ACCOUNT_LOOKUP status_uid (request statuses).",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "REQUEST UPDATE_STATUS"
+        },
+        "contract_status": {
+          "what": "New contract status.",
+          "value_source": "STATIC enum.",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "ACTIVE",
+            "INACTIVE"
+          ],
+          "depends_on": "CONTRACT UPDATE_STATUS"
+        },
+        "module_type": {
+          "what": "Estimate document type.",
+          "value_source": "STATIC enum — affects quote_status options/labels.",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "Quote",
+            "Proposal"
+          ],
+          "depends_on": "ESTIMATES"
+        },
+        "sub_operator_type": {
+          "what": "Assignment strategy.",
+          "value_source": "STATIC enum.",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "ASSIGN_FROM_TEAM_USER",
+            "ASSIGN_ALL",
+            "ASSIGN_TEAM_TL",
+            "ASSIGN_TEAM_FE",
+            "ASSIGN_TEAM"
+          ],
+          "depends_on": "operator_type=ASSIGN|UNASSIGN (JOB)",
+          "when_to_use": "ASSIGN_FROM_TEAM_USER reveals team+users; ASSIGN_TEAM* needs only team."
+        },
+        "team": {
+          "what": "Team(s) to (un)assign.",
+          "value_source": "ACCOUNT_LOOKUP team_uid array (list_teams).",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "ASSIGN/UNASSIGN"
+        },
+        "users": {
+          "what": "User(s) to (un)assign.",
+          "value_source": "array<{user_uid, team_uid}> (list_users).",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "ASSIGN + sub_operator_type=ASSIGN_FROM_TEAM_USER"
+        },
+        "schedule_type": {
+          "what": "Which schedule to set.",
+          "value_source": "STATIC enum.",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "SCHEDULE_DATE",
+            "DUE_DATE"
+          ],
+          "depends_on": "operator_type=SCHEDULE"
+        },
+        "schedule_value": {
+          "what": "What schedule value to write.",
+          "value_source": "STATIC enum.",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "EXECUTION_DATE_TIME",
+            "SCHEDULE_DATE",
+            "FROM_DATE",
+            "TO_DATE",
+            "BOTH",
+            "CLEAR_SCHEDULE",
+            "DATE"
+          ],
+          "depends_on": "SCHEDULE"
+        },
+        "offset_type": {
+          "what": "Offset direction for a relative schedule.",
+          "value_source": "STATIC enum.",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "BEFORE",
+            "AFTER"
+          ],
+          "depends_on": "SCHEDULE"
+        },
+        "duration_type": {
+          "what": "Where the duration comes from (when schedule_value=BOTH).",
+          "value_source": "STATIC enum.",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "BASED_ON_CATEGORY",
+            "CUSTOM"
+          ],
+          "depends_on": "SCHEDULE"
+        },
+        "days": {
+          "what": "Days component of a CUSTOM duration/offset.",
+          "value_source": "integer.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "SCHEDULE (CUSTOM)"
+        },
+        "hours": {
+          "what": "Hours component.",
+          "value_source": "integer.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "SCHEDULE (CUSTOM)"
+        },
+        "minutes": {
+          "what": "Minutes component.",
+          "value_source": "integer.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "SCHEDULE (CUSTOM)"
+        },
+        "date": {
+          "what": "Fixed schedule date.",
+          "value_source": "date 'YYYY-MM-DD'.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "SCHEDULE (schedule_value=DATE)"
+        },
+        "time": {
+          "what": "Fixed schedule time.",
+          "value_source": "time 'HH:mm:ss'.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "SCHEDULE"
+        },
+        "service_task": {
+          "what": "Service task(s) to add.",
+          "value_source": "array of service-task objects (custom or picked).",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "operator_type=SERVICE_TASK (JOB)"
+        },
+        "job_fields": {
+          "what": "Native field writes — see native_fields_entry for the entry shape; per-field meaning in native_field_keys.",
+          "value_source": "array<{field_key,<field_key>:{type,value}}>.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "operator_type=FIELD"
+        },
+        "custom_fields": {
+          "what": "Custom field writes — see custom_fields_entry for the exact envelope.",
+          "value_source": "array; key=group/Default (NOT uid), identity=id+label.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "operator_type=FIELD"
+        },
+        "is_required": {
+          "what": "Per-custom-field required flag (ASSET module only).",
+          "value_source": "def.is_required.",
+          "depends_on": "ASSET custom_fields entry"
+        },
+        "native_field_value_sources": {
+          "_note": "Each <module>_fields entry sets ONE native field. Value source by field: *_category/*_uid/tags/skills/assignees/property/organization/customer → ACCOUNT_LOOKUP uid(s) via MCP; *_address → structured address object; *_date/*_datetime → date/datetime string; job_type→NEW|REVISIT; *_priority→LOW|MEDIUM|HIGH|URGENT; everything else → free text or {{expression}}. The exact key list per module is in modules.<M>.native_field_keys."
+        },
+        "job_title": {
+          "what": "Job title.",
+          "value_source": "free text or {{expression}}",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "job_category": {
+          "what": "Job category.",
+          "value_source": "ACCOUNT_LOOKUP category_uid (list_job_categories).",
+          "fixed_or_expression": "FIXED"
+        },
+        "prefix": {
+          "what": "Record number prefix.",
+          "value_source": "free text or {{expression}}",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "job_type": {
+          "what": "Job type.",
+          "value_source": "STATIC enum.",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "NEW",
+            "REVISIT"
+          ]
+        },
+        "job_priority": {
+          "what": "Job priority.",
+          "value_source": "STATIC enum.",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "LOW",
+            "MEDIUM",
+            "HIGH",
+            "URGENT"
+          ]
+        },
+        "job_tags": {
+          "what": "Tags.",
+          "value_source": "array<string> (company tags).",
+          "fixed_or_expression": "FIXED"
+        },
+        "job_skills": {
+          "what": "Required skillsets.",
+          "value_source": "ACCOUNT_LOOKUP array<skillset_uid> (list_skillsets).",
+          "fixed_or_expression": "FIXED"
+        },
+        "job_description": {
+          "what": "Job description.",
+          "value_source": "free text or {{expression}}",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "job_billing_address": {
+          "what": "Billing address.",
+          "value_source": "structured address object (each sub-key {type,value})",
+          "fixed_or_expression": "FIXED"
+        },
+        "job_service_address": {
+          "what": "Service address.",
+          "value_source": "structured address object (each sub-key {type,value})",
+          "fixed_or_expression": "FIXED"
+        },
+        "property_name": {
+          "what": "Property name.",
+          "value_source": "free text or {{expression}}",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "property_description": {
+          "what": "Property description.",
+          "value_source": "free text or {{expression}}",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "property_address": {
+          "what": "Property address.",
+          "value_source": "structured address object (each sub-key {type,value})",
+          "fixed_or_expression": "FIXED"
+        },
+        "reference_number": {
+          "what": "Reference number.",
+          "value_source": "free text or {{expression}}",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "tags": {
+          "what": "Tags.",
+          "value_source": "array<string>.",
+          "fixed_or_expression": "FIXED"
+        },
+        "invoice_date": {
+          "what": "Invoice date.",
+          "value_source": "date 'YYYY-MM-DD'.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "invoice_due_date": {
+          "what": "Invoice due date.",
+          "value_source": "date 'YYYY-MM-DD'.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "description": {
+          "what": "Description.",
+          "value_source": "free text or {{expression}}",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "invoice_payment_term": {
+          "what": "Invoice payment term.",
+          "value_source": "ACCOUNT_LOOKUP payment_terms uid (/invoices/payment_terms).",
+          "fixed_or_expression": "FIXED"
+        },
+        "invoice_template": {
+          "what": "Invoice template.",
+          "value_source": "ACCOUNT_LOOKUP template uid.",
+          "fixed_or_expression": "FIXED"
+        },
+        "quote_expiry_date": {
+          "what": "Quote expiry date.",
+          "value_source": "date 'YYYY-MM-DD'.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "title": {
+          "what": "Title (estimate).",
+          "value_source": "free text or {{expression}}",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "quote_date": {
+          "what": "Quote date.",
+          "value_source": "date 'YYYY-MM-DD'.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "request_title": {
+          "what": "Request title.",
+          "value_source": "free text or {{expression}}",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "request_description": {
+          "what": "Request description.",
+          "value_source": "free text or {{expression}}",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "request_due_date": {
+          "what": "Due date.",
+          "value_source": "date 'YYYY-MM-DD'.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "request_preferred_date_1": {
+          "what": "Preferred date 1.",
+          "value_source": "nested object { date, startTime, endTime }.",
+          "fixed_or_expression": "FIXED"
+        },
+        "request_preferred_date_2": {
+          "what": "Preferred date 2.",
+          "value_source": "nested object { date, startTime, endTime }.",
+          "fixed_or_expression": "FIXED"
+        },
+        "request_source": {
+          "what": "Request source.",
+          "value_source": "ACCOUNT_LOOKUP request_source_uid.",
+          "fixed_or_expression": "FIXED"
+        },
+        "request_priority": {
+          "what": "Request priority.",
+          "value_source": "STATIC enum.",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "LOW",
+            "MEDIUM",
+            "HIGH",
+            "URGENT"
+          ]
+        },
+        "name": {
+          "what": "Name (project).",
+          "value_source": "free text or {{expression}}",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "project_start_date": {
+          "what": "Project start date.",
+          "value_source": "date 'YYYY-MM-DD'.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "project_due_date": {
+          "what": "Project due date.",
+          "value_source": "date 'YYYY-MM-DD'.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "project_end_date": {
+          "what": "Project end date.",
+          "value_source": "date 'YYYY-MM-DD'.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "project_priority": {
+          "what": "Project priority.",
+          "value_source": "STATIC enum.",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "LOW",
+            "MEDIUM",
+            "HIGH",
+            "URGENT"
+          ]
+        },
+        "project_service_address": {
+          "what": "Service address.",
+          "value_source": "structured address object (each sub-key {type,value})",
+          "fixed_or_expression": "FIXED"
+        },
+        "project_billing_address": {
+          "what": "Billing address.",
+          "value_source": "structured address object (each sub-key {type,value})",
+          "fixed_or_expression": "FIXED"
+        },
+        "project_category": {
+          "what": "Project category.",
+          "value_source": "ACCOUNT_LOOKUP category_uid (project categories).",
+          "fixed_or_expression": "FIXED"
+        },
+        "customer_fields": {
+          "what": "The native-field collection for this module (each entry sets one customer field).",
+          "value_source": "array; entry shape = native_fields_entry; per-field meaning in native_fields.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "operator_type=FIELD"
+        },
+        "property_fields": {
+          "what": "The native-field collection for this module (each entry sets one property field).",
+          "value_source": "array; entry shape = native_fields_entry; per-field meaning in native_fields.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "operator_type=FIELD"
+        },
+        "invoice_fields": {
+          "what": "The native-field collection for this module (each entry sets one invoice field).",
+          "value_source": "array; entry shape = native_fields_entry; per-field meaning in native_fields.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "operator_type=FIELD"
+        },
+        "estimate_fields": {
+          "what": "The native-field collection for this module (each entry sets one estimate field).",
+          "value_source": "array; entry shape = native_fields_entry; per-field meaning in native_fields.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "operator_type=FIELD"
+        },
+        "asset_fields": {
+          "what": "The native-field collection for this module (each entry sets one asset field).",
+          "value_source": "array; entry shape = native_fields_entry; per-field meaning in native_fields.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "operator_type=FIELD"
+        },
+        "request_fields": {
+          "what": "The native-field collection for this module (each entry sets one request field).",
+          "value_source": "array; entry shape = native_fields_entry; per-field meaning in native_fields.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "operator_type=FIELD"
+        },
+        "contract_fields": {
+          "what": "The native-field collection for this module (each entry sets one contract field).",
+          "value_source": "array; entry shape = native_fields_entry; per-field meaning in native_fields.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "operator_type=FIELD"
+        },
+        "project_fields": {
+          "what": "The native-field collection for this module (each entry sets one project field).",
+          "value_source": "array; entry shape = native_fields_entry; per-field meaning in native_fields.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "operator_type=FIELD"
+        }
+      },
+      "native_fields": {
+        "job_title": {
+          "what": "Job title.",
+          "value_source": "free text or {{expression}}",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "request_title": {
+          "what": "Request title.",
+          "value_source": "free text or {{expression}}",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "title": {
+          "what": "Title (estimate).",
+          "value_source": "free text or {{expression}}",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "name": {
+          "what": "Name (project).",
+          "value_source": "free text or {{expression}}",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "property_name": {
+          "what": "Property name.",
+          "value_source": "free text or {{expression}}",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "description": {
+          "what": "Description.",
+          "value_source": "free text or {{expression}}",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "job_description": {
+          "what": "Job description.",
+          "value_source": "free text or {{expression}}",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "request_description": {
+          "what": "Request description.",
+          "value_source": "free text or {{expression}}",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "property_description": {
+          "what": "Property description.",
+          "value_source": "free text or {{expression}}",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "prefix": {
+          "what": "Record number prefix.",
+          "value_source": "free text or {{expression}}",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "reference_number": {
+          "what": "Reference number.",
+          "value_source": "free text or {{expression}}",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "job_type": {
+          "what": "Job type.",
+          "value_source": "STATIC enum.",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "NEW",
+            "REVISIT"
+          ]
+        },
+        "job_priority": {
+          "what": "Job priority.",
+          "value_source": "STATIC enum.",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "LOW",
+            "MEDIUM",
+            "HIGH",
+            "URGENT"
+          ]
+        },
+        "project_priority": {
+          "what": "Project priority.",
+          "value_source": "STATIC enum.",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "LOW",
+            "MEDIUM",
+            "HIGH",
+            "URGENT"
+          ]
+        },
+        "request_priority": {
+          "what": "Request priority.",
+          "value_source": "STATIC enum.",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "LOW",
+            "MEDIUM",
+            "HIGH",
+            "URGENT"
+          ]
+        },
+        "job_category": {
+          "what": "Job category.",
+          "value_source": "ACCOUNT_LOOKUP category_uid (list_job_categories).",
+          "fixed_or_expression": "FIXED"
+        },
+        "project_category": {
+          "what": "Project category.",
+          "value_source": "ACCOUNT_LOOKUP category_uid (project categories).",
+          "fixed_or_expression": "FIXED"
+        },
+        "job_customer": {
+          "what": "Customer.",
+          "value_source": "ACCOUNT_LOOKUP customer_uid (search_customers).",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "request_customer": {
+          "what": "Customer.",
+          "value_source": "ACCOUNT_LOOKUP customer_uid.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "job_organization": {
+          "what": "Organization.",
+          "value_source": "ACCOUNT_LOOKUP organization_uid.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "request_organization": {
+          "what": "Organization.",
+          "value_source": "ACCOUNT_LOOKUP organization_uid.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "job_property": {
+          "what": "Property.",
+          "value_source": "ACCOUNT_LOOKUP property_uid.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "request_property": {
+          "what": "Property.",
+          "value_source": "ACCOUNT_LOOKUP property_uid.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "job_skills": {
+          "what": "Required skillsets.",
+          "value_source": "ACCOUNT_LOOKUP array<skillset_uid> (list_skillsets).",
+          "fixed_or_expression": "FIXED"
+        },
+        "job_tags": {
+          "what": "Tags.",
+          "value_source": "array<string> (company tags).",
+          "fixed_or_expression": "FIXED"
+        },
+        "tags": {
+          "what": "Tags.",
+          "value_source": "array<string>.",
+          "fixed_or_expression": "FIXED"
+        },
+        "job_assigned_users": {
+          "what": "Assigned users (on create).",
+          "value_source": "array of user objects (list_users).",
+          "fixed_or_expression": "FIXED"
+        },
+        "job_assigned_teams": {
+          "what": "Assigned teams (on create).",
+          "value_source": "array of team objects (list_teams).",
+          "fixed_or_expression": "FIXED"
+        },
+        "request_assigned_users": {
+          "what": "Assigned users.",
+          "value_source": "array of user objects.",
+          "fixed_or_expression": "FIXED"
+        },
+        "request_assigned_teams": {
+          "what": "Assigned teams.",
+          "value_source": "array of team objects.",
+          "fixed_or_expression": "FIXED"
+        },
+        "request_source": {
+          "what": "Request source.",
+          "value_source": "ACCOUNT_LOOKUP request_source_uid.",
+          "fixed_or_expression": "FIXED"
+        },
+        "invoice_payment_term": {
+          "what": "Invoice payment term.",
+          "value_source": "ACCOUNT_LOOKUP payment_terms uid (/invoices/payment_terms).",
+          "fixed_or_expression": "FIXED"
+        },
+        "invoice_template": {
+          "what": "Invoice template.",
+          "value_source": "ACCOUNT_LOOKUP template uid.",
+          "fixed_or_expression": "FIXED"
+        },
+        "job_billing_address": {
+          "what": "Billing address.",
+          "value_source": "structured address object (each sub-key {type,value})",
+          "fixed_or_expression": "FIXED"
+        },
+        "job_service_address": {
+          "what": "Service address.",
+          "value_source": "structured address object (each sub-key {type,value})",
+          "fixed_or_expression": "FIXED"
+        },
+        "project_billing_address": {
+          "what": "Billing address.",
+          "value_source": "structured address object (each sub-key {type,value})",
+          "fixed_or_expression": "FIXED"
+        },
+        "project_service_address": {
+          "what": "Service address.",
+          "value_source": "structured address object (each sub-key {type,value})",
+          "fixed_or_expression": "FIXED"
+        },
+        "request_billing_address": {
+          "what": "Billing address.",
+          "value_source": "structured address object (each sub-key {type,value})",
+          "fixed_or_expression": "FIXED"
+        },
+        "request_service_address": {
+          "what": "Service address.",
+          "value_source": "structured address object (each sub-key {type,value})",
+          "fixed_or_expression": "FIXED"
+        },
+        "property_address": {
+          "what": "Property address.",
+          "value_source": "structured address object (each sub-key {type,value})",
+          "fixed_or_expression": "FIXED"
+        },
+        "job_due_date": {
+          "what": "Due date.",
+          "value_source": "date 'YYYY-MM-DD'.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "request_due_date": {
+          "what": "Due date.",
+          "value_source": "date 'YYYY-MM-DD'.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "invoice_date": {
+          "what": "Invoice date.",
+          "value_source": "date 'YYYY-MM-DD'.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "invoice_due_date": {
+          "what": "Invoice due date.",
+          "value_source": "date 'YYYY-MM-DD'.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "quote_date": {
+          "what": "Quote date.",
+          "value_source": "date 'YYYY-MM-DD'.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "quote_expiry_date": {
+          "what": "Quote expiry date.",
+          "value_source": "date 'YYYY-MM-DD'.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "project_start_date": {
+          "what": "Project start date.",
+          "value_source": "date 'YYYY-MM-DD'.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "project_due_date": {
+          "what": "Project due date.",
+          "value_source": "date 'YYYY-MM-DD'.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "project_end_date": {
+          "what": "Project end date.",
+          "value_source": "date 'YYYY-MM-DD'.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "job_scheduled_start_datetime": {
+          "what": "Scheduled start.",
+          "value_source": "datetime 'YYYY-MM-DD HH:mm:ss'.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "job_scheduled_end_datetime": {
+          "what": "Scheduled end.",
+          "value_source": "datetime 'YYYY-MM-DD HH:mm:ss'.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "request_preferred_date_1": {
+          "what": "Preferred date 1.",
+          "value_source": "nested object { date, startTime, endTime }.",
+          "fixed_or_expression": "FIXED"
+        },
+        "request_preferred_date_2": {
+          "what": "Preferred date 2.",
+          "value_source": "nested object { date, startTime, endTime }.",
+          "fixed_or_expression": "FIXED"
+        }
+      },
+      "_custom_fields_module_name_note": "Per-module module_name literal in the custom_fields envelope. KNOWN FE BUGS: CUSTOMER hardcodes 'INVOICE' (should be CUSTOMER); CONTRACT writes 'CONTRACT' but fetches SERVICE_CONTRACT. ASSET adds an extra is_required key. Build the correct module_name; the worker is tolerant.",
+      "_field_modes_note": "PRODUCTION (origin/features) has THREE field-edit modes: FIELD_DEFAULT (native only), FIELD_CUSTOM (custom only), and legacy FIELD (both, avoid). Setting a custom field → operator_type=FIELD_CUSTOM; native field → FIELD_DEFAULT."
+    },
+    "zuper_create": {
+      "kind": "ACTION",
+      "what": "Create a NEW Zuper record. FE implements create UIs for JOB and REQUEST only (module-keyed via `module`).",
+      "mode_key": "module",
+      "mode_key_ui_label": "Pick a Module",
+      "modules_implemented": [
+        "JOB",
+        "REQUEST",
+        "INVOICE"
+      ],
+      "common_fields": {
+        "module": {
+          "what": "Which entity to create.",
+          "fixed_or_expression": "FIXED",
+          "value_source": "STATIC enum JOB | REQUEST (only these two in FE)",
+          "required_always": true
+        }
+      },
+      "modules": {
+        "JOB": {
+          "native_fields_key": "job_fields",
+          "required_to_create": [
+            "job_title",
+            "job_category",
+            "job_service_address",
+            "job_billing_address"
+          ],
+          "native_field_keys": [
+            "job_title",
+            "job_description",
+            "job_tags",
+            "job_property",
+            "job_organization",
+            "job_customer",
+            "job_category",
+            "job_service_address",
+            "job_billing_address",
+            "job_priority",
+            "job_due_date",
+            "job_scheduled_start_datetime",
+            "job_scheduled_end_datetime",
+            "job_assigned_users",
+            "job_assigned_teams"
+          ],
+          "value_sources": {
+            "job_customer": "ACCOUNT_LOOKUP customer_uid",
+            "job_property": "ACCOUNT_LOOKUP property_uid",
+            "job_organization": "ACCOUNT_LOOKUP organization_uid",
+            "job_category": "ACCOUNT_LOOKUP category_uid",
+            "job_service_address": "structured ADDRESS object",
+            "job_billing_address": "structured ADDRESS object",
+            "job_due_date": "date 'YYYY-MM-DD'",
+            "job_scheduled_start_datetime": "datetime 'YYYY-MM-DD HH:mm:ss'"
+          },
+          "notes": "job_customer present only when company has CUSTOMER module access."
+        },
+        "REQUEST": {
+          "native_fields_key": "request_fields",
+          "required_to_create": [
+            "request_title",
+            "request_service_address",
+            "request_billing_address",
+            "request_due_date"
+          ],
+          "native_field_keys": [
+            "request_title",
+            "request_description",
+            "request_property",
+            "request_organization",
+            "request_customer",
+            "request_source",
+            "request_service_address",
+            "request_billing_address",
+            "request_priority",
+            "request_due_date",
+            "request_preferred_date_1",
+            "request_preferred_date_2",
+            "request_assigned_users",
+            "request_assigned_teams"
+          ],
+          "value_sources": {
+            "request_source": "ACCOUNT_LOOKUP request_source_uid",
+            "request_preferred_date_1": "nested {date,startTime,endTime}",
+            "request_preferred_date_2": "nested {date,startTime,endTime}"
+          }
+        },
+        "INVOICE": {
+          "native_fields_key": "invoice_fields",
+          "required_to_create": [
+            "invoice_customer",
+            "invoice_date_mode",
+            "payment_term",
+            "invoice_template",
+            "invoice_service_address",
+            "invoice_billing_address"
+          ],
+          "native_field_keys": [
+            "invoice_customer",
+            "invoice_organization",
+            "invoice_property",
+            "invoice_job",
+            "invoice_estimate",
+            "source_for_line_items",
+            "invoice_prefix",
+            "invoice_reference_number",
+            "invoice_date_mode",
+            "invoice_offset_value",
+            "payment_term",
+            "invoice_template",
+            "invoice_tags",
+            "invoice_description",
+            "invoice_due_date_offset",
+            "invoice_service_address",
+            "invoice_billing_address"
+          ],
+          "notes": "NEW. NO line-item array — line items derive from source_for_line_items (JOB|ESTIMATE) + a linked invoice_job/invoice_estimate UID. invoice_date_mode RELATIVE_TO_EXECUTION|RELATIVE_TO_OFFSET_VALUE; invoice_due_date_offset auto from payment_term."
+        }
+      },
+      "native_fields_entry": {
+        "what": "One native field. Collection key = <module>_fields. DOUBLE-WRAPPED: { field_key, [field_key]:{type,value} } (the value subkey name EQUALS field_key).",
+        "example": {
+          "field_key": "job_title",
+          "job_title": {
+            "type": "FIXED",
+            "value": "AC Repair"
+          }
+        }
+      },
+      "custom_fields_entry": {
+        "what": "Same envelope as zuper_update.custom_fields_entry EXCEPT the ungrouped `key` is the literal \"Others\" (NOT \"Default\"), and an `is_required` key is included. FILE/LOOKUP custom-field types are filtered out of the picker.",
+        "key_for_ungrouped": "Others",
+        "shares": "zuper_update.custom_fields_entry (id+label identity, full envelope, module_name literal)"
+      },
+      "address_value": {
+        "what": "Structured value for *_service_address / *_billing_address: each sub-key (street/city/state/country/zip_code/first_name/last_name/phone_number/email/landmark/lat/lng) is itself a {type,value} group. Empty = {}."
+      },
+      "fields": {
+        "module": {
+          "what": "Module to create in.",
+          "value_source": "STATIC enum JOB | REQUEST (only these in FE).",
+          "fixed_or_expression": "FIXED",
+          "why": "selects the per-module create sub-form."
+        },
+        "job_title": {
+          "what": "The new job's title.",
+          "value_source": "free text or expression.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "JOB (required)"
+        },
+        "job_category": {
+          "what": "Job category.",
+          "value_source": "ACCOUNT_LOOKUP category_uid (list_job_categories).",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "JOB (required)"
+        },
+        "job_customer": {
+          "what": "Customer for the job.",
+          "value_source": "ACCOUNT_LOOKUP customer_uid.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "JOB (only if CUSTOMER module enabled)"
+        },
+        "job_priority": {
+          "what": "Priority.",
+          "value_source": "STATIC enum.",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "LOW",
+            "MEDIUM",
+            "HIGH",
+            "URGENT"
+          ],
+          "depends_on": "JOB"
+        },
+        "job_service_address": {
+          "what": "Service address.",
+          "value_source": "structured address object (each sub-key {type,value}).",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "JOB (required)"
+        },
+        "job_billing_address": {
+          "what": "Billing address.",
+          "value_source": "structured address object.",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "JOB (required)"
+        },
+        "request_title": {
+          "what": "The new request's title.",
+          "value_source": "free text/expression.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "REQUEST (required)"
+        },
+        "request_source": {
+          "what": "Request source.",
+          "value_source": "ACCOUNT_LOOKUP request_source_uid.",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "REQUEST"
+        },
+        "request_due_date": {
+          "what": "Request due date.",
+          "value_source": "date 'YYYY-MM-DD'.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "REQUEST (required)"
+        },
+        "_native_note": "Other native fields (job_description/job_tags/job_skills/job_property/job_organization/job_type/job_scheduled_*/assigned_users/assigned_teams; request_* equivalents) follow native_field_value_sources: lookups→uid via MCP, addresses→address object, dates→date string, tags/assignees→arrays, else text/expression. Full key list per module in modules.<M>.native_field_keys. Entry shape = native_fields_entry. custom_fields → custom_fields_entry (ungrouped key=\"Others\").",
+        "job_description": {
+          "what": "Job description.",
+          "value_source": "free text or {{expression}}",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "job_tags": {
+          "what": "Tags.",
+          "value_source": "array<string> (company tags).",
+          "fixed_or_expression": "FIXED"
+        },
+        "job_property": {
+          "what": "Property.",
+          "value_source": "ACCOUNT_LOOKUP property_uid.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "job_organization": {
+          "what": "Organization.",
+          "value_source": "ACCOUNT_LOOKUP organization_uid.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "job_due_date": {
+          "what": "Due date.",
+          "value_source": "date 'YYYY-MM-DD'.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "job_scheduled_start_datetime": {
+          "what": "Scheduled start.",
+          "value_source": "datetime 'YYYY-MM-DD HH:mm:ss'.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "job_scheduled_end_datetime": {
+          "what": "Scheduled end.",
+          "value_source": "datetime 'YYYY-MM-DD HH:mm:ss'.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "job_assigned_users": {
+          "what": "Assigned users (on create).",
+          "value_source": "array of user objects (list_users).",
+          "fixed_or_expression": "FIXED"
+        },
+        "job_assigned_teams": {
+          "what": "Assigned teams (on create).",
+          "value_source": "array of team objects (list_teams).",
+          "fixed_or_expression": "FIXED"
+        },
+        "request_description": {
+          "what": "Request description.",
+          "value_source": "free text or {{expression}}",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "request_property": {
+          "what": "Property.",
+          "value_source": "ACCOUNT_LOOKUP property_uid.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "request_organization": {
+          "what": "Organization.",
+          "value_source": "ACCOUNT_LOOKUP organization_uid.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "request_customer": {
+          "what": "Customer.",
+          "value_source": "ACCOUNT_LOOKUP customer_uid.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "request_service_address": {
+          "what": "Service address.",
+          "value_source": "structured address object (each sub-key {type,value})",
+          "fixed_or_expression": "FIXED"
+        },
+        "request_billing_address": {
+          "what": "Billing address.",
+          "value_source": "structured address object (each sub-key {type,value})",
+          "fixed_or_expression": "FIXED"
+        },
+        "request_priority": {
+          "what": "Request priority.",
+          "value_source": "STATIC enum.",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "LOW",
+            "MEDIUM",
+            "HIGH",
+            "URGENT"
+          ]
+        },
+        "request_preferred_date_1": {
+          "what": "Preferred date 1.",
+          "value_source": "nested object { date, startTime, endTime }.",
+          "fixed_or_expression": "FIXED"
+        },
+        "request_preferred_date_2": {
+          "what": "Preferred date 2.",
+          "value_source": "nested object { date, startTime, endTime }.",
+          "fixed_or_expression": "FIXED"
+        },
+        "request_assigned_users": {
+          "what": "Assigned users.",
+          "value_source": "array of user objects.",
+          "fixed_or_expression": "FIXED"
+        },
+        "request_assigned_teams": {
+          "what": "Assigned teams.",
+          "value_source": "array of team objects.",
+          "fixed_or_expression": "FIXED"
+        },
+        "job_fields": {
+          "what": "The native-field collection for this module (each entry sets one job field).",
+          "value_source": "array; entry shape = native_fields_entry; per-field meaning in native_fields.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "operator_type=FIELD"
+        },
+        "request_fields": {
+          "what": "The native-field collection for this module (each entry sets one request field).",
+          "value_source": "array; entry shape = native_fields_entry; per-field meaning in native_fields.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "operator_type=FIELD"
+        },
+        "source_for_line_items": {
+          "what": "INVOICE: where line items come from.",
+          "value_source": "STATIC enum",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "JOB",
+            "ESTIMATE"
+          ],
+          "depends_on": "INVOICE"
+        },
+        "invoice_date_mode": {
+          "what": "INVOICE date strategy.",
+          "value_source": "STATIC enum",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "RELATIVE_TO_EXECUTION",
+            "RELATIVE_TO_OFFSET_VALUE"
+          ],
+          "depends_on": "INVOICE"
+        },
+        "payment_term": {
+          "what": "INVOICE payment term (auto-sets the due-date offset).",
+          "value_source": "ACCOUNT_LOOKUP payment_term_uid",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "INVOICE"
+        },
+        "invoice_customer": {
+          "what": "INVOICE customer.",
+          "value_source": "ACCOUNT_LOOKUP customer_uid",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "INVOICE (required)"
+        },
+        "invoice_organization": {
+          "what": "Organization for the invoice.",
+          "value_source": "ACCOUNT_LOOKUP organization_uid",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "INVOICE"
+        },
+        "invoice_property": {
+          "what": "Property for the invoice.",
+          "value_source": "ACCOUNT_LOOKUP property_uid",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "INVOICE"
+        },
+        "invoice_job": {
+          "what": "Source job (when source_for_line_items=JOB).",
+          "value_source": "job_uid (or expression)",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "INVOICE, source_for_line_items=JOB"
+        },
+        "invoice_estimate": {
+          "what": "Source estimate (when source_for_line_items=ESTIMATE).",
+          "value_source": "estimate_uid (or expression)",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "INVOICE, source_for_line_items=ESTIMATE"
+        },
+        "invoice_prefix": {
+          "what": "Invoice number prefix.",
+          "value_source": "free text",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "INVOICE"
+        },
+        "invoice_reference_number": {
+          "what": "Invoice reference number.",
+          "value_source": "free text",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "INVOICE"
+        },
+        "invoice_offset_value": {
+          "what": "Date offset value (when invoice_date_mode=RELATIVE_TO_OFFSET_VALUE).",
+          "value_source": "number",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "INVOICE"
+        },
+        "invoice_template": {
+          "what": "Invoice template.",
+          "value_source": "ACCOUNT_LOOKUP template uid",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "INVOICE (required) / ESTIMATES CONVERT_TO_INVOICE"
+        },
+        "invoice_tags": {
+          "what": "Tags.",
+          "value_source": "array<string>",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "INVOICE"
+        },
+        "invoice_description": {
+          "what": "Description.",
+          "value_source": "free text",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "INVOICE"
+        },
+        "invoice_due_date_offset": {
+          "what": "Due-date offset (auto-derived from payment_term).",
+          "value_source": "number (auto)",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "INVOICE"
+        },
+        "invoice_service_address": {
+          "what": "Service address.",
+          "value_source": "structured address object",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "INVOICE (required)"
+        },
+        "invoice_billing_address": {
+          "what": "Billing address.",
+          "value_source": "structured address object",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "INVOICE (required)"
+        },
+        "invoice_payment_term": {
+          "what": "Payment term (ESTIMATES CONVERT_TO_INVOICE).",
+          "value_source": "ACCOUNT_LOOKUP payment_terms uid",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "ESTIMATES CONVERT_TO_INVOICE"
+        }
+      },
+      "native_fields": {
+        "job_title": {
+          "what": "Job title.",
+          "value_source": "free text or {{expression}}",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "request_title": {
+          "what": "Request title.",
+          "value_source": "free text or {{expression}}",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "title": {
+          "what": "Title (estimate).",
+          "value_source": "free text or {{expression}}",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "name": {
+          "what": "Name (project).",
+          "value_source": "free text or {{expression}}",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "property_name": {
+          "what": "Property name.",
+          "value_source": "free text or {{expression}}",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "description": {
+          "what": "Description.",
+          "value_source": "free text or {{expression}}",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "job_description": {
+          "what": "Job description.",
+          "value_source": "free text or {{expression}}",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "request_description": {
+          "what": "Request description.",
+          "value_source": "free text or {{expression}}",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "property_description": {
+          "what": "Property description.",
+          "value_source": "free text or {{expression}}",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "prefix": {
+          "what": "Record number prefix.",
+          "value_source": "free text or {{expression}}",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "reference_number": {
+          "what": "Reference number.",
+          "value_source": "free text or {{expression}}",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "job_type": {
+          "what": "Job type.",
+          "value_source": "STATIC enum.",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "NEW",
+            "REVISIT"
+          ]
+        },
+        "job_priority": {
+          "what": "Job priority.",
+          "value_source": "STATIC enum.",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "LOW",
+            "MEDIUM",
+            "HIGH",
+            "URGENT"
+          ]
+        },
+        "project_priority": {
+          "what": "Project priority.",
+          "value_source": "STATIC enum.",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "LOW",
+            "MEDIUM",
+            "HIGH",
+            "URGENT"
+          ]
+        },
+        "request_priority": {
+          "what": "Request priority.",
+          "value_source": "STATIC enum.",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "LOW",
+            "MEDIUM",
+            "HIGH",
+            "URGENT"
+          ]
+        },
+        "job_category": {
+          "what": "Job category.",
+          "value_source": "ACCOUNT_LOOKUP category_uid (list_job_categories).",
+          "fixed_or_expression": "FIXED"
+        },
+        "project_category": {
+          "what": "Project category.",
+          "value_source": "ACCOUNT_LOOKUP category_uid (project categories).",
+          "fixed_or_expression": "FIXED"
+        },
+        "job_customer": {
+          "what": "Customer.",
+          "value_source": "ACCOUNT_LOOKUP customer_uid (search_customers).",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "request_customer": {
+          "what": "Customer.",
+          "value_source": "ACCOUNT_LOOKUP customer_uid.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "job_organization": {
+          "what": "Organization.",
+          "value_source": "ACCOUNT_LOOKUP organization_uid.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "request_organization": {
+          "what": "Organization.",
+          "value_source": "ACCOUNT_LOOKUP organization_uid.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "job_property": {
+          "what": "Property.",
+          "value_source": "ACCOUNT_LOOKUP property_uid.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "request_property": {
+          "what": "Property.",
+          "value_source": "ACCOUNT_LOOKUP property_uid.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "job_skills": {
+          "what": "Required skillsets.",
+          "value_source": "ACCOUNT_LOOKUP array<skillset_uid> (list_skillsets).",
+          "fixed_or_expression": "FIXED"
+        },
+        "job_tags": {
+          "what": "Tags.",
+          "value_source": "array<string> (company tags).",
+          "fixed_or_expression": "FIXED"
+        },
+        "tags": {
+          "what": "Tags.",
+          "value_source": "array<string>.",
+          "fixed_or_expression": "FIXED"
+        },
+        "job_assigned_users": {
+          "what": "Assigned users (on create).",
+          "value_source": "array of user objects (list_users).",
+          "fixed_or_expression": "FIXED"
+        },
+        "job_assigned_teams": {
+          "what": "Assigned teams (on create).",
+          "value_source": "array of team objects (list_teams).",
+          "fixed_or_expression": "FIXED"
+        },
+        "request_assigned_users": {
+          "what": "Assigned users.",
+          "value_source": "array of user objects.",
+          "fixed_or_expression": "FIXED"
+        },
+        "request_assigned_teams": {
+          "what": "Assigned teams.",
+          "value_source": "array of team objects.",
+          "fixed_or_expression": "FIXED"
+        },
+        "request_source": {
+          "what": "Request source.",
+          "value_source": "ACCOUNT_LOOKUP request_source_uid.",
+          "fixed_or_expression": "FIXED"
+        },
+        "invoice_payment_term": {
+          "what": "Invoice payment term.",
+          "value_source": "ACCOUNT_LOOKUP payment_terms uid (/invoices/payment_terms).",
+          "fixed_or_expression": "FIXED"
+        },
+        "invoice_template": {
+          "what": "Invoice template.",
+          "value_source": "ACCOUNT_LOOKUP template uid.",
+          "fixed_or_expression": "FIXED"
+        },
+        "job_billing_address": {
+          "what": "Billing address.",
+          "value_source": "structured address object (each sub-key {type,value})",
+          "fixed_or_expression": "FIXED"
+        },
+        "job_service_address": {
+          "what": "Service address.",
+          "value_source": "structured address object (each sub-key {type,value})",
+          "fixed_or_expression": "FIXED"
+        },
+        "project_billing_address": {
+          "what": "Billing address.",
+          "value_source": "structured address object (each sub-key {type,value})",
+          "fixed_or_expression": "FIXED"
+        },
+        "project_service_address": {
+          "what": "Service address.",
+          "value_source": "structured address object (each sub-key {type,value})",
+          "fixed_or_expression": "FIXED"
+        },
+        "request_billing_address": {
+          "what": "Billing address.",
+          "value_source": "structured address object (each sub-key {type,value})",
+          "fixed_or_expression": "FIXED"
+        },
+        "request_service_address": {
+          "what": "Service address.",
+          "value_source": "structured address object (each sub-key {type,value})",
+          "fixed_or_expression": "FIXED"
+        },
+        "property_address": {
+          "what": "Property address.",
+          "value_source": "structured address object (each sub-key {type,value})",
+          "fixed_or_expression": "FIXED"
+        },
+        "job_due_date": {
+          "what": "Due date.",
+          "value_source": "date 'YYYY-MM-DD'.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "request_due_date": {
+          "what": "Due date.",
+          "value_source": "date 'YYYY-MM-DD'.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "invoice_date": {
+          "what": "Invoice date.",
+          "value_source": "date 'YYYY-MM-DD'.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "invoice_due_date": {
+          "what": "Invoice due date.",
+          "value_source": "date 'YYYY-MM-DD'.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "quote_date": {
+          "what": "Quote date.",
+          "value_source": "date 'YYYY-MM-DD'.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "quote_expiry_date": {
+          "what": "Quote expiry date.",
+          "value_source": "date 'YYYY-MM-DD'.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "project_start_date": {
+          "what": "Project start date.",
+          "value_source": "date 'YYYY-MM-DD'.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "project_due_date": {
+          "what": "Project due date.",
+          "value_source": "date 'YYYY-MM-DD'.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "project_end_date": {
+          "what": "Project end date.",
+          "value_source": "date 'YYYY-MM-DD'.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "job_scheduled_start_datetime": {
+          "what": "Scheduled start.",
+          "value_source": "datetime 'YYYY-MM-DD HH:mm:ss'.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "job_scheduled_end_datetime": {
+          "what": "Scheduled end.",
+          "value_source": "datetime 'YYYY-MM-DD HH:mm:ss'.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "request_preferred_date_1": {
+          "what": "Preferred date 1.",
+          "value_source": "nested object { date, startTime, endTime }.",
+          "fixed_or_expression": "FIXED"
+        },
+        "request_preferred_date_2": {
+          "what": "Preferred date 2.",
+          "value_source": "nested object { date, startTime, endTime }.",
+          "fixed_or_expression": "FIXED"
+        }
+      },
+      "_custom_fields_note": "zuper_create custom_fields envelope ADDS is_required, show_field_wf, category_uid keys and uses ungrouped key 'Others' (NOT 'Default'); module_name is the runtime module (JOB/REQUEST/INVOICE). (zuper_update uses 'Default' and a module literal.)"
+    },
+    "zuper_get_record": {
+      "kind": "ACTION",
+      "what": "Fetch ONE existing Zuper record so downstream nodes can read its fields (single-record GET — no list/filter/pagination). UI label says \"Edit Record\" but it is a GET.",
+      "mode_key": null,
+      "record_selection": {
+        "module": {
+          "what": "Module to fetch from.",
+          "fixed_or_expression": "FIXED",
+          "value_source": "STATIC enum (company-enabled subset): JOB|CUSTOMER|PROPERTY|ORGANIZATION|ESTIMATES|INVOICE|SERVICE_CONTRACTS|PROJECT|USER|ASSETS",
+          "required_always": true
+        },
+        "source_node": {
+          "what": "Upstream zuper node_uid (same module) whose record is the target, OR the literal 'CUSTOM'.",
+          "fixed_or_expression": "FIXED",
+          "value_source": "an upstream node_uid | 'CUSTOM'",
+          "required_always": true
+        },
+        "module_uid": {
+          "what": "Explicit record UID — ONLY when source_node='CUSTOM'.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "value_source": "uid or expression e.g. {{ $.getLatestNodeData('<Trigger>').data.body.job_uid }}",
+          "depends_on": "source_node='CUSTOM'"
+        },
+        "source_type": {
+          "what": "Inert leftover — emit {type:FIXED,value:\"\"}.",
+          "fixed_or_expression": "FIXED"
+        }
+      },
+      "returns": "The full fetched record (native + custom fields) — read via $.getNodeData(<this node>)."
+    },
+    "zuper_custom_field": {
+      "kind": "ACTION",
+      "what": "COPY custom-field values from one record (FROM) to another (TO), across/within modules. One FE component serves BOTH zuper_custom_field and zuper_associations.",
+      "alias": "zuper_associations",
+      "mode_key": "copy_type",
+      "record_selection": {
+        "from_module": {
+          "what": "Source record module.",
+          "fixed_or_expression": "FIXED",
+          "value_source": "module enum"
+        },
+        "from_source_node": {
+          "what": "Upstream node_uid emitting the SOURCE record, OR 'CUSTOM'.",
+          "fixed_or_expression": "FIXED",
+          "value_source": "node_uid | 'CUSTOM'",
+          "depends_on": "from_module"
+        },
+        "from_module_uid": {
+          "what": "Source record UID — only when from_source_node='CUSTOM'.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "from_source_node='CUSTOM'"
+        },
+        "from_source_type": {
+          "what": "Inert — emit {FIXED,\"\"}."
+        },
+        "to_module": {
+          "what": "Target record module.",
+          "fixed_or_expression": "FIXED",
+          "value_source": "module enum"
+        },
+        "to_source_node": {
+          "what": "Upstream node_uid emitting the TARGET record, OR 'CUSTOM'.",
+          "fixed_or_expression": "FIXED",
+          "value_source": "node_uid | 'CUSTOM'",
+          "depends_on": "to_module"
+        },
+        "to_module_uid": {
+          "what": "Target record UID — only when to_source_node='CUSTOM'.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "to_source_node='CUSTOM'"
+        },
+        "to_source_type": {
+          "what": "Inert — emit {FIXED,\"\"}."
+        }
+      },
+      "common_fields": {
+        "copy_type": {
+          "what": "ALL = copy every custom field source→target; SELECTED = copy only the explicit pairs in associations[].",
+          "fixed_or_expression": "FIXED",
+          "value_source": "STATIC enum ALL|SELECTED",
+          "required_always": true
+        }
+      },
+      "modes": {
+        "ALL": {
+          "required": [],
+          "clear": [
+            "associations"
+          ],
+          "notes": "associations MUST be [] (FE clears it)."
+        },
+        "SELECTED": {
+          "required": [
+            "associations"
+          ],
+          "dependent": [
+            "associations"
+          ],
+          "notes": "associations REQUIRED non-empty."
+        }
+      },
+      "associations_entry": {
+        "what": "One field→field copy pair (copy_type=SELECTED). value is the custom field DATA_KEY (NOT uid, NOT label).",
+        "shape": {
+          "associate_from": {
+            "type": "FIXED|EXPRESSION",
+            "value": "<source custom field data_key>"
+          },
+          "associate_to": {
+            "type": "FIXED|EXPRESSION",
+            "value": "<target custom field data_key>"
+          }
+        },
+        "grounding": "data_keys come from each module /meta filtered to field_type==\"custom_field\" (FROM uses from_module catalogue, TO uses to_module). ORGANIZATION → /v2/organization/meta."
+      },
+      "mode_options": {
+        "_field": "copy_type",
+        "ALL": {
+          "what": "Copy every custom field from source to target.",
+          "when_to_use": "Mirror all custom fields across the two records."
+        },
+        "SELECTED": {
+          "what": "Copy only the explicit field pairs in associations[].",
+          "when_to_use": "Map specific source→target fields."
+        }
+      },
+      "fields": {
+        "copy_type": {
+          "what": "ALL vs SELECTED (see mode_options).",
+          "value_source": "STATIC enum",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "ALL",
+            "SELECTED"
+          ]
+        },
+        "associations": {
+          "what": "The field→field copy pairs (SELECTED only).",
+          "value_source": "array [{associate_from:{type,value:<source data_key>}, associate_to:{type,value:<target data_key>}}] — see associations_entry. data_keys come from each module /meta (field_type=custom_field).",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "copy_type=SELECTED"
+        }
+      }
+    },
+    "zuper_associations": {
+      "kind": "ACTION",
+      "what": "LINK (associate) two existing records across modules — e.g. attach a secondary contact, link a property to a project. Does NOT copy field values (that is zuper_custom_field).",
+      "mode_key": null,
+      "record_selection": {
+        "from_module": {
+          "what": "Source record module.",
+          "fixed_or_expression": "FIXED",
+          "value_source": "enum (JOB|ESTIMATE|PROPERTY|ORGANIZATION|CUSTOMER|REQUEST|PROJECT)"
+        },
+        "from_source_node": {
+          "what": "Upstream node_uid providing the FROM record, or 'CUSTOM'.",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "from_module"
+        },
+        "from_module_uid": {
+          "what": "FROM record uid (when CUSTOM).",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "from_source_node='CUSTOM'"
+        },
+        "to_module": {
+          "what": "Target module — CONSTRAINED by from_module (adjacency map) + always SECONDARY_CONTACT/CHILD_JOB.",
+          "fixed_or_expression": "FIXED",
+          "value_source": "computed from from_module",
+          "depends_on": "from_module"
+        },
+        "to_source_node": {
+          "what": "Upstream node_uid providing the TO record, or 'CUSTOM'.",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "to_module"
+        },
+        "to_module_uid": {
+          "what": "TO record uid (when CUSTOM). May accept MULTIPLE uids for certain pairs (e.g. JOB→SECONDARY_CONTACT).",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "to_source_node='CUSTOM'"
+        }
+      },
+      "fields": {
+        "from_module": {
+          "what": "Source record module.",
+          "fixed_or_expression": "FIXED",
+          "value_source": "enum (JOB|ESTIMATE|PROPERTY|ORGANIZATION|CUSTOMER|REQUEST|PROJECT)"
+        },
+        "from_source_node": {
+          "what": "Upstream node_uid providing the FROM record, or 'CUSTOM'.",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "from_module"
+        },
+        "from_module_uid": {
+          "what": "FROM record uid (when CUSTOM).",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "from_source_node='CUSTOM'"
+        },
+        "to_module": {
+          "what": "Target module — CONSTRAINED by from_module (adjacency map) + always SECONDARY_CONTACT/CHILD_JOB.",
+          "fixed_or_expression": "FIXED",
+          "value_source": "computed from from_module",
+          "depends_on": "from_module"
+        },
+        "to_source_node": {
+          "what": "Upstream node_uid providing the TO record, or 'CUSTOM'.",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "to_module"
+        },
+        "to_module_uid": {
+          "what": "TO record uid (when CUSTOM). May accept MULTIPLE uids for certain pairs (e.g. JOB→SECONDARY_CONTACT).",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "to_source_node='CUSTOM'"
+        }
+      },
+      "_note": "Flat from_*/to_* envelope, NO copy_type, NO associations[] array. from_source_type/to_source_type are inert. to_module options are constrained by from_module."
+    },
+    "if_else": {
+      "kind": "FLOW",
+      "what": "Conditional branch: evaluate conditions[] combined by AND/OR → route TRUE/FALSE.",
+      "mode_key": null,
+      "form_fields": {
+        "combine": {
+          "what": "How conditions combine.",
+          "fixed_or_expression": "FIXED",
+          "value_source": "STATIC enum AND|OR (default AND)",
+          "gotchas": "A {type,value} group, not a bare string."
+        },
+        "conditions": {
+          "what": "Array of comparisons.",
+          "value_type": "array",
+          "value_source": "[{ field_key, value1{type,value}, operation{type,value}, value2{type,value} }]",
+          "gotchas": "field_key is a TYPE TAG (STRING|NUMBER|BOOLEAN|ARRAY|OBJECT) that gates the operator set — NOT the data field name. if_else uses EMPTY/NOT_EMPTY/EXISTS/NOT_EXISTS (NOT the trigger-filter IS_EMPTY/IS_NOT_EMPTY). value2 is OMITTED for EMPTY/NOT_EMPTY/EXISTS/NOT_EXISTS. STRING \"STARTS WITH\" literally has a space.",
+          "operators_by_field_key": {
+            "BOOLEAN": [
+              "EQUAL_TO",
+              "NOT_EQUAL_TO"
+            ],
+            "NUMBER": [
+              "EQUAL_TO",
+              "NOT_EQUAL_TO",
+              "LESS_THAN",
+              "LESS_THAN_EQUAL_TO",
+              "GREATER_THAN",
+              "GREATER_THAN_EQUAL_TO",
+              "EMPTY",
+              "NOT_EMPTY"
+            ],
+            "STRING": [
+              "EQUAL_TO",
+              "NOT_EQUAL_TO",
+              "CONTAINS",
+              "STARTS WITH",
+              "NOT_STARTS_WITH",
+              "ENDS_WITH",
+              "NOT_ENDS_WITH",
+              "EMPTY",
+              "NOT_EMPTY",
+              "REGEX",
+              "NOT_REGEX"
+            ],
+            "ARRAY": [
+              "EXISTS",
+              "NOT_EXISTS",
+              "EMPTY",
+              "NOT_EMPTY",
+              "CONTAINS",
+              "NOT_CONTAINS",
+              "LENGTH_EQUAL_TO",
+              "LENGTH_NOT_EQUAL_TO",
+              "LENGTH_GREATER_THAN_EQUAL_TO",
+              "LENGTH_LESS_THAN",
+              "LENGTH_LESS_THAN_EQUAL_TO"
+            ],
+            "OBJECT": [
+              "EXISTS",
+              "NOT_EXISTS",
+              "EMPTY",
+              "NOT_EMPTY"
+            ]
+          },
+          "example": [
+            {
+              "field_key": "STRING",
+              "value1": {
+                "type": "EXPRESSION",
+                "value": "{{ $.getLatestNodeData('Get Job').data.data.data.job_status }}"
+              },
+              "operation": {
+                "type": "FIXED",
+                "value": "EQUAL_TO"
+              },
+              "value2": {
+                "type": "FIXED",
+                "value": "Completed"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "wait": {
+      "kind": "FLOW",
+      "what": "Pause until a duration elapses, a calendar date/time, or an offset from a Zuper date field.",
+      "mode_key": "wait_type",
+      "modes": {
+        "FIXED": {
+          "required": [
+            "wait_type",
+            "one of days/hours/minutes/seconds > 0"
+          ],
+          "dependent": [
+            "days",
+            "hours",
+            "minutes",
+            "seconds"
+          ],
+          "clear": [
+            "date",
+            "time",
+            "timezone",
+            "source_node",
+            "source_module",
+            "source_field",
+            "offset_type"
+          ],
+          "notes": "Wait for a duration. (Inside a loop, wait_type is forced to FIXED.)"
+        },
+        "CALENDAR_DATE": {
+          "required": [
+            "wait_type",
+            "date",
+            "time",
+            "timezone"
+          ],
+          "dependent": [
+            "date",
+            "time",
+            "timezone"
+          ],
+          "clear": [
+            "days",
+            "hours",
+            "minutes",
+            "seconds",
+            "source_node",
+            "source_module",
+            "source_field",
+            "offset_type"
+          ],
+          "notes": "date 'YYYY-MM-DD', time 'HH:mm:ss'."
+        },
+        "BASED_ON_ZUPER_FIELD": {
+          "required": [
+            "wait_type",
+            "source_node",
+            "source_module",
+            "source_field",
+            "offset_type",
+            "one of days/hours/minutes/seconds > 0"
+          ],
+          "dependent": [
+            "source_node",
+            "source_module",
+            "source_field",
+            "offset_type",
+            "days",
+            "hours",
+            "minutes",
+            "seconds"
+          ],
+          "clear": [
+            "date",
+            "time",
+            "timezone"
+          ],
+          "notes": "offset_type BEFORE|AFTER; source_field = a date/datetime data_key; source_module set implicitly from source_node."
+        }
+      },
+      "form_fields": {
+        "wait_type": {
+          "what": "Wait mode.",
+          "fixed_or_expression": "FIXED",
+          "value_source": "STATIC enum FIXED|CALENDAR_DATE|BASED_ON_ZUPER_FIELD",
+          "gotchas": "value 'FIXED' = wait-for-duration (distinct from the type:'FIXED' envelope)."
+        }
+      },
+      "mode_options": {
+        "_field": "wait_type",
+        "FIXED": {
+          "what": "Pause for a relative duration.",
+          "when_to_use": "Wait \"2 hours / 3 days\" before the next step. (Forced inside a loop.)"
+        },
+        "CALENDAR_DATE": {
+          "what": "Pause until an absolute date/time.",
+          "when_to_use": "Resume at a specific calendar moment (e.g. 1st of next month, 9am)."
+        },
+        "BASED_ON_ZUPER_FIELD": {
+          "what": "Pause until an offset before/after a Zuper date field.",
+          "when_to_use": "Act \"1 day before the scheduled start\" / \"2 hours after completion\" — anchored to a record field."
+        }
+      },
+      "fields": {
+        "wait_type": {
+          "what": "Wait mode.",
+          "value_source": "STATIC enum (see mode_options).",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "FIXED",
+            "CALENDAR_DATE",
+            "BASED_ON_ZUPER_FIELD"
+          ]
+        },
+        "days": {
+          "what": "Days to wait.",
+          "value_source": "integer ≥0.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "wait_type=FIXED|BASED_ON_ZUPER_FIELD (≥1 of days/hours/minutes/seconds >0)"
+        },
+        "hours": {
+          "what": "Hours to wait.",
+          "value_source": "integer ≥0.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "wait_type=FIXED|BASED_ON_ZUPER_FIELD"
+        },
+        "minutes": {
+          "what": "Minutes to wait.",
+          "value_source": "integer ≥0.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "wait_type=FIXED|BASED_ON_ZUPER_FIELD"
+        },
+        "seconds": {
+          "what": "Seconds to wait.",
+          "value_source": "integer ≥0.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "wait_type=FIXED|BASED_ON_ZUPER_FIELD"
+        },
+        "date": {
+          "what": "Absolute resume date.",
+          "value_source": "date 'YYYY-MM-DD'.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "wait_type=CALENDAR_DATE"
+        },
+        "time": {
+          "what": "Absolute resume time.",
+          "value_source": "time 'HH:mm:ss'.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "wait_type=CALENDAR_DATE"
+        },
+        "timezone": {
+          "what": "Timezone for the date/time.",
+          "value_source": "timezone key (default company_timezone).",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "wait_type=CALENDAR_DATE"
+        },
+        "source_node": {
+          "what": "Upstream zuper node whose record carries the anchor date field.",
+          "value_source": "an upstream zuper node_uid.",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "wait_type=BASED_ON_ZUPER_FIELD"
+        },
+        "source_module": {
+          "what": "Module of source_node (set implicitly).",
+          "value_source": "auto from source_node.",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "wait_type=BASED_ON_ZUPER_FIELD"
+        },
+        "source_field": {
+          "what": "The date/datetime field to offset from.",
+          "value_source": "data_key of a date/datetime field on the module's /meta.",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "wait_type=BASED_ON_ZUPER_FIELD"
+        },
+        "offset_type": {
+          "what": "Wait before or after the field value.",
+          "value_source": "STATIC enum.",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "BEFORE",
+            "AFTER"
+          ],
+          "depends_on": "wait_type=BASED_ON_ZUPER_FIELD"
+        }
+      }
+    },
+    "schedule": {
+      "kind": "FLOW",
+      "what": "SCHEDULE trigger config — fire on a fixed INTERVAL or an rrule RECURRENCE.",
+      "mode_key": "schedule_type",
+      "modes": {
+        "INTERVAL": {
+          "required": [
+            "schedule_type",
+            "trigger_rules_interval",
+            "timezone"
+          ],
+          "dependent": [
+            "trigger_rules_interval"
+          ],
+          "notes": "trigger_rules_interval = single-entry array. trigger_interval.value ∈ minutes|hours|days selects which sibling matters (minutes→trigger_at_minute enum 15/30/45/60; hours→hours_between_triggers; days→days_between_triggers + trigger_at_hour 0-23)."
+        },
+        "RECURRENCE": {
+          "required": [
+            "schedule_type",
+            "rrule.recurrence",
+            "rrule.run_at",
+            "timezone"
+          ],
+          "dependent": [
+            "rrule"
+          ],
+          "notes": "rrule is a BARE object (no {type,value}). recurrence DAILY|WEEKLY|MONTHLY. WEEKLY→week_day (comma SU..SA); MONTHLY→month_day (comma 1..31, \"last\"→-1) + optional run_on months. run_at[]={minute:\"HH:mm\"} (the key is \"minute\" but holds a TIME string)."
+        }
+      },
+      "form_fields": {
+        "schedule_type": {
+          "what": "INTERVAL vs RECURRENCE.",
+          "fixed_or_expression": "FIXED",
+          "value_source": "STATIC enum (default INTERVAL)"
+        },
+        "timezone": {
+          "what": "Timezone anchoring all times.",
+          "fixed_or_expression": "FIXED",
+          "value_source": "timezone key (default company_timezone)"
+        }
+      },
+      "mode_options": {
+        "_field": "schedule_type",
+        "INTERVAL": {
+          "what": "Fire on a fixed interval.",
+          "when_to_use": "Run every N minutes/hours/days regardless of calendar."
+        },
+        "RECURRENCE": {
+          "what": "Fire on a calendar recurrence (rrule).",
+          "when_to_use": "Run daily/weekly/monthly at specific times (e.g. every Monday 10:30am)."
+        }
+      },
+      "fields": {
+        "schedule_type": {
+          "what": "Interval vs recurrence.",
+          "value_source": "STATIC enum (see mode_options).",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "INTERVAL",
+            "RECURRENCE"
+          ]
+        },
+        "timezone": {
+          "what": "Timezone anchoring all times.",
+          "value_source": "timezone key.",
+          "fixed_or_expression": "FIXED"
+        },
+        "trigger_rules_interval": {
+          "what": "Single-entry interval config.",
+          "value_source": "[{ trigger_interval(minutes|hours|days), trigger_at_minute(15|30|45|60), trigger_at_hour(0-23), hours_between_triggers, days_between_triggers }] — trigger_interval selects which sibling matters.",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "schedule_type=INTERVAL"
+        },
+        "rrule": {
+          "what": "Recurrence object (BARE object, not {type,value}).",
+          "value_source": "{ recurrence:DAILY|WEEKLY|MONTHLY, week_day:\"MO,WE,FR\" (WEEKLY), month_day:\"1,15,last→-1\" (MONTHLY), run_on:months (MONTHLY), run_at:[{minute:\"HH:mm\"}] }.",
+          "depends_on": "schedule_type=RECURRENCE"
+        },
+        "rrule.recurrence": {
+          "what": "Recurrence frequency.",
+          "value_source": "STATIC enum.",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "DAILY",
+            "WEEKLY",
+            "MONTHLY"
+          ],
+          "depends_on": "schedule_type=RECURRENCE"
+        },
+        "rrule.run_at": {
+          "what": "Run time(s) of day.",
+          "value_source": "array [{ minute: \"HH:mm\" }] (the key is \"minute\" but holds a TIME string).",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "schedule_type=RECURRENCE"
+        },
+        "rrule.week_day": {
+          "what": "Days of week (WEEKLY).",
+          "value_source": "comma list of SU,MO,TU,WE,TH,FR,SA.",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "rrule.recurrence=WEEKLY"
+        },
+        "rrule.month_day": {
+          "what": "Days of month (MONTHLY).",
+          "value_source": "comma list 1..31 (and/or \"last\" → -1).",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "rrule.recurrence=MONTHLY"
+        }
+      }
+    },
+    "loop": {
+      "kind": "FLOW",
+      "what": "Iterate over an array; runs the loop body once per element. Now HAS a form field (input_data) — was previously structural-only.",
+      "mode_key": null,
+      "form_fields": {
+        "input_data": {
+          "what": "The array to iterate over.",
+          "why": "Each element runs the loop body once.",
+          "when": "Always (else the loop falls back to the previous step output).",
+          "value_type": "array",
+          "fixed_or_expression": "EXPRESSION-only",
+          "value_source": "an expression returning an ARRAY (e.g. {{ $.getNodeData('List Jobs') }} / {{ job.line_items }})",
+          "gotchas": "Shape is { value: <expression-string> } — NOT the {type,value} envelope. The UI validates the value resolves to an Array. If blank, the builder auto-uses the previous step output.",
+          "example": {
+            "input_data": {
+              "value": "{{ $.getNodeData('Fetch Jobs').data.data }}"
+            }
+          }
+        }
+      },
+      "fields": {
+        "input_data": {
+          "what": "The array to iterate over.",
+          "why": "Each element runs the loop body once.",
+          "when": "Always (else the loop falls back to the previous step output).",
+          "value_type": "array",
+          "fixed_or_expression": "EXPRESSION-only",
+          "value_source": "an expression returning an ARRAY (e.g. {{ $.getNodeData('List Jobs') }} / {{ job.line_items }})",
+          "gotchas": "Shape is { value: <expression-string> } — NOT the {type,value} envelope. The UI validates the value resolves to an Array. If blank, the builder auto-uses the previous step output.",
+          "example": {
+            "input_data": {
+              "value": "{{ $.getNodeData('Fetch Jobs').data.data }}"
+            }
+          }
+        }
+      }
+    },
+    "split": {
+      "kind": "FLOW",
+      "what": "Split into parallel branches — purely structural (outgoing edges).",
+      "mode_key": null,
+      "form_fields": {},
+      "notes": "No config."
+    },
+    "merge": {
+      "kind": "FLOW",
+      "what": "Join parallel branches — purely structural (incoming edges); waits for all branches.",
+      "mode_key": null,
+      "form_fields": {},
+      "notes": "No config."
+    },
+    "http_request": {
+      "kind": "ACTION",
+      "what": "External HTTP call via Axios.",
+      "mode_key": "authentication",
+      "modes": {
+        "NONE": {
+          "required": [
+            "method",
+            "url"
+          ],
+          "clear": [
+            "username",
+            "password"
+          ]
+        },
+        "BASIC": {
+          "required": [
+            "method",
+            "url",
+            "username",
+            "password"
+          ],
+          "dependent": [
+            "username",
+            "password"
+          ]
+        },
+        "HEADER_AUTH": {
+          "required": [
+            "method",
+            "url",
+            "header_parameters"
+          ],
+          "dependent": [
+            "send_headers(forced true)",
+            "header_parameters"
+          ],
+          "clear": [
+            "username",
+            "password"
+          ],
+          "notes": "Bearer/token auth is done HERE (Authorization header), there is NO BEARER mode."
+        }
+      },
+      "form_fields": {
+        "method": {
+          "what": "HTTP verb.",
+          "fixed_or_expression": "FIXED",
+          "value_source": "GET|POST|PUT|DELETE|PATCH",
+          "gotchas": "GET hides the entire body section."
+        },
+        "url": {
+          "what": "Target URL.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "value_source": "LITERAL absolute URL",
+          "gotchas": "Must be a literal absolute URL, NOT a whole {{variable}} — the backend new URL() rejects an expression-only url."
+        },
+        "authentication": {
+          "what": "Auth mode.",
+          "fixed_or_expression": "FIXED",
+          "value_source": "STATIC enum NONE|BASIC|HEADER_AUTH (NO BEARER option)"
+        },
+        "send_body": {
+          "what": "Toggle a request body.",
+          "fixed_or_expression": "FIXED",
+          "value_source": "true|false",
+          "depends_on": "method != GET"
+        },
+        "body_data_type": {
+          "what": "Body encoding.",
+          "fixed_or_expression": "FIXED",
+          "value_source": "JSON|RAW|FORM_DATA",
+          "depends_on": "send_body=true"
+        },
+        "json_body": {
+          "what": "JSON body.",
+          "fixed_or_expression": "EXPRESSION",
+          "value_source": "JSON text with {{ expressions }}",
+          "depends_on": "body_data_type=JSON"
+        },
+        "header_parameters": {
+          "what": "Headers array.",
+          "value_type": "array",
+          "value_source": "[{header_key:{type,value}, header_value:{type,value}}]",
+          "depends_on": "send_headers=true OR authentication=HEADER_AUTH"
+        },
+        "query_parameters": {
+          "what": "Query params array.",
+          "value_type": "array",
+          "value_source": "[{query_key:{type,value}, query_value:{type,value}}]",
+          "depends_on": "send_query_param=true"
+        },
+        "timeout": {
+          "what": "Timeout seconds (1-300, default 60).",
+          "fixed_or_expression": "FIXED"
+        },
+        "error_action": {
+          "what": "What to do on HTTP error.",
+          "value_source": "STATIC enum",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "STOP",
+            "CONTINUE"
+          ],
+          "depends_on": "default STOP (Advanced Settings)"
+        },
+        "username": {
+          "what": "Basic-auth username.",
+          "value_source": "literal or expression.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "authentication=BASIC"
+        },
+        "password": {
+          "what": "Basic-auth password.",
+          "value_source": "literal/expression/{{variable}}.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "authentication=BASIC"
+        },
+        "send_headers": {
+          "what": "Toggle custom headers.",
+          "value_source": "true|false (forced true when authentication=HEADER_AUTH).",
+          "fixed_or_expression": "FIXED"
+        },
+        "send_query_param": {
+          "what": "Toggle query params.",
+          "value_source": "true|false.",
+          "fixed_or_expression": "FIXED"
+        },
+        "raw_body_data": {
+          "what": "Raw request body.",
+          "value_source": "raw text/XML.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "body_data_type=RAW"
+        },
+        "content_type": {
+          "what": "Content-Type for RAW body.",
+          "value_source": "e.g. application/json, text/xml.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "body_data_type=RAW"
+        },
+        "form_data_parameters": {
+          "what": "Form-data body pairs.",
+          "value_source": "[{form_data_key:{type,value},form_data_value:{type,value}}].",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "body_data_type=FORM_DATA"
+        },
+        "ignore_ssl": {
+          "what": "Skip SSL verification.",
+          "value_source": "true|false (default false).",
+          "fixed_or_expression": "FIXED"
+        },
+        "enable_retry": {
+          "what": "Retry on failure (NEW).",
+          "value_source": "true|false",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "Advanced Settings"
+        },
+        "max_retries": {
+          "what": "Max retry attempts (NEW).",
+          "value_source": "number 1-3",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "enable_retry=true"
+        },
+        "retry_interval": {
+          "what": "Retry interval ms (NEW).",
+          "value_source": "number 1-3000",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "enable_retry=true"
+        }
+      },
+      "mode_options": {
+        "_field": "authentication",
+        "NONE": {
+          "what": "No auth header.",
+          "when_to_use": "Public endpoint, or auth is carried in a header/body you set yourself."
+        },
+        "BASIC": {
+          "what": "HTTP Basic auth (username + password).",
+          "when_to_use": "The API uses basic auth."
+        },
+        "HEADER_AUTH": {
+          "what": "Custom auth header(s).",
+          "when_to_use": "Bearer/token/API-key auth — put it in header_parameters (e.g. Authorization: Bearer …). There is NO separate BEARER mode."
+        }
+      }
+    },
+    "zuper_email": {
+      "kind": "ACTION",
+      "what": "Send a standalone email.",
+      "mode_key": null,
+      "form_fields": {
+        "send_to": {
+          "what": "Recipient email(s).",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "value_source": "email or expression"
+        },
+        "email_subject": {
+          "what": "Subject.",
+          "fixed_or_expression": "FIXED|EXPRESSION"
+        },
+        "email_body": {
+          "what": "HTML body.",
+          "fixed_or_expression": "EXPRESSION",
+          "value_source": "rich HTML; DUAL templating: {{ $... }} = Nunjucks workflow expr, {{ token }} (no $) = Zuper merge-tag resolved server-side."
+        },
+        "email_config_uid": {
+          "what": "Sender config (From). OPTIONAL — null = account default mailer.",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "optional"
+        },
+        "cc_emails": {
+          "what": "CC array [{cc_email_value:{type,value}}].",
+          "value_type": "array",
+          "depends_on": "optional"
+        },
+        "bcc_emails": {
+          "what": "BCC array [{bcc_email_value:{type,value}}].",
+          "value_type": "array",
+          "depends_on": "optional"
+        }
+      }
+    },
+    "notification": {
+      "kind": "ACTION",
+      "what": "Send a notification. One component drives BOTH internal (zuper_generic_internal_notifications) and customer (zuper_customer_notifications) nodes.",
+      "mode_key": "notification_type",
+      "node_type_discriminator": {
+        "internal": {
+          "action_key": "zuper_generic_internal_notifications",
+          "recipient_fields": [
+            "notify_to",
+            "users",
+            "teams",
+            "node_lookup"
+          ],
+          "push_allowed": true
+        },
+        "customer": {
+          "action_key": "zuper_customer_notifications",
+          "recipient_fields": [
+            "customer_uid"
+          ],
+          "push_allowed": false,
+          "template_module": "forced CUSTOMER"
+        }
+      },
+      "modes": {
+        "SMS": {
+          "required": [
+            "notification_type",
+            "sms_body"
+          ],
+          "dependent": [
+            "sms_body"
+          ],
+          "clear": [
+            "push_notification_title",
+            "push_notification_body",
+            "email_subject",
+            "email_body",
+            "email_config_uid",
+            "template_module",
+            "cc_emails",
+            "bcc_emails"
+          ],
+          "notes": "Plus the recipient block per node type."
+        },
+        "EMAIL": {
+          "required": [
+            "notification_type",
+            "email_subject",
+            "email_body"
+          ],
+          "dependent": [
+            "email_subject",
+            "email_body",
+            "email_config_uid",
+            "template_module",
+            "cc_emails",
+            "bcc_emails"
+          ],
+          "clear": [
+            "sms_body",
+            "push_notification_title",
+            "push_notification_body"
+          ]
+        },
+        "PUSH": {
+          "required": [
+            "notification_type",
+            "push_notification_title",
+            "push_notification_body"
+          ],
+          "dependent": [
+            "push_notification_title",
+            "push_notification_body"
+          ],
+          "clear": [
+            "sms_body",
+            "email_subject",
+            "email_body",
+            "email_config_uid",
+            "template_module"
+          ],
+          "notes": "NOT available for the CUSTOMER node."
+        }
+      },
+      "form_fields": {
+        "notification_type": {
+          "what": "Channel.",
+          "fixed_or_expression": "FIXED",
+          "value_source": "SMS|EMAIL|PUSH (PUSH internal-only)"
+        },
+        "notify_to": {
+          "what": "Recipient group (INTERNAL only).",
+          "fixed_or_expression": "FIXED",
+          "value_source": "ALL_ASSIGNED|ONLY_ASSIGNED_TL|ONLY_ASSIGNED_EMPLOYEES|ONLY_TEAM_LEADERS|CREATED_BY|SELECTED_USERS|SELECTED_TEAMS",
+          "depends_on": "internal node"
+        },
+        "users": {
+          "what": "Recipient user_uids.",
+          "value_type": "array<uid>",
+          "value_source": "ACCOUNT_LOOKUP user_uid",
+          "depends_on": "notify_to=SELECTED_USERS"
+        },
+        "teams": {
+          "what": "Recipient team_uids.",
+          "value_type": "array<uid>",
+          "value_source": "ACCOUNT_LOOKUP team_uid",
+          "depends_on": "notify_to=SELECTED_TEAMS"
+        },
+        "customer_uid": {
+          "what": "Target customer (CUSTOMER node).",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "customer node"
+        },
+        "template_module": {
+          "what": "Email merge-tag module context.",
+          "fixed_or_expression": "FIXED",
+          "value_source": "JOB|ORGANIZATION|CUSTOMER|INVOICE|ESTIMATE|SERVICE_CONTRACT",
+          "depends_on": "notification_type=EMAIL (forced CUSTOMER for the customer node)"
+        },
+        "email_body": {
+          "what": "HTML email body (dual templating, keyed to template_module).",
+          "fixed_or_expression": "EXPRESSION",
+          "depends_on": "notification_type=EMAIL"
+        }
+      },
+      "mode_options": {
+        "_field": "notification_type",
+        "EMAIL": {
+          "what": "Send an email.",
+          "when_to_use": "Rich/long message; supports template_module merge-tags."
+        },
+        "SMS": {
+          "what": "Send an SMS.",
+          "when_to_use": "Short text alert."
+        },
+        "PUSH": {
+          "what": "Send a push notification (INTERNAL only).",
+          "when_to_use": "In-app alert to internal users/teams; not available for the customer node."
+        }
+      },
+      "fields": {
+        "notification_type": {
+          "what": "Channel.",
+          "value_source": "STATIC enum (see mode_options).",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "EMAIL",
+            "SMS",
+            "PUSH"
+          ]
+        },
+        "notify_to": {
+          "what": "Recipient group (INTERNAL node only).",
+          "value_source": "STATIC enum.",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "ALL_ASSIGNED",
+            "ONLY_ASSIGNED_TL",
+            "ONLY_ASSIGNED_EMPLOYEES",
+            "ONLY_TEAM_LEADERS",
+            "CREATED_BY",
+            "SELECTED_USERS",
+            "SELECTED_TEAMS"
+          ],
+          "depends_on": "internal node"
+        },
+        "users": {
+          "what": "Recipient users.",
+          "value_source": "ACCOUNT_LOOKUP user_uid array (list_users).",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "notify_to=SELECTED_USERS"
+        },
+        "teams": {
+          "what": "Recipient teams.",
+          "value_source": "ACCOUNT_LOOKUP team_uid array (list_teams).",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "notify_to=SELECTED_TEAMS"
+        },
+        "node_lookup": {
+          "what": "Upstream zuper node whose module anchors the email template (INTERNAL). NEW.",
+          "value_source": "an upstream zuper node_uid; auto-sets template_module",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "internal node"
+        },
+        "customer_uid": {
+          "what": "Target customer (CUSTOMER node).",
+          "value_source": "customer_uid (or expression).",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "customer node"
+        },
+        "sms_body": {
+          "what": "SMS text.",
+          "value_source": "text/expression.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "notification_type=SMS"
+        },
+        "push_notification_title": {
+          "what": "Push title.",
+          "value_source": "text/expression.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "notification_type=PUSH"
+        },
+        "push_notification_body": {
+          "what": "Push body.",
+          "value_source": "text/expression.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "notification_type=PUSH"
+        },
+        "email_subject": {
+          "what": "Email subject.",
+          "value_source": "text/expression.",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "notification_type=EMAIL"
+        },
+        "email_body": {
+          "what": "HTML email body (dual templating, keyed to template_module).",
+          "value_source": "rich HTML; {{ $.. }}=Nunjucks, {{ token }}=Zuper merge-tag.",
+          "fixed_or_expression": "EXPRESSION",
+          "depends_on": "notification_type=EMAIL"
+        },
+        "email_config_uid": {
+          "what": "Sender email config (From). Optional.",
+          "value_source": "email_config uid (or null = default).",
+          "fixed_or_expression": "FIXED",
+          "depends_on": "notification_type=EMAIL (optional)"
+        },
+        "template_module": {
+          "what": "Email merge-tag module context.",
+          "value_source": "STATIC enum.",
+          "fixed_or_expression": "FIXED",
+          "options": [
+            "JOB",
+            "ORGANIZATION",
+            "CUSTOMER",
+            "INVOICE",
+            "ESTIMATE",
+            "SERVICE_CONTRACT"
+          ],
+          "depends_on": "notification_type=EMAIL (forced CUSTOMER on the customer node)"
+        },
+        "cc_emails": {
+          "what": "CC list.",
+          "value_source": "[{cc_email_value:{type,value}}].",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "notification_type=EMAIL (optional)"
+        },
+        "bcc_emails": {
+          "what": "BCC list.",
+          "value_source": "[{bcc_email_value:{type,value}}].",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "notification_type=EMAIL (optional)"
+        }
+      }
+    },
+    "code": {
+      "kind": "ACTION",
+      "what": "Run user-defined JavaScript (firejail sandbox). LAST RESORT — prefer native nodes / Nunjucks.",
+      "mode_key": null,
+      "form_fields": {
+        "code": {
+          "what": "JavaScript source.",
+          "value_type": "string",
+          "fixed_or_expression": "PLAIN STRING — NOT a {type,value} envelope (the sole exception across all nodes).",
+          "value_source": "raw JS; sandbox context exposes $item, output_data, variable, axios, moment, _",
+          "gotchas": "JS only (no runtime selector). Backend runs it in a firejail child process."
+        }
+      }
+    },
+    "respond_webhook": {
+      "kind": "ACTION",
+      "what": "Return the HTTP response to a webhook caller.",
+      "mode_key": "respond_with",
+      "modes": {
+        "json": {
+          "required": [
+            "respond_with",
+            "response_body",
+            "response_code"
+          ],
+          "dependent": [
+            "response_body"
+          ]
+        },
+        "no_data": {
+          "required": [
+            "respond_with",
+            "response_code"
+          ],
+          "clear": [
+            "response_body"
+          ]
+        }
+      },
+      "form_fields": {
+        "respond_with": {
+          "what": "Response mode.",
+          "fixed_or_expression": "FIXED",
+          "value_source": "STATIC enum json|no_data (lowercase, default json)"
+        },
+        "response_body": {
+          "what": "JSON response body (field name is response_body, NOT body).",
+          "fixed_or_expression": "FIXED|EXPRESSION",
+          "depends_on": "respond_with=json"
+        },
+        "response_code": {
+          "what": "HTTP status (string; field name response_code, NOT status; default \"200\").",
+          "fixed_or_expression": "FIXED"
+        },
+        "header_parameters": {
+          "what": "Response headers [{header_key:{type,value},header_value:{type,value}}].",
+          "value_type": "array",
+          "depends_on": "send_headers=true"
+        }
+      },
+      "mode_options": {
+        "_field": "respond_with",
+        "json": {
+          "what": "Return a JSON body.",
+          "when_to_use": "The caller expects a response payload."
+        },
+        "no_data": {
+          "what": "Return only a status code.",
+          "when_to_use": "Acknowledge receipt with no body."
+        }
+      }
+    }
+  },
+  "_coverage": "All node families modelled (2026-06-25 fan-out): trigger, zuper_update, zuper_create, zuper_get_record, zuper_custom_field(+zuper_associations), if_else, wait, schedule, loop, split, merge, http_request, zuper_email, notification(internal+customer), code, respond_webhook. zuper_create FE implements JOB+REQUEST only. loop/split/merge are structural (no form_fields).",
+  "_option_docs_note": "Each mode-keyed node carries `mode_options`: per-OPTION what + when_to_use for its mode_key field (operator_type/wait_type/schedule_type/authentication/notification_type/copy_type/respond_with). get_node_field_schema returns these so the agent (and a UI tooltip) knows what/why/when for each option.",
+  "_fields_coverage": "Every node now carries a per-field `fields` map (what / value_source / fixed_or_expression / options / depends_on) covering ALL form fields — beyond the mode_options (per-option) + modes (required/dependent/clear) + envelope shapes. get_node_field_schema returns it.",
+  "_source_branch": "origin/features (= origin/development, commit c0f68ea975, 2026-06-08) — current PRODUCTION. Re-mined 2026-06-26 after discovering the local ai_builder branch was ~8 months stale.",
+  "_prod_realign_note": "Re-mined from origin/features 2026-06-26. KEY CORRECTIONS vs the prior (stale ai_builder) schema: zuper_update has FIELD_DEFAULT/FIELD_CUSTOM/FIELD (NOT collapsed to FIELD); loop has input_data; zuper_create adds INVOICE; zuper_associations is a separate LINK node; http_request adds retry/error_action; notification adds node_lookup. Per-module operator_type sets vary (CUSTOMER/PROPERTY have no UPDATE_STATUS; ESTIMATES adds CONVERT_TO_INVOICE + module_type)."
+}

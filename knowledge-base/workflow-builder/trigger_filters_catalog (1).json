@@ -1,0 +1,136 @@
+{
+  "generated_at": "2026-06-09",
+  "purpose": "How the AI Workflow Generator builds TRIGGER FILTERS (trigger_rules) on a Zuper-event trigger node so a workflow fires only when the entity matches (e.g. 'only HIGH-priority Repair jobs'). The per-module field list is SERVER-DRIVEN — fetch it at runtime, do not hardcode.",
+  "provenance": {
+    "shape_and_field_list": "Adapted from colleague repo zuper-ai-workflow/captures/trigger_filter_schema.json + docs/13-trigger-filters.md — LIVE-VERIFIED 2026-06-09 (GET /jobs/meta/filter → 65 fields = 45 default + 20 custom). This is UI-faithful (built by the advance-filter component from the meta/filter catalogue).",
+    "runtime_semantics": "Confirmed from backend workflow-builder-trigger-handler/controllers/event_handler.js checkIsValidZuperTrigger."
+  },
+
+  "applies_to": {
+    "ZUPER_EVENT": "YES — trigger filters are evaluated.",
+    "EXTERNAL_WEBHOOK": "NO — no trigger-level filtering. Use an if_else gate right after the trigger instead (false branch → stop_execution).",
+    "SCHEDULE_EVENT": "NO — schedule has trigger_rules_interval (timing), not entity filtering. Use if_else after the trigger."
+  },
+
+  "runtime_semantics": {
+    "where_stored": "trigger_node.form_fields.trigger_rules.value (array). Empty array ⇒ fire on every event of that type.",
+    "evaluation": "Two-phase. (1) PAYLOAD-BASED for events job.status_update and job.update_checklist — rules on status_uid/status_type/status_name matched directly against the event payload (no API call). (2) API-BASED for all other rules — POST to the module's ..._list_v2 filter API with the rules + an auto-appended module_uid CONTAINS rule, limit:1.",
+    "outcome": "≥1 record matches ⇒ workflow proceeds. 0 matches ⇒ execution status = SKIPPED (workflow does not run). API error ⇒ execution status = FAILED.",
+    "note": "module_uid is appended by the backend automatically; the generator does NOT add it."
+  },
+
+  "trigger_form_fields": {
+    "trigger_rules": "array<rule> — the filters (see rule_object)",
+    "filter_rule_operator": "AND | OR — how rules combine. Flat list, NO nested groups.",
+    "excluded_user_uids": "array<user_uid> — skip events caused by these users (loop prevention)",
+    "loop_prevention": "bool (optional)",
+    "loop_prevention_workflow_uids": "array<workflow_uid> (optional)"
+  },
+
+  "rule_object": {
+    "key": "field identifier = fieldDataKey from meta/filter (e.g. 'job_category_uid', 'current_job_status.status_type', or 'cf_<uuid>' for custom)",
+    "type": "default_field | custom_field (meta/filter field.type)",
+    "field_type": "data type from meta/filter field.fieldType (see field_types)",
+    "operator": "one of THIS field's meta/filter field.operators[].displayValue",
+    "value": "value(s) — format depends on field_type",
+    "module": "the trigger module (JOB, CUSTOMER, …)",
+    "displayKeyValue": "human-readable echo of value (UI display; array)",
+    "rangeKey": "optional, DATE only: TODAY | LAST_7_DAYS | LAST_30_DAYS | THIS_MONTH | CUSTOM_DATE | …"
+  },
+
+  "field_list_source": {
+    "rule": "SERVER-DRIVEN per module — fetch, do not hardcode. The generator calls fetch_trigger_filters(module).",
+    "endpoint": "GET {DC}/{metaApiKey}/meta/filter   (ORGANIZATION & CUSTOMER use the /v2/ key)",
+    "returns_per_field": "{ type, fieldDataKey, fieldType, multiSelect, fieldOptions[] (DROPDOWN/RADIO/MULTI_ITEM), operators[{displayValue}], data:{url,dataKey} (LOOKUP) }",
+    "metaApiKey": {
+      "JOB": "jobs", "PROJECT": "projects", "REQUEST": "request",
+      "ORGANIZATION": "v2/organization", "CUSTOMER": "v2/customers", "PROPERTY": "property",
+      "TIMESHEET": "timesheets", "PRODUCTS": "product", "ESTIMATES": "estimate",
+      "INVOICE": "invoice", "SERVICE_CONTRACTS": "service_contract", "USER": "users",
+      "ASSETS": "assets", "PAYMENTS": "payments/transactions"
+    },
+    "includes_custom_fields": "YES — per-company custom fields appear as key='cf_<uuid>', type='custom_field' (JOB returned 20)."
+  },
+
+  "field_types": {
+    "_note": "ALWAYS use the field's own operators[] from meta/filter. Lists below are the typical superset.",
+    "TEXT":      { "operators": ["EQUAL_TO","NOT_EQUAL_TO","CONTAINS","NOT_CONTAINS","IS_EMPTY","IS_NOT_EMPTY"], "value": "string" },
+    "NUMBER":    { "operators": ["EQUAL_TO","NOT_EQUAL_TO","LESS_THAN","LESS_THAN_EQUAL_TO","GREATER_THAN","GREATER_THAN_EQUAL_TO","BETWEEN","IS_EMPTY","IS_NOT_EMPTY"], "value": "number | [min,max] for BETWEEN" },
+    "DECIMAL":   { "operators": ["EQUAL_TO","NOT_EQUAL_TO","LESS_THAN","LESS_THAN_EQUAL_TO","GREATER_THAN","GREATER_THAN_EQUAL_TO","BETWEEN","IS_EMPTY","IS_NOT_EMPTY"], "value": "number | [min,max]" },
+    "DATE":      { "operators": ["EQUAL_TO","NOT_EQUAL_TO","LESS_THAN","LESS_THAN_EQUAL_TO","GREATER_THAN","GREATER_THAN_EQUAL_TO","BETWEEN","IS_EMPTY","IS_NOT_EMPTY"], "value": "YYYY-MM-DD | [from,to]; optional rangeKey" },
+    "DATETIME":  { "operators": ["EQUAL_TO","NOT_EQUAL_TO","LESS_THAN","LESS_THAN_EQUAL_TO","GREATER_THAN","GREATER_THAN_EQUAL_TO","BETWEEN","IS_EMPTY","IS_NOT_EMPTY"], "value": "YYYY-MM-DD HH:mm:ss | [from,to]" },
+    "TIME":      { "operators": ["EQUAL_TO","NOT_EQUAL_TO","LESS_THAN","LESS_THAN_EQUAL_TO","GREATER_THAN","GREATER_THAN_EQUAL_TO","BETWEEN","IS_EMPTY","IS_NOT_EMPTY"], "value": "HH:mm:ss | [from,to]" },
+    "BOOLEAN":   { "operators": ["EQUAL_TO","NOT_EQUAL_TO","IS_EMPTY","IS_NOT_EMPTY"], "value": "true|false" },
+    "CHECKBOX":  { "operators": ["EQUAL_TO","NOT_EQUAL_TO","IS_EMPTY","IS_NOT_EMPTY"], "value": "boolean | boolean[]" },
+    "DROPDOWN":  { "operators": ["EQUAL_TO","NOT_EQUAL_TO","IS_EMPTY","IS_NOT_EMPTY"], "value": "option-key | array (multiSelect); options from field.fieldOptions[]" },
+    "RADIO":     { "operators": ["EQUAL_TO","NOT_EQUAL_TO","IS_EMPTY","IS_NOT_EMPTY"], "value": "option-key; options from field.fieldOptions[]" },
+    "MULTI_ITEM":{ "operators": ["EQUAL_TO","NOT_EQUAL_TO","IS_EMPTY","IS_NOT_EMPTY"], "value": "array<option-key>; options from field.fieldOptions[]" },
+    "LOOKUP":    { "operators": ["EQUAL_TO","NOT_EQUAL_TO","IS_EMPTY","IS_NOT_EMPTY"], "value": "uid | uid[] (multiSelect); options lazy from field.data.url, value=field.data.dataKey" },
+    "TAGS":      { "operators": ["EQUAL_TO","NOT_EQUAL_TO","IS_EMPTY","IS_NOT_EMPTY"], "value": "string (comma-separated) | array" }
+  },
+
+  "operator_catalogue": ["EQUAL_TO","NOT_EQUAL_TO","CONTAINS","NOT_CONTAINS","IS_EMPTY","IS_NOT_EMPTY","GREATER_THAN","GREATER_THAN_EQUAL_TO","LESS_THAN","LESS_THAN_EQUAL_TO","BETWEEN"],
+
+  "important_distinction_vs_if_else": "Trigger filters use IS_EMPTY / IS_NOT_EMPTY and BETWEEN. The if_else NODE uses EMPTY / NOT_EMPTY (and adds string/array operators). Do NOT mix the two operator vocabularies.",
+
+  "value_resolution": {
+    "DROPDOWN/RADIO/MULTI_ITEM": "Pick option key(s) from the field's fieldOptions[] (static, in the meta/filter response).",
+    "LOOKUP": "Resolve the human name to a UID via MCP (see mcp_resolution_map.json) — e.g. job_category_uid via list_job_categories, status_uid via list_job_statuses, assigned_to.user_uid via list_users, team_uid via list_teams. The field's data.url confirms the source; data.dataKey is the value key.",
+    "custom_field (cf_<uuid>)": "field def + options come from the same meta/filter response (or list_custom_field_definitions(module)).",
+    "ambiguity": "If a name matches >1 record, raise a clarifying question — never guess."
+  },
+
+  "special_keys": {
+    "cf_<uuid>": "custom field (rule.type = custom_field)",
+    "current_job_status.status_type": "JOB status bucket (NEW, SCHEDULED, COMPLETED, …) — DROPDOWN. Payload-based for job.status_update.",
+    "<module>_current_status.status_uid": "nested status UID (PROJECT etc.), filtered by that module's category"
+  },
+
+  "option_source": {
+    "_purpose": "Every filter field's value source is ONE of three classes. This decides whether the agent must call MCP.",
+    "STATIC_ENUM": "Global, platform-fixed options — IDENTICAL for every company. Enumerated below in static_enums. The agent picks from the known set with NO MCP call.",
+    "ACCOUNT_LOOKUP": "Per-company options — resolve the human name to a UID at runtime via an MCP resolver (account_lookup_resolvers). Includes custom fields.",
+    "FREE": "User-supplied text / number / date — no enum, no lookup.",
+    "detection_rule": "In a GET /{metaApiKey}/meta/filter field: inline `values`/`fieldOptions[]` ⇒ STATIC_ENUM (use directly); `data.url` (LOOKUP) or description '…UID from list_X' ⇒ ACCOUNT_LOOKUP; TEXT/NUMBER/DATE with neither ⇒ FREE. So the class is also detectable at runtime, not only from this catalog."
+  },
+
+  "static_enums": {
+    "_note": "Company-INDEPENDENT fixed option sets (no MCP call needed). JOB set verified live via get_module_filters 2026-06-10. `priority` is universal across modules; each module's status_type bucket is its own system enum.",
+    "priority": { "fields": ["job_priority","request_priority","project_priority"], "values": ["URGENT","HIGH","MEDIUM","LOW"] },
+    "job_type": { "fields": ["job_type"], "values": ["NEW","REVISIT"] },
+    "status_type_JOB": { "fields": ["current_job_status.status_type","filter_status_type"], "values": ["NEW","SCHEDULED","ON_MY_WAY","IN_PROGRESS","ON_HOLD","COMPLETED","CANCELLED","INCOMPLETE","REJECTED"] },
+    "schedule_status": { "fields": ["schedule_status"], "values": ["SCHEDULED","NOT_SCHEDULED","PARTIALLY_SCHEDULED"] },
+    "assignment_status": { "fields": ["assignment_status"], "values": ["ASSIGNED","UNASSIGNED"] },
+    "customer_feedback": { "fields": ["customer_feedback","job_feedback.rating"], "values": ["HAPPY","NEUTRAL","UNHAPPY","VERY_HAPPY","VERY_UNHAPPY"] },
+    "date_range_preset": { "fields": ["scheduled_date_range","*_date_range"], "rangeKey_values": ["TODAY","THIS_WEEK","LAST_WEEK","THIS_MONTH","LAST_MONTH","THIS_YEAR","LAST_YEAR","CUSTOM_DATE"] },
+    "boolean": { "fields": ["is_invoiced","waiting_on_po","waiting_on_mr","is_recurrence","delayed_job","is_active","is_paid","is_expired","is_converted","owned_by_customer","is_available","is_billable"], "values": [true, false] },
+    "asset_status": { "fields": ["asset_status"], "values": ["READY_TO_INSTALL","INSTALLED","UNDER_SERVICE","REMOVED","OBSOLETE"] },
+    "other_module_status_type": "INVOICE/ESTIMATE/PROJECT/REQUEST/etc. each expose a system status_type/state enum (company-independent) via their meta/filter — treat as STATIC_ENUM; fetch once if not enumerated here. The per-company NAMED status (status_uid) is always ACCOUNT_LOOKUP."
+  },
+
+  "account_lookup_resolvers": {
+    "_note": "ACCOUNT_LOOKUP fields → the read-only MCP tool that resolves a human name to the UID (per company). See mcp_resolution_map.json + mcp_tool_policy.json (allowlist).",
+    "job_category_uid / *_category_uid": "list_job_categories (or module category list)",
+    "status_uid (named status)": "list_job_statuses(category_uid) / module status list",
+    "customer_uid": "search_customers / list_customers",
+    "customer_organization / organization_uid": "list_organizations",
+    "assigned_to.user_uid / created_by / project_manager": "list_users",
+    "*_team.team_uid / team_uid": "list_teams",
+    "asset_uid / property_uid / project_uid / contract_uid / product_*_uid": "list_assets / list_properties / list_projects / list_service_contracts / list_products",
+    "route_uid / territory_uid / bu_uid / source.source_uid / skillset_uid / payment_mode_uid": "respective list_* (or zuper_dc_get on data.url)",
+    "tags / job_tags": "company tags (zuper_dc_get /company_tags?filter.module_key=<MODULE>)",
+    "cf_<uuid> (custom field)": "list_custom_field_definitions(module) for the field + its options"
+  },
+
+  "examples": [
+    { "key": "current_job_status.status_type", "type": "default_field", "field_type": "DROPDOWN", "operator": "CONTAINS", "value": ["SCHEDULED"], "module": "JOB", "displayKeyValue": ["SCHEDULED"] },
+    { "key": "job_priority", "type": "default_field", "field_type": "DROPDOWN", "operator": "EQUAL_TO", "value": ["HIGH"], "module": "JOB", "displayKeyValue": ["HIGH"] },
+    { "key": "job_category_uid", "type": "default_field", "field_type": "LOOKUP", "operator": "EQUAL_TO", "value": ["<category_uid resolved via list_job_categories>"], "module": "JOB", "displayKeyValue": ["Repair"] },
+    { "key": "work_order_number", "type": "default_field", "field_type": "NUMBER", "operator": "GREATER_THAN", "value": 1000, "module": "JOB" },
+    { "key": "scheduled_start_time", "type": "default_field", "field_type": "DATE", "operator": "BETWEEN", "value": ["2026-06-01","2026-06-30"], "module": "JOB", "rangeKey": "CUSTOM_DATE" },
+    { "key": "cf_1234abcd", "type": "custom_field", "field_type": "TEXT", "operator": "CONTAINS", "value": "VIP", "module": "JOB" }
+  ],
+
+  "trigger_modules": ["JOB","CUSTOMER","PROPERTY","ORGANIZATION","PRODUCTS","ESTIMATES","INVOICE","ASSETS","SERVICE_CONTRACTS","TEAM","USER","TIMESHEET","PAYMENTS","REQUEST","PROJECT"],
+  "illustrative_field_inventory": "See reference/TRIGGER_FILTERS.md for indicative per-module field tables. Those are snapshots for human reference only — the runtime authority is GET /{metaApiKey}/meta/filter (which also returns per-company custom fields)."
+}

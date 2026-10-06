@@ -1,0 +1,164 @@
+{
+  "generated_at": "2026-06-12T00:00:00.000Z",
+  "engine": "Nunjucks (server-side). Form-field values are typed { type:\"FIXED\"|\"EXPRESSION\", value }. ONLY type=EXPRESSION values are evaluated. A closing }} auto-gets `| json | safe`.",
+  "source": "VERIFIED from workflow-automation-worker/controllers/execute.js (node_prototype, parseExpression, latest_node_data/all_node_data build ~L342-586), lib/sandbox_v2.js (code-node context), workflow-builder-trigger-handler (trigger execution_data), AND real captured workflows in mcp-server/captures.",
+
+  "core_model": {
+    "wrapper": "Every node stores its output as execution_data = { node: { node_name, node_uid, ... }, data: <payload> }. EVERY accessor ($item, $.getLatestNodeData(), $.getNodeData()[i], $.getRecentNodeData()) returns this WRAPPER object — NOT the bare payload.",
+    "golden_rule": "ALWAYS reach a field through `.data`:  <accessor>.data.<...path...>. Omitting `.data` is the #1 cause of broken workflows.",
+    "node_name_is_display_name": "The name passed to getNodeData/getLatestNodeData is the node's DISPLAY NAME (action_name), e.g. 'On Webhook', 'Get Record', 'Code'. Node names are unique per workflow (the backend enforces it), so named access is stable.",
+    "verified_real_form": "{{$.getNodeData('On Webhook')[0]['data']['body']['date']}}  — note [0] (run index) then ['data'] then the payload path."
+  },
+
+  "accessors": [
+    {
+      "syntax": "{{ $.getLatestNodeData('<Node Name>').data.<path> }}",
+      "returns": "the LATEST single wrapper of that node → .data is its payload",
+      "preferred": true,
+      "use": "RECOMMENDED default. Named + robust to graph reordering. e.g. {{ $.getLatestNodeData('Get Record').data.data.work_order_number }}"
+    },
+    {
+      "syntax": "{{ $.getNodeData('<Node Name>')[<i>].data.<path> }}",
+      "returns": "ARRAY of wrappers (one per run; multiple when the node is inside a loop). [0] = first run.",
+      "use": "When you need a specific run or all runs of a node. e.g. {{ $.getNodeData('On Webhook')[0].data.body.job_uid }}"
+    },
+    {
+      "syntax": "{{ $item.data.<path> }}",
+      "returns": "the IMMEDIATELY-PREVIOUS node's wrapper → .data is its payload",
+      "use": "Quick access to the node right before this one. Equivalent to getLatestNodeData of the previous node. e.g. {{ $item.data.body.job_uid }} (when the previous node is the webhook trigger). PREFER named access for clarity in multi-node flows.",
+      "warning": "$item is POSITIONAL — it changes if the graph is reordered. It is the WRAPPER, so you still need .data."
+    },
+    {
+      "syntax": "{{ $.getRecentNodeData(<n>).data.<path> }}",
+      "returns": "the n-th previous node's wrapper (1..100); 0/empty = latest (== $item)",
+      "use": "Walk back N nodes along the prev_execution chain."
+    },
+    {
+      "syntax": "{{ variable.<name> }}  /  {{ VARIABLE.<name> }}  /  {{ $.getVariable('<name>') }}",
+      "returns": "a company workflow variable value (top-level — NOT through .data)",
+      "use": "Reuse config/secrets. e.g. {{ variable.api_base_url }}"
+    }
+  ],
+
+  "trigger_data_shapes": {
+    "note": "What the TRIGGER node's wrapper.data contains, by trigger type (verified).",
+    "external_webhook": {
+      "data_shape": "{ body, params, query, headers }",
+      "access": "$.getLatestNodeData('On Webhook').data.body.<field>  ·  .data.query.<q>  ·  .data.headers.<h>  ·  .data.params.<p>",
+      "example": "{{ $.getNodeData('On Webhook')[0].data.body.job_uid }}",
+      "note": "The incoming request body is under .data.body — NOT .data directly."
+    },
+    "zuper_event": {
+      "data_shape": "{ ...envelope..., body: { <event/entity payload> } }",
+      "access": "$.getLatestNodeData('On Job Status Update').data.body.<field>",
+      "example": "{{ $.getLatestNodeData('On Job Status Update').data.body.status.checklist['6'].answer }}",
+      "note": "Event payload (the job/customer/etc.) is under .data.body. For full entity fields not in the event, add a Zuper Get Record node and read .data.data from it."
+    },
+    "schedule": {
+      "data_shape": "{ scheduled_at, ...optional schedule payload }",
+      "access": "$.getLatestNodeData('<Schedule node name>').data.<field>",
+      "note": "Schedule triggers carry timing/context, not an entity."
+    }
+  },
+
+  "node_output_shapes": {
+    "note": "What each ACTION node's wrapper.data contains (verified from captures + worker code). Mind the DOUBLE-`data` cases.",
+    "zuper_get_record": {
+      "data_shape": "{ data: { <full Zuper entity> }, ... }  ← Zuper API response stored verbatim",
+      "access": "$.getLatestNodeData('Get Record').data.data.<entityField>  (DOUBLE data!)",
+      "examples": [
+        "{{ $.getLatestNodeData('Get Record').data.data.work_order_number }}",
+        "{{ $.getLatestNodeData('Get Record').data.data.customer.customer_first_name }}",
+        "{{ $.getLatestNodeData('Get Record').data.data.custom_fields['14'].value }}"
+      ],
+      "gotcha": "custom_fields is an ARRAY indexed by position (['14']), each { label, value, ... }."
+    },
+    "http_request_v2": {
+      "data_shape": "{ http_status, status, data: <response body>, headers, request_data }",
+      "access": "response body at .data.data ; HTTP status code at .data.status ; SUCCESS/ERROR at .data.http_status",
+      "examples": [
+        "{{ $.getLatestNodeData('HTTP Request').data.data.<field> }}",
+        "{{ $.getLatestNodeData('HTTP Request').data.status }}"
+      ],
+      "gotcha": "DOUBLE data again — the HTTP response body lives at wrapper.data.data."
+    },
+    "code": {
+      "data_shape": "<exactly the object your code returns>",
+      "access": "$.getLatestNodeData('Code').data.<yourReturnedKey>",
+      "examples": [
+        "{{ $.getLatestNodeData('Code').data.items }}",
+        "{{ $.getLatestNodeData('Code').data.a }}"
+      ],
+      "note": "If your code returns { items, a, b }, access them as .data.items / .data.a / .data.b. v2 code reads inputs via $input.<name>; v1 via $/$item."
+    },
+    "if_else": {
+      "data_shape": "{ output_value: true|false, data: { condition info } }",
+      "note": "Routing is by output_value (TRUE→two-a, FALSE→two-b). You rarely read its data; read the upstream node it tested."
+    },
+    "zuper_create_update": {
+      "data_shape": "{ data: { <created/updated entity or API response> }, ... }",
+      "access": "$.getLatestNodeData('<node>').data.data.<field> (typically double data, like Get Record)."
+    },
+    "loop": {
+      "data_shape": "per-iteration: wrapper.data = the CURRENT array element; wrapper also carries current_iteration / total_iterations / overall_data at the TOP level.",
+      "note": "See `loop` section for the proper accessors."
+    }
+  },
+
+  "loop": [
+    { "syntax": "{{ $.getCurrentLoopIndex() }}", "use": "current iteration, 0-based; null if not in a loop" },
+    { "syntax": "{{ $.getTotalLoopIterations() }}", "use": "total iterations; null if not in a loop" },
+    { "syntax": "{{ $.getArrayData() }}", "use": "the full array the loop iterates over" },
+    { "syntax": "{{ $.getArrayData()[$.getCurrentLoopIndex()] }}", "use": "the current item (explicit)" },
+    { "syntax": "{{ $.isNodeInsideLoop() }}", "use": "boolean — is the current node inside a loop body" },
+    { "syntax": "{{ $item.data.<field> }}", "use": "inside a loop body, $item is usually the loop's current element wrapper → .data is the element" },
+    { "note": "Inside a loop, $.getNodeData('<node in body>') returns an ARRAY across iterations — use [$.getCurrentLoopIndex()] or [i] to pick one." }
+  ],
+
+  "variables": [
+    { "syntax": "{{ variable.<name> }}", "use": "shorthand, evaluated" },
+    { "syntax": "{{ VARIABLE.<name> }}", "use": "alias of variable" },
+    { "syntax": "{{ $.getVariable('<name>') }}", "use": "method form" },
+    { "note": "Variables are top-level (no .data). Provision new ones with the create_variable MCP tool; secrets → is_sensitive (masked on read, still usable in expressions)." }
+  ],
+
+  "rendering": {
+    "json_safe": "Closing }} auto-gets `| json | safe`, so {{ $.getLatestNodeData('Code').data.items }} renders the object/array correctly. Only add `| json | safe` manually when you MIX literal text with an object in one field.",
+    "bracket_vs_dot": "Both notations work: .data.body.job_uid  ==  ['data']['body']['job_uid']. Use brackets for numeric/odd keys: .data.data.custom_fields['14'].value or [14].",
+    "js_in_expression": "Nunjucks evaluates JS-ish expressions: {{ $item.data.amount > 1000 ? 'high':'low' }}, {{ moment($item.data.created_at).format('YYYY-MM-DD') }} (moment available in code nodes)."
+  },
+
+  "fixed_vs_expression": {
+    "rule": "A field value is { type, value }. type='EXPRESSION' → the value is Nunjucks-evaluated against { $, $item, variable, VARIABLE }. type='FIXED' → used literally (even if it contains {{ }}).",
+    "implication": "Any value that references upstream data MUST be type='EXPRESSION'. A literal UID/string/number is type='FIXED'."
+  },
+
+  "notification_body_dual_templating": {
+    "note": "In email/notification SUBJECT and BODY (type=EXPRESSION) two syntaxes coexist (renderTemplatePreservingHandlebars, zuper worker):",
+    "workflow_expression": "{{ $... }} (starts with $) → evaluated by Nunjucks. e.g. {{ $.getLatestNodeData('Get Record').data.data.customer.email }}",
+    "zuper_handlebars": "{{ <non-$ merge tag> }} → PRESERVED and resolved later by Zuper. e.g. {{ customer.first_name }}, {{ job.job_number }}",
+    "rule": "If the inside of {{ }} begins with $ (or variable/VARIABLE) it is a workflow expression; otherwise it is a Zuper handlebars merge-tag passed through untouched."
+  },
+
+  "common_mistakes": [
+    "OMITTING .data — wrong: {{ $item.body.job_uid }} / {{ $item.job_uid }} ; right: {{ $item.data.body.job_uid }}. Every accessor returns the {node,data} wrapper.",
+    "Forgetting the DOUBLE data on Get Record / HTTP — right: {{ $.getLatestNodeData('Get Record').data.data.work_order_number }} and {{ $.getLatestNodeData('HTTP Request').data.data.<field> }}.",
+    "Reading webhook fields without .body — webhook payload is at .data.body.<field> (also .query/.headers/.params).",
+    "Using $.getNodeData('X') without an index — it returns an ARRAY; use [0] (or the loop index).",
+    "Referencing a node by a wrong/duplicate display name — names must be unique; use the exact action_name.",
+    "Putting a data expression in a type='FIXED' field — it won't be evaluated; use type='EXPRESSION'.",
+    "Guessing entity field paths — confirm real field names from the actual upstream execution_data / a Get Record output, not assumptions."
+  ],
+
+  "worked_examples": [
+    { "goal": "job_uid from an incoming webhook", "expression": "{{ $.getNodeData('On Webhook')[0].data.body.job_uid }}", "note": "or {{ $item.data.body.job_uid }} if On Webhook is the immediately previous node" },
+    { "goal": "checklist answer from a Zuper job event", "expression": "{{ $.getLatestNodeData('On Job Status Update').data.body.status.checklist['6'].answer }}" },
+    { "goal": "work order number from Get Record", "expression": "{{ $.getLatestNodeData('Get Record').data.data.work_order_number }}" },
+    { "goal": "assignee email from Get Record", "expression": "{{ $.getLatestNodeData('Get Record').data.data.assigned_to[0].user.email }}" },
+    { "goal": "an HTTP response field + status", "expression": "{{ $.getLatestNodeData('HTTP Request').data.data.id }} (status: {{ $.getLatestNodeData('HTTP Request').data.status }})" },
+    { "goal": "a value computed by a Code node", "expression": "{{ $.getLatestNodeData('Code').data.items }}" },
+    { "goal": "a workflow variable", "expression": "{{ variable.api_base_url }}" },
+    { "goal": "current loop item field", "expression": "{{ $item.data.email }}  (inside loop body)  ·  or {{ $.getArrayData()[$.getCurrentLoopIndex()].email }}" },
+    { "goal": "email body mixing Zuper merge-tag + workflow expr", "expression": "Hi {{ customer.first_name }}, your job {{ $.getLatestNodeData('Get Record').data.data.work_order_number }} is done." }
+  ]
+}

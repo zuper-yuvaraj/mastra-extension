@@ -1,0 +1,395 @@
+{
+  "generated_at": "2026-07-02",
+  "purpose": "GENERALIZED inline-create contract for interactive intake pick-lists. When the intake shows a `kind:config` pick-list (via mcp_resolution_map.json interactive_resolutions) and the value the user wants does NOT exist, this map tells the orchestrator + FE whether that `need` can be created inline, WHICH create mechanism to use, and the MINIMAL fields to collect. It is the symmetric sibling of the FETCH map (interactive_resolutions): fetch lists options, create adds one. Consumed by backend resolve.createOption() (this repo) and, in wave-2, by the orchestrator (phases.js) + FE (cards.js) to render a 'Create ' affordance next to 'Refresh'.",
+  "grounding": "Every create_tool / dc_post endpoint below is GROUNDED against real source — MCP write tools verified in Project-WF/mcp-auth-token/src/mastra/tools/**; job/project/request status create endpoints verified in Project-WF/zuper-webapp-v3/projects/settings (settings.service.ts + *-status-form.component.ts). status_type enum option lists copied verbatim from the Angular settings forms. Nothing here is invented — entities without a confirmed API create path are recorded with create_tool:null + reason so the FE hides 'Create' for them.",
+  "field_types": ["text", "email", "number", "color", "enum", "options"],
+  "mechanisms": {
+    "mcp_write": "create_tool is a Zuper product MCP write tool id (create_* family). resolve.createOption dispatches via gateway.callWrite(create_tool, args) — bypasses the read-only build policy, orchestrator-only, approval-gated by the caller. The MCP tool handles its own request-body wrapper.",
+    "dc_post": "No MCP write tool exists — create is a direct authenticated POST to the Zuper DC API via gateway.dcPost. The `dc_post` block gives the path (with {token} args substituted from `args`), the request-body wrapper key that required_fields nest under, and any top-level body_extra fields sourced from `args`."
+  },
+  "field_conventions": {
+    "required_fields": "Fields the FE must collect from the user before create. `key` = the exact create-input key (MCP tool arg name for mcp_write; body field under dc_post.body_wrapper for dc_post). `type` drives the input widget. `enum` (when present) is the exact allowed {label,value} set. `default` (when present) is applied by resolve.createOption if the user leaves it blank — so a field with a default is effectively optional to the user. `from_prior_answer` = the value comes from an already-resolved prior answer / fetch arg (e.g. a parent category_uid), NOT fresh user input.",
+    "conditional_fields": "Fields the FE collects ONLY when a sibling field's value is in `required_when.in` (dependent-field reveal). Same `key`/`type` semantics as required_fields. `required_when.field` names the sibling driver key and `required_when.in` the values that make this field shown AND required; otherwise it stays hidden and unrequired. `type:'options'` is a repeatable list widget whose collected value is a `string[]` (blank entries dropped). Consumed by resolve.createOption (thread the key through to the create call) and by the FE (CreateOptionForm renders the widget + gates the create button).",
+    "arg_from_context": "Create-tool args (mcp_write) whose value is threaded from the interactive fetch `args` / a prior answer rather than collected from the user. `tool_arg` = the create-tool arg name; `from` = the key to read out of `args`.",
+    "parent_arg": "Mirrors the interactive_resolutions `parent` — the need whose resolved value must exist before create (e.g. job_status needs the job_category's category_uid). `provides` names the arg key it supplies.",
+    "company_id / token": "Multi-tenancy is threaded by resolve.createOption exactly like fetchOptions — company_id scopes any cache bust; token is the logged-in user's bearer passed to gateway.callWrite / gateway.dcPost."
+  },
+  "capabilities": [
+    {
+      "need": "job_category",
+      "creatable": true,
+      "mechanism": "mcp_write",
+      "create_tool": "create_job_category",
+      "name_arg": "category_name",
+      "required_fields": [
+        { "key": "category_name", "label": "Category name", "type": "text" }
+      ],
+      "note": "POST /jobs/category (MCP create_job_category). Optional: category_color, category_description."
+    },
+    {
+      "need": "job_status",
+      "creatable": true,
+      "mechanism": "dc_post",
+      "create_tool": "create_job_status",
+      "name_arg": "status_name",
+      "parent_arg": { "need": "job_category", "provides": "category_uid" },
+      "dc_post": {
+        "path": "/jobs/status_new/{category_uid}",
+        "path_args": [{ "token": "category_uid", "from": "category_uid" }],
+        "body_wrapper": "job_status",
+        "body_extra": []
+      },
+      "required_fields": [
+        { "key": "status_name", "label": "Status name", "type": "text" },
+        { "key": "status_type", "label": "Status type", "type": "enum", "enum": [
+          { "label": "New", "value": "NEW" },
+          { "label": "Scheduled", "value": "SCHEDULED" },
+          { "label": "On My Way", "value": "ON_MY_WAY" },
+          { "label": "Started", "value": "STARTED" },
+          { "label": "On Hold", "value": "ON_HOLD" },
+          { "label": "Completed", "value": "COMPLETED" },
+          { "label": "Cannot Complete", "value": "CANNOT_COMPLETE" },
+          { "label": "Canceled", "value": "CANCELED" },
+          { "label": "Failed", "value": "FAILED" },
+          { "label": "Paid", "value": "PAID" },
+          { "label": "Closed", "value": "CLOSED" },
+          { "label": "Follow Up", "value": "FOLLOW_UP" },
+          { "label": "Follow up - Same Job", "value": "FOLLOW_UP_SAME_JOB" },
+          { "label": "Lead", "value": "LEAD" },
+          { "label": "Estimating", "value": "ESTIMATING" },
+          { "label": "Sold", "value": "SOLD" },
+          { "label": "Lost", "value": "LOST" },
+          { "label": "Production", "value": "PRODUCTION" },
+          { "label": "Others", "value": "OTHER" }
+        ] },
+        { "key": "status_color", "label": "Status color", "type": "color", "default": "#02B875" }
+      ],
+      "note": "No MCP tool — POST /jobs/status_new/{category_uid} body { job_status: { status_name, status_type, status_color } }. Verified in zuper-webapp-v3 settings.service.ts (newJobStatusUrl) + job-status-form.component.ts (Validators.required on status_name/status_type/status_color; status_type list copied verbatim). Per-category: the parent job_category's category_uid is the path arg."
+    },
+    {
+      "need": "trigger_status",
+      "creatable": false,
+      "mechanism": null,
+      "create_tool": null,
+      "reason": "trigger_status options are SYSTEM status-type enum buckets read live from the module's meta/filter DROPDOWN (company-independent system values, not account records). There is nothing to create — the buckets are fixed by Zuper. If the user wants a NAMED per-account status they should use the module-specific need (job_status / project_status / request_status) which is creatable."
+    },
+    {
+      "need": "project_status",
+      "creatable": true,
+      "mechanism": "dc_post",
+      "create_tool": "create_project_status",
+      "name_arg": "project_status_name",
+      "parent_arg": { "need": "project_category", "provides": "category_uid" },
+      "dc_post": {
+        "path": "/projects/status",
+        "path_args": [],
+        "body_wrapper": "project_status",
+        "body_extra": [{ "key": "project_category_uid", "from": "category_uid" }]
+      },
+      "required_fields": [
+        { "key": "project_status_name", "label": "Status name", "type": "text" },
+        { "key": "project_status_type", "label": "Status type", "type": "enum", "enum": [
+          { "label": "New", "value": "NEW" },
+          { "label": "Scheduled", "value": "SCHEDULED" },
+          { "label": "In Progress", "value": "IN_PROGRESS" },
+          { "label": "On Hold", "value": "ON_HOLD" },
+          { "label": "Completed", "value": "COMPLETED" },
+          { "label": "Paid", "value": "PAID" },
+          { "label": "Closed", "value": "CLOSED" },
+          { "label": "Canceled", "value": "CANCELED" },
+          { "label": "Follow Up", "value": "FOLLOW_UP" },
+          { "label": "Lead", "value": "LEAD" },
+          { "label": "Estimating", "value": "ESTIMATING" },
+          { "label": "Sold", "value": "SOLD" },
+          { "label": "Lost", "value": "LOST" },
+          { "label": "Production", "value": "PRODUCTION" },
+          { "label": "Others", "value": "OTHERS" }
+        ] },
+        { "key": "project_status_color", "label": "Status color", "type": "color", "default": "#02B875" }
+      ],
+      "note": "No MCP tool — POST /projects/status body { project_category_uid, project_status: { project_status_name, project_status_type, project_status_color } }. Verified in zuper-webapp-v3 settings.service.ts (projectStatusUrl) + project-status-form.component.ts (project_category_uid is a TOP-LEVEL body key, statuses nest under project_status; Validators.required on name/type/color; status_type list copied verbatim). Per-category: parent project_category supplies category_uid → project_category_uid."
+    },
+    {
+      "need": "request_status",
+      "creatable": true,
+      "mechanism": "dc_post",
+      "create_tool": "create_request_status",
+      "name_arg": "status_name",
+      "dc_post": {
+        "path": "/request/status",
+        "path_args": [],
+        "body_wrapper": "request_status",
+        "body_extra": []
+      },
+      "required_fields": [
+        { "key": "status_name", "label": "Status name", "type": "text" },
+        { "key": "status_type", "label": "Status type", "type": "enum", "enum": [
+          { "label": "Open", "value": "OPEN" },
+          { "label": "In Progress", "value": "IN_PROGRESS" },
+          { "label": "On Hold", "value": "ON_HOLD" },
+          { "label": "Closed", "value": "CLOSED" },
+          { "label": "Canceled", "value": "CANCELED" },
+          { "label": "Others", "value": "OTHERS" }
+        ] },
+        { "key": "status_color", "label": "Status color", "type": "color", "default": "#2563EB" }
+      ],
+      "note": "No MCP tool — POST /request/status body { request_status: { status_name, status_type, status_color } }. Account-wide (NOT per-category, unlike job/project). Verified in zuper-webapp-v3 settings.service.ts (requestStatusUrl) + request-status-form.component.ts + request-status.interface.ts (status_type enum copied verbatim)."
+    },
+    {
+      "need": "team",
+      "creatable": true,
+      "mechanism": "mcp_write",
+      "create_tool": "create_team",
+      "name_arg": "team_name",
+      "required_fields": [
+        { "key": "team_name", "label": "Team name", "type": "text" }
+      ],
+      "note": "POST /team (MCP create_team). Optional: team_color, team_description, user_uids."
+    },
+    {
+      "need": "user",
+      "creatable": true,
+      "mechanism": "mcp_write",
+      "create_tool": "create_user",
+      "name_arg": "first_name",
+      "required_fields": [
+        { "key": "first_name", "label": "First name", "type": "text" },
+        { "key": "last_name", "label": "Last name", "type": "text" },
+        { "key": "email", "label": "Email (must be unique)", "type": "email" },
+        { "key": "role_name", "label": "Role", "type": "text", "default": "Technician" }
+      ],
+      "note": "POST /user (MCP create_user). allow_user_set_password defaults true → an INVITE is sent; emp_code/designation derived; role_name resolved to role_id via /user/roles. Some accounts hard-block API user creation (400) → FE falls back to manual + Refresh. Name may be collected as a single 'Full name' and split into first/last by the FE/orchestrator."
+    },
+    {
+      "need": "admin_user",
+      "creatable": true,
+      "mechanism": "mcp_write",
+      "create_tool": "create_user",
+      "name_arg": "first_name",
+      "required_fields": [
+        { "key": "first_name", "label": "First name", "type": "text" },
+        { "key": "last_name", "label": "Last name", "type": "text" },
+        { "key": "email", "label": "Email (must be unique)", "type": "email" },
+        { "key": "role_name", "label": "Admin role", "type": "text", "default": "Admin" }
+      ],
+      "note": "Same MCP create_user as `user`, but role_name defaults to Admin (the pick-list itself is ADMIN-role filtered on fetch)."
+    },
+    {
+      "need": "field_executive",
+      "creatable": true,
+      "mechanism": "mcp_write",
+      "create_tool": "create_user",
+      "name_arg": "first_name",
+      "required_fields": [
+        { "key": "first_name", "label": "First name", "type": "text" },
+        { "key": "last_name", "label": "Last name", "type": "text" },
+        { "key": "email", "label": "Email (must be unique)", "type": "email" },
+        { "key": "role_name", "label": "Role", "type": "text", "default": "Technician" }
+      ],
+      "note": "Same MCP create_user as `user`, but role_name defaults to Technician (the pick-list itself is FIELD_EXECUTIVE-role filtered on fetch)."
+    },
+    {
+      "need": "customer_category",
+      "creatable": true,
+      "mechanism": "mcp_write",
+      "create_tool": "create_customer_category",
+      "name_arg": "category_name",
+      "required_fields": [
+        { "key": "category_name", "label": "Category name", "type": "text" }
+      ],
+      "note": "POST /customers/category (MCP create_customer_category). Optional: category_description."
+    },
+    {
+      "need": "project_category",
+      "creatable": true,
+      "mechanism": "mcp_write",
+      "create_tool": "create_project_category",
+      "name_arg": "category_name",
+      "required_fields": [
+        { "key": "category_name", "label": "Category name", "type": "text" }
+      ],
+      "fixed_args": { "auto_create_status": true },
+      "note": "POST /projects/category (MCP create_project_category). fixed_args.auto_create_status=true seeds default statuses so a freshly-created category is immediately usable by the dependent project_status pick-list. Optional: category_description, category_color."
+    },
+    {
+      "need": "organization",
+      "creatable": true,
+      "mechanism": "mcp_write",
+      "create_tool": "create_organization",
+      "name_arg": "organization_name",
+      "required_fields": [
+        { "key": "organization_name", "label": "Organization name", "type": "text" }
+      ],
+      "note": "POST /organization (MCP create_organization). Only organization_name is required by the tool; email/contact/pricelist etc. are optional. This is a DATA entity (not account config) — enable the inline-create affordance only if the product wants it; otherwise the FE may keep it search-only."
+    },
+    {
+      "need": "custom_field",
+      "creatable": true,
+      "mechanism": "mcp_write",
+      "create_tool": "create_custom_field",
+      "name_arg": "field_name",
+      "arg_from_context": [{ "tool_arg": "module_name", "from": "module" }],
+      "required_fields": [
+        { "key": "field_name", "label": "Field name", "type": "text" },
+        { "key": "field_type", "label": "Field type", "type": "enum", "default": "SINGLE_LINE", "enum": [
+          { "label": "Single line text", "value": "SINGLE_LINE" },
+          { "label": "Multi line text", "value": "MULTI_LINE" },
+          { "label": "Dropdown (single)", "value": "SINGLE_ITEM" },
+          { "label": "Dropdown (multi)", "value": "MULTI_ITEM" },
+          { "label": "Radio", "value": "RADIO" },
+          { "label": "Number", "value": "NUMBER" },
+          { "label": "Date", "value": "DATE" },
+          { "label": "Time", "value": "TIME" },
+          { "label": "Date & time", "value": "DATETIME" },
+          { "label": "Lookup", "value": "LOOKUP" },
+          { "label": "File", "value": "FILE" }
+        ] },
+        { "key": "field_options", "label": "Options", "type": "options", "item_type": "text", "required_if": { "key": "field_type", "in": ["SINGLE_ITEM", "MULTI_ITEM", "RADIO"] } }
+      ],
+      "note": "POST /settings/custom_fields/new (MCP create_custom_field). module_name is threaded from the interactive fetch arg `module` (the custom_field need already requires_args:['module']). field_type defaults SINGLE_LINE. The dropdown/radio types SINGLE_ITEM/MULTI_ITEM/RADIO additionally require field_options — a `string[]` collected by the FE via the conditional_fields `options` widget (shown only for those field_types) and threaded verbatim to the create_custom_field arg `field_options`. Collect nothing extra for the scalar field_types."
+    },
+    {
+      "need": "service_task",
+      "creatable": false,
+      "mechanism": null,
+      "create_tool": null,
+      "reason": "A NEW/one-off service task does NOT need an inline master-create here: the JOB update SERVICE_TASK action natively accepts a CUSTOM task inline — service_task:[{ is_custom_task:true, service_task_title, service_task_description?, estimated_duration? }] with NO master uid (grounded via describe_module_action(JOB,update,SERVICE_TASK) + mcp-server/captures/zuper_action_schema.json). So the intake captures a free-text service_task_title and the node-builder builds is_custom_task:true; nothing is created up-front. A create_service_tasks MCP tool DOES exist (id 'create_service_tasks', endpoint POST /service_tasks, required 'service_task_title'), but its inputSchema wraps tasks in an ARRAY (`service_tasks:[{ service_task_title, ... }]`) whereas resolve.createOption's mcp_write path sends FLAT fields keyed by required_fields[].key — it has no array-wrapper — so wiring create_service_tasks as an inline mcp_write Create affordance would fail the tool's Zod validation. Leave creatable:false until createOption supports an array-wrapped tool arg (owned by the orchestrator/resolve layer); the account-level service-task MASTER pick (need:service_task in mcp_resolution_map.json) stays search-only + ↻ Refresh, and CUSTOM tasks go through the native is_custom_task path (no create step)."
+    },
+    {
+      "need": "asset_category",
+      "creatable": true,
+      "mechanism": "mcp_write",
+      "create_tool": "create_asset_category",
+      "name_arg": "category_name",
+      "required_fields": [
+        { "key": "category_name", "label": "Category name", "type": "text" }
+      ],
+      "note": "POST /assets/category (MCP create_asset_category). Optional: description."
+    },
+    {
+      "need": "product_category",
+      "creatable": true,
+      "mechanism": "mcp_write",
+      "create_tool": "create_product_category",
+      "name_arg": "category_name",
+      "required_fields": [
+        { "key": "category_name", "label": "Category name", "type": "text" }
+      ],
+      "note": "POST /products/category (MCP create_product_category). Optional: category_description, is_active."
+    },
+    {
+      "need": "business_unit",
+      "creatable": true,
+      "mechanism": "mcp_write",
+      "create_tool": "create_business_unit",
+      "name_arg": "bu_name",
+      "required_fields": [
+        { "key": "bu_name", "label": "Business unit name", "type": "text" }
+      ],
+      "note": "POST /business_units (MCP create_business_unit). Optional: bu_description, is_active."
+    },
+    {
+      "need": "tag",
+      "creatable": true,
+      "mechanism": "mcp_write",
+      "create_tool": "create_tag",
+      "name_arg": "tag_name",
+      "required_fields": [
+        { "key": "tag_name", "label": "Tag name", "type": "text" }
+      ],
+      "note": "POST /company_tags (MCP create_tag). Optional module_uid to scope. NOTE: the mcp_resolution_map tag note said 'no create tool wired' — that is now stale; create_tag exists on the MCP surface."
+    },
+    {
+      "need": "tax",
+      "creatable": true,
+      "mechanism": "mcp_write",
+      "create_tool": "create_tax",
+      "name_arg": "tax_name",
+      "required_fields": [
+        { "key": "tax_name", "label": "Tax name", "type": "text" },
+        { "key": "tax_rate", "label": "Tax rate (%)", "type": "number" }
+      ],
+      "note": "POST /invoice_estimate/tax (MCP create_tax). tax_rate is a number (0 valid). Optional: is_local_tax, applicable_to."
+    },
+    {
+      "need": "tax_group",
+      "creatable": true,
+      "mechanism": "mcp_write",
+      "create_tool": "create_tax_group",
+      "name_arg": "tax_group_name",
+      "required_fields": [
+        { "key": "tax_group_name", "label": "Tax group name (unique)", "type": "text" }
+      ],
+      "note": "POST /invoice_estimate/tax_groups (MCP create_tax_group). Optional taxes[] (each { tax_uid, type: APPLICABLE|EXEMPT }) to seed the bundle — collect only if the product wants it."
+    },
+    {
+      "need": "vendor",
+      "creatable": true,
+      "mechanism": "mcp_write",
+      "create_tool": "create_vendor",
+      "name_arg": "vendor_name",
+      "required_fields": [
+        { "key": "vendor_name", "label": "Vendor name", "type": "text" },
+        { "key": "vendor_email", "label": "Vendor email", "type": "email" },
+        { "key": "vendor_contact_name", "label": "Contact person name", "type": "text" }
+      ],
+      "note": "POST /vendors (MCP create_vendor). Master VendorSchema enforces vendor_email (valid format) + vendor_contact_name as required — hence 3 fields, not 1. vendor_display_name defaults to vendor_name."
+    },
+    {
+      "need": "product",
+      "creatable": false,
+      "mechanism": null,
+      "create_tool": null,
+      "reason": "create_product exists on the MCP, but a product is a catalog entity that needs a category and pricing context to be usable, and inline-creating it from a workflow pick-list would produce an underspecified record. User creates the product in Zuper + Refresh. (Enable later with create_product if a richer inline form is desired.)"
+    },
+    {
+      "need": "pricelist",
+      "creatable": false,
+      "mechanism": null,
+      "create_tool": null,
+      "reason": "create_pricelist requires pricelist_type (FIXED_DISCOUNT/FIXED_MARGIN/PER_ITEM) plus a value or line_items[] with product refs — not a name-only create. Out of scope for an inline pick-list create; user creates it in Zuper + Refresh."
+    },
+    {
+      "need": "proposal_template",
+      "creatable": false,
+      "mechanism": null,
+      "create_tool": null,
+      "reason": "Templates carry rich document content/layout; there is no name-only create path and no create_proposal_template MCP tool. User authors it in Zuper + Refresh."
+    },
+    {
+      "need": "document_template",
+      "creatable": false,
+      "mechanism": null,
+      "create_tool": null,
+      "reason": "PDF/document SEND templates carry rich layout content; no create_document_template MCP tool. User authors it in Zuper + Refresh."
+    },
+    {
+      "need": "email_template",
+      "creatable": false,
+      "mechanism": null,
+      "create_tool": null,
+      "reason": "Email templates carry subject/body/merge content; no create_email_template MCP tool. User authors it in Zuper + Refresh."
+    },
+    {
+      "need": "timeoff_request_type",
+      "creatable": false,
+      "mechanism": null,
+      "create_tool": null,
+      "reason": "No create tool for time-off request TYPES is exposed on the MCP surface (create_timeoff_request creates a request, not a type). User configures the type in Zuper timesheet settings + Refresh."
+    },
+    {
+      "need": "expense_category",
+      "creatable": false,
+      "mechanism": null,
+      "create_tool": null,
+      "reason": "expense_category is fetched read-only via DC GET /expenses/category; no create tool/endpoint was confirmed. User creates it in Zuper expense settings + Refresh. (If a POST /expenses/category is later confirmed, convert to a dc_post entry.)"
+    },
+    {
+      "need": "measurement_category",
+      "creatable": false,
+      "mechanism": null,
+      "create_tool": null,
+      "reason": "measurement_category is fetched read-only via DC GET /measurements/categories; no create tool/endpoint was confirmed. User creates it in Zuper measurement settings + Refresh."
+    }
+  ]
+}

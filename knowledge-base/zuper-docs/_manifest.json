@@ -1,0 +1,1897 @@
+{
+  "source": "https://docs.zuper.co/llms.txt",
+  "generatedAt": "2026-10-06T13:30:46.715Z",
+  "pages": [
+    {
+      "title": "Create a new quotation",
+      "url": "https://docs.zuper.co/Accounting/Create_New_Quote.md",
+      "file": "Accounting\\Create_New_Quote.md"
+    },
+    {
+      "title": "Difference Between Proposals and Quotes",
+      "url": "https://docs.zuper.co/Accounting/Difference_Between_Proposals_and_Quotes.md",
+      "file": "Accounting\\Difference_Between_Proposals_and_Quotes.md"
+    },
+    {
+      "title": "Managing accounts receivable",
+      "url": "https://docs.zuper.co/Accounting/Invoices/AR_management.md",
+      "file": "Accounting\\Invoices\\AR_management.md"
+    },
+    {
+      "title": "Collecting a Partial Payment",
+      "url": "https://docs.zuper.co/Accounting/Invoices/collecting-partial-payments.md",
+      "file": "Accounting\\Invoices\\collecting-partial-payments.md"
+    },
+    {
+      "title": "Creating a new invoice",
+      "url": "https://docs.zuper.co/Accounting/Invoices/Create_new_invoice.md",
+      "file": "Accounting\\Invoices\\Create_new_invoice.md"
+    },
+    {
+      "title": "Edit Paid & Partially Paid Invoices",
+      "url": "https://docs.zuper.co/Accounting/Invoices/edit-paid-and-partially-paid-invoices.md",
+      "file": "Accounting\\Invoices\\edit-paid-and-partially-paid-invoices.md"
+    },
+    {
+      "title": "Managing your invoices",
+      "url": "https://docs.zuper.co/Accounting/Invoices/Managing_invoices.md",
+      "file": "Accounting\\Invoices\\Managing_invoices.md"
+    },
+    {
+      "title": "Overview",
+      "url": "https://docs.zuper.co/Accounting/Invoices/Overview.md",
+      "file": "Accounting\\Invoices\\Overview.md"
+    },
+    {
+      "title": "Recording payments",
+      "url": "https://docs.zuper.co/Accounting/Invoices/Recording_payments.md",
+      "file": "Accounting\\Invoices\\Recording_payments.md"
+    },
+    {
+      "title": "Managing your proposals and quotes",
+      "url": "https://docs.zuper.co/Accounting/Managing_Quotes.md",
+      "file": "Accounting\\Managing_Quotes.md"
+    },
+    {
+      "title": "Overview",
+      "url": "https://docs.zuper.co/Accounting/Overview.md",
+      "file": "Accounting\\Overview.md"
+    },
+    {
+      "title": "Payments Overview",
+      "url": "https://docs.zuper.co/Accounting/Payments.md",
+      "file": "Accounting\\Payments.md"
+    },
+    {
+      "title": "Profit Margin Slider",
+      "url": "https://docs.zuper.co/Accounting/Profit_Margin.md",
+      "file": "Accounting\\Profit_Margin.md"
+    },
+    {
+      "title": "Create a new proposal",
+      "url": "https://docs.zuper.co/Accounting/Proposal.md",
+      "file": "Accounting\\Proposal.md"
+    },
+    {
+      "title": "Rebates",
+      "url": "https://docs.zuper.co/Accounting/Rebates.md",
+      "file": "Accounting\\Rebates.md"
+    },
+    {
+      "title": "Recording a deposit on quotes",
+      "url": "https://docs.zuper.co/Accounting/Recording_a_Deposit_for_Quotes.md",
+      "file": "Accounting\\Recording_a_Deposit_for_Quotes.md"
+    },
+    {
+      "title": "Sections",
+      "url": "https://docs.zuper.co/Accounting/Sections.md",
+      "file": "Accounting\\Sections.md"
+    },
+    {
+      "title": "Sending and Getting Customer Approval",
+      "url": "https://docs.zuper.co/Accounting/sending-a-proposal-and-getting-customer-approval.md",
+      "file": "Accounting\\sending-a-proposal-and-getting-customer-approval.md"
+    },
+    {
+      "title": "Appointments",
+      "url": "https://docs.zuper.co/Appointments/Appointments.md",
+      "file": "Appointments\\Appointments.md"
+    },
+    {
+      "title": "Managing appointments from the Calendar",
+      "url": "https://docs.zuper.co/Appointments/manage-appointments-from-calendar.md",
+      "file": "Appointments\\manage-appointments-from-calendar.md"
+    },
+    {
+      "title": "Managing your appointments from the Dispatch Board",
+      "url": "https://docs.zuper.co/Appointments/Understanding-the-Dispatch-Board.md",
+      "file": "Appointments\\Understanding-the-Dispatch-Board.md"
+    },
+    {
+      "title": "Work with appointments in the Zuper Mobile app",
+      "url": "https://docs.zuper.co/Appointments/work-with-appointments-in-the-zuper-mobile-app.md",
+      "file": "Appointments\\work-with-appointments-in-the-zuper-mobile-app.md"
+    },
+    {
+      "title": "Channels",
+      "url": "https://docs.zuper.co/Chat/Channels.md",
+      "file": "Chat\\Channels.md"
+    },
+    {
+      "title": "Direct Messages",
+      "url": "https://docs.zuper.co/Chat/Direct-Messages.md",
+      "file": "Chat\\Direct-Messages.md"
+    },
+    {
+      "title": "Messages",
+      "url": "https://docs.zuper.co/Chat/Messages.md",
+      "file": "Chat\\Messages.md"
+    },
+    {
+      "title": "Quick Start Guide",
+      "url": "https://docs.zuper.co/Chat/quickstart-guide.md",
+      "file": "Chat\\quickstart-guide.md"
+    },
+    {
+      "title": "Search in Chat",
+      "url": "https://docs.zuper.co/Chat/Search.md",
+      "file": "Chat\\Search.md"
+    },
+    {
+      "title": "Applying credits",
+      "url": "https://docs.zuper.co/Client/Contact/Applying_credits.md",
+      "file": "Client\\Contact\\Applying_credits.md"
+    },
+    {
+      "title": "Adding new contact",
+      "url": "https://docs.zuper.co/Client/Contact/Create_contact.md",
+      "file": "Client\\Contact\\Create_contact.md"
+    },
+    {
+      "title": "Managing the Contact Detail",
+      "url": "https://docs.zuper.co/Client/Contact/Manage_contact.md",
+      "file": "Client\\Contact\\Manage_contact.md"
+    },
+    {
+      "title": "Adding new organization",
+      "url": "https://docs.zuper.co/Client/Organization/Create_Organization.md",
+      "file": "Client\\Organization\\Create_Organization.md"
+    },
+    {
+      "title": "Managing the organization detail",
+      "url": "https://docs.zuper.co/Client/Organization/Managing_Organization.md",
+      "file": "Client\\Organization\\Managing_Organization.md"
+    },
+    {
+      "title": "Overview",
+      "url": "https://docs.zuper.co/Client/Overview.md",
+      "file": "Client\\Overview.md"
+    },
+    {
+      "title": "Adding new property",
+      "url": "https://docs.zuper.co/Client/Property/Create_property.md",
+      "file": "Client\\Property\\Create_property.md"
+    },
+    {
+      "title": "Managing the property detail",
+      "url": "https://docs.zuper.co/Client/Property/Managing_Property.md",
+      "file": "Client\\Property\\Managing_Property.md"
+    },
+    {
+      "title": "Photo Comments",
+      "url": "https://docs.zuper.co/commenting-on-photos.md",
+      "file": "commenting-on-photos.md"
+    },
+    {
+      "title": "Setting up commissions",
+      "url": "https://docs.zuper.co/Commissions/Commissions.md",
+      "file": "Commissions\\Commissions.md"
+    },
+    {
+      "title": "Getting Started with Email in Zuper",
+      "url": "https://docs.zuper.co/communication/getting-started-with-email-in-zuper.md",
+      "file": "communication\\getting-started-with-email-in-zuper.md"
+    },
+    {
+      "title": "Creating an asset",
+      "url": "https://docs.zuper.co/Contracts_and_Assets_Management/Assets/Creating_asset.md",
+      "file": "Contracts_and_Assets_Management\\Assets\\Creating_asset.md"
+    },
+    {
+      "title": "Creating and managing PPM",
+      "url": "https://docs.zuper.co/Contracts_and_Assets_Management/Assets/Creating_PPM.md",
+      "file": "Contracts_and_Assets_Management\\Assets\\Creating_PPM.md"
+    },
+    {
+      "title": "Managing inspection forms",
+      "url": "https://docs.zuper.co/Contracts_and_Assets_Management/Assets/Inspection_form.md",
+      "file": "Contracts_and_Assets_Management\\Assets\\Inspection_form.md"
+    },
+    {
+      "title": "Managing your assets",
+      "url": "https://docs.zuper.co/Contracts_and_Assets_Management/Assets/managing_assets.md",
+      "file": "Contracts_and_Assets_Management\\Assets\\managing_assets.md"
+    },
+    {
+      "title": "Overview",
+      "url": "https://docs.zuper.co/Contracts_and_Assets_Management/Assets/Overview.md",
+      "file": "Contracts_and_Assets_Management\\Assets\\Overview.md"
+    },
+    {
+      "title": "Creating a contract",
+      "url": "https://docs.zuper.co/Contracts_and_Assets_Management/Contract/Creating_Contract.md",
+      "file": "Contracts_and_Assets_Management\\Contract\\Creating_Contract.md"
+    },
+    {
+      "title": "Managing your contracts",
+      "url": "https://docs.zuper.co/Contracts_and_Assets_Management/Contract/managing_your_contract.md",
+      "file": "Contracts_and_Assets_Management\\Contract\\managing_your_contract.md"
+    },
+    {
+      "title": "Overview",
+      "url": "https://docs.zuper.co/Contracts_and_Assets_Management/Contract/Overview.md",
+      "file": "Contracts_and_Assets_Management\\Contract\\Overview.md"
+    },
+    {
+      "title": "Create a Widget",
+      "url": "https://docs.zuper.co/Create-a-Widget.md",
+      "file": "Create-a-Widget.md"
+    },
+    {
+      "title": "Adding and Managing Cards in Your Wallet",
+      "url": "https://docs.zuper.co/Customer_Portal/Cards.md",
+      "file": "Customer_Portal\\Cards.md"
+    },
+    {
+      "title": "Login to your customer portal",
+      "url": "https://docs.zuper.co/Customer_Portal/Login_to_customer_portal.md",
+      "file": "Customer_Portal\\Login_to_customer_portal.md"
+    },
+    {
+      "title": "Dispatch Assistant",
+      "url": "https://docs.zuper.co/Dispatch/Assistant-Dispatch.md",
+      "file": "Dispatch\\Assistant-Dispatch.md"
+    },
+    {
+      "title": "Creating and managing a non-job event",
+      "url": "https://docs.zuper.co/Dispatch/Create_manage_non_job_event.md",
+      "file": "Dispatch\\Create_manage_non_job_event.md"
+    },
+    {
+      "title": "Creating and managing recurring routes",
+      "url": "https://docs.zuper.co/Dispatch/Create_manage_recurring_route.md",
+      "file": "Dispatch\\Create_manage_recurring_route.md"
+    },
+    {
+      "title": "Dispatcher Queue",
+      "url": "https://docs.zuper.co/Dispatch/Deep_dive_into_dispatcher_queue.md",
+      "file": "Dispatch\\Deep_dive_into_dispatcher_queue.md"
+    },
+    {
+      "title": "Users, Scheduler, and Map layouts",
+      "url": "https://docs.zuper.co/Dispatch/Detailed_Overview.md",
+      "file": "Dispatch\\Detailed_Overview.md"
+    },
+    {
+      "title": "Find Live Nearest Technicians & Nearby Jobs",
+      "url": "https://docs.zuper.co/Dispatch/FInd_tech.md",
+      "file": "Dispatch\\FInd_tech.md"
+    },
+    {
+      "title": "Live View in Dispatch Board",
+      "url": "https://docs.zuper.co/Dispatch/Live_View.md",
+      "file": "Dispatch\\Live_View.md"
+    },
+    {
+      "title": "Accessing the Maps",
+      "url": "https://docs.zuper.co/Dispatch/Maps/Maps.md",
+      "file": "Dispatch\\Maps\\Maps.md"
+    },
+    {
+      "title": "Overview",
+      "url": "https://docs.zuper.co/Dispatch/Overview.md",
+      "file": "Dispatch\\Overview.md"
+    },
+    {
+      "title": "Customize Dispatch Board",
+      "url": "https://docs.zuper.co/Dispatch/Settings.md",
+      "file": "Dispatch\\Settings.md"
+    },
+    {
+      "title": "Understanding job visibility on the Dispatch Board",
+      "url": "https://docs.zuper.co/Dispatch/Understanding_Job_Visibility.md",
+      "file": "Dispatch\\Understanding_Job_Visibility.md"
+    },
+    {
+      "title": "Get roof insights with Property Intelligence",
+      "url": "https://docs.zuper.co/Get-Roof-Property-Intelligence.md",
+      "file": "Get-Roof-Property-Intelligence.md"
+    },
+    {
+      "title": "Concepts",
+      "url": "https://docs.zuper.co/Getting_Started/Concepts.md",
+      "file": "Getting_Started\\Concepts.md"
+    },
+    {
+      "title": "Installing Zuper",
+      "url": "https://docs.zuper.co/Getting_Started/Installing_Zuper.md",
+      "file": "Getting_Started\\Installing_Zuper.md"
+    },
+    {
+      "title": "Adding users & teams",
+      "url": "https://docs.zuper.co/Getting_Started/Users_Teams.md",
+      "file": "Getting_Started\\Users_Teams.md"
+    },
+    {
+      "title": "Welcome to Zuper",
+      "url": "https://docs.zuper.co/Getting_Started/Welcome_to_Zuper.md",
+      "file": "Getting_Started\\Welcome_to_Zuper.md"
+    },
+    {
+      "title": "Zuper for Roofing Trial Walkthrough",
+      "url": "https://docs.zuper.co/Getting_Started/zuper-roofing-trial.md",
+      "file": "Getting_Started\\zuper-roofing-trial.md"
+    },
+    {
+      "title": "Avalara",
+      "url": "https://docs.zuper.co/Integrations/Accounting_and_payments/Avalara.md",
+      "file": "Integrations\\Accounting_and_payments\\Avalara.md"
+    },
+    {
+      "title": "Clyr",
+      "url": "https://docs.zuper.co/Integrations/Accounting_and_payments/Clyr.md",
+      "file": "Integrations\\Accounting_and_payments\\Clyr.md"
+    },
+    {
+      "title": "Debugging common errors",
+      "url": "https://docs.zuper.co/Integrations/Accounting_and_payments/QBD_Error.md",
+      "file": "Integrations\\Accounting_and_payments\\QBD_Error.md"
+    },
+    {
+      "title": "Pre-Requisites",
+      "url": "https://docs.zuper.co/Integrations/Accounting_and_payments/QBD_Pre.md",
+      "file": "Integrations\\Accounting_and_payments\\QBD_Pre.md"
+    },
+    {
+      "title": "Inventory sync",
+      "url": "https://docs.zuper.co/Integrations/Accounting_and_payments/QBD_Reverse_Inventory.md",
+      "file": "Integrations\\Accounting_and_payments\\QBD_Reverse_Inventory.md"
+    },
+    {
+      "title": "Module & Field Level Mapping",
+      "url": "https://docs.zuper.co/Integrations/Accounting_and_payments/QBD_Sync.md",
+      "file": "Integrations\\Accounting_and_payments\\QBD_Sync.md"
+    },
+    {
+      "title": "Inventory sync",
+      "url": "https://docs.zuper.co/Integrations/Accounting_and_payments/QBO_bid_inventory.md",
+      "file": "Integrations\\Accounting_and_payments\\QBO_bid_inventory.md"
+    },
+    {
+      "title": "Debugging common errors",
+      "url": "https://docs.zuper.co/Integrations/Accounting_and_payments/QBO_Errors.md",
+      "file": "Integrations\\Accounting_and_payments\\QBO_Errors.md"
+    },
+    {
+      "title": "Overview",
+      "url": "https://docs.zuper.co/Integrations/Accounting_and_payments/QBO_Overview.md",
+      "file": "Integrations\\Accounting_and_payments\\QBO_Overview.md"
+    },
+    {
+      "title": "Accessing sync history",
+      "url": "https://docs.zuper.co/Integrations/Accounting_and_payments/QBO_Sync_History.md",
+      "file": "Integrations\\Accounting_and_payments\\QBO_Sync_History.md"
+    },
+    {
+      "title": "Payments sync",
+      "url": "https://docs.zuper.co/Integrations/Accounting_and_payments/QDP_Payments.md",
+      "file": "Integrations\\Accounting_and_payments\\QDP_Payments.md"
+    },
+    {
+      "title": "QuickBooks Online Data Import",
+      "url": "https://docs.zuper.co/Integrations/Accounting_and_payments/QuickBooks_data_import.md",
+      "file": "Integrations\\Accounting_and_payments\\QuickBooks_data_import.md"
+    },
+    {
+      "title": "Sage Intacct",
+      "url": "https://docs.zuper.co/Integrations/Accounting_and_payments/Sage.md",
+      "file": "Integrations\\Accounting_and_payments\\Sage.md"
+    },
+    {
+      "title": "Square",
+      "url": "https://docs.zuper.co/Integrations/Accounting_and_payments/Square.md",
+      "file": "Integrations\\Accounting_and_payments\\Square.md"
+    },
+    {
+      "title": "Xero",
+      "url": "https://docs.zuper.co/Integrations/Accounting_and_payments/Xero.md",
+      "file": "Integrations\\Accounting_and_payments\\Xero.md"
+    },
+    {
+      "title": "Setup the integration",
+      "url": "https://docs.zuper.co/Integrations/Accounting_and_payments/Zuper_QuickBooks_Desktop.md",
+      "file": "Integrations\\Accounting_and_payments\\Zuper_QuickBooks_Desktop.md"
+    },
+    {
+      "title": "Setup the integration",
+      "url": "https://docs.zuper.co/Integrations/Accounting_and_payments/Zuper_QuickBooks_Online.md",
+      "file": "Integrations\\Accounting_and_payments\\Zuper_QuickBooks_Online.md"
+    },
+    {
+      "title": "Wisetack",
+      "url": "https://docs.zuper.co/Integrations/Accounting_and_payments/Zuper_Wisetack.md",
+      "file": "Integrations\\Accounting_and_payments\\Zuper_Wisetack.md"
+    },
+    {
+      "title": "Google Calendar",
+      "url": "https://docs.zuper.co/Integrations/Calendar/Google_Calendar.md",
+      "file": "Integrations\\Calendar\\Google_Calendar.md"
+    },
+    {
+      "title": "Slack",
+      "url": "https://docs.zuper.co/Integrations/Collaboration/Slack.md",
+      "file": "Integrations\\Collaboration\\Slack.md"
+    },
+    {
+      "title": "Dear",
+      "url": "https://docs.zuper.co/Integrations/Commerce/Dear.md",
+      "file": "Integrations\\Commerce\\Dear.md"
+    },
+    {
+      "title": "FreshDesk",
+      "url": "https://docs.zuper.co/Integrations/CRM/FreshDesk/FreshDesk.md",
+      "file": "Integrations\\CRM\\FreshDesk\\FreshDesk.md"
+    },
+    {
+      "title": "Zendesk Support",
+      "url": "https://docs.zuper.co/Integrations/CRM/Zendesk/Zendesk.md",
+      "file": "Integrations\\CRM\\Zendesk\\Zendesk.md"
+    },
+    {
+      "title": "Zoho CRM",
+      "url": "https://docs.zuper.co/Integrations/CRM/ZohoCRM/Zoho_CRM.md",
+      "file": "Integrations\\CRM\\ZohoCRM\\Zoho_CRM.md"
+    },
+    {
+      "title": "HubSpot SalesHub & Service Hub",
+      "url": "https://docs.zuper.co/Integrations/CRM/Zuper_HubSpot_Integration.md",
+      "file": "Integrations\\CRM\\Zuper_HubSpot_Integration.md"
+    },
+    {
+      "title": "Mailchimp",
+      "url": "https://docs.zuper.co/Integrations/Marketing/Mailchimp.md",
+      "file": "Integrations\\Marketing\\Mailchimp.md"
+    },
+    {
+      "title": "EagleView",
+      "url": "https://docs.zuper.co/Integrations/Measurements_and_estimations/EagleView.md",
+      "file": "Integrations\\Measurements_and_estimations\\EagleView.md"
+    },
+    {
+      "title": "GAF Quick Measure",
+      "url": "https://docs.zuper.co/Integrations/Measurements_and_estimations/GAF.md",
+      "file": "Integrations\\Measurements_and_estimations\\GAF.md"
+    },
+    {
+      "title": "Hover Mobile",
+      "url": "https://docs.zuper.co/Integrations/Measurements_and_estimations/Hover_mobile.md",
+      "file": "Integrations\\Measurements_and_estimations\\Hover_mobile.md"
+    },
+    {
+      "title": "RoofScope",
+      "url": "https://docs.zuper.co/Integrations/Measurements_and_estimations/RoofScope.md",
+      "file": "Integrations\\Measurements_and_estimations\\RoofScope.md"
+    },
+    {
+      "title": "Upload Measurements",
+      "url": "https://docs.zuper.co/Integrations/Measurements_and_estimations/Upload_measurements.md",
+      "file": "Integrations\\Measurements_and_estimations\\Upload_measurements.md"
+    },
+    {
+      "title": "Hover Web",
+      "url": "https://docs.zuper.co/Integrations/Measurements_and_estimations/Zuper_Hover.md",
+      "file": "Integrations\\Measurements_and_estimations\\Zuper_Hover.md"
+    },
+    {
+      "title": "Geo Code",
+      "url": "https://docs.zuper.co/Integrations/Power_Apps/Geo_Code_App.md",
+      "file": "Integrations\\Power_Apps\\Geo_Code_App.md"
+    },
+    {
+      "title": "Invoice Auto Generator",
+      "url": "https://docs.zuper.co/Integrations/Power_Apps/Invoice_Auto_Generator.md",
+      "file": "Integrations\\Power_Apps\\Invoice_Auto_Generator.md"
+    },
+    {
+      "title": "Job Mileage Calculation",
+      "url": "https://docs.zuper.co/Integrations/Power_Apps/Job_Mileage_Calculation.md",
+      "file": "Integrations\\Power_Apps\\Job_Mileage_Calculation.md"
+    },
+    {
+      "title": "Job Rescheduler",
+      "url": "https://docs.zuper.co/Integrations/Power_Apps/Job_Rescheduler.md",
+      "file": "Integrations\\Power_Apps\\Job_Rescheduler.md"
+    },
+    {
+      "title": "Job Time Calculation",
+      "url": "https://docs.zuper.co/Integrations/Power_Apps/Job_Time_Calculation.md",
+      "file": "Integrations\\Power_Apps\\Job_Time_Calculation.md"
+    },
+    {
+      "title": "Connecting ABC Supply",
+      "url": "https://docs.zuper.co/Integrations/Purchasing/abc-supply/Integrations/Purchasing/abc-supply/connecting-abc-supply.md",
+      "file": "Integrations\\Purchasing\\abc-supply\\Integrations\\Purchasing\\abc-supply\\connecting-abc-supply.md"
+    },
+    {
+      "title": "Placing Material Order to ABC",
+      "url": "https://docs.zuper.co/Integrations/Purchasing/abc-supply/placing-material-order-to-abc.md",
+      "file": "Integrations\\Purchasing\\abc-supply\\placing-material-order-to-abc.md"
+    },
+    {
+      "title": "Setup Your ABC Catalog",
+      "url": "https://docs.zuper.co/Integrations/Purchasing/abc-supply/setup-your-abc-catalog.md",
+      "file": "Integrations\\Purchasing\\abc-supply\\setup-your-abc-catalog.md"
+    },
+    {
+      "title": "Using ABC Pricing on Your Proposals",
+      "url": "https://docs.zuper.co/Integrations/Purchasing/abc-supply/using-abc-pricing-on-your-proposals.md",
+      "file": "Integrations\\Purchasing\\abc-supply\\using-abc-pricing-on-your-proposals.md"
+    },
+    {
+      "title": "Using SRS Pricing on Your Proposals",
+      "url": "https://docs.zuper.co/Integrations/Purchasing/Creating%20a%20CPQ%20proposal%20with%20SRS%20pricing.md",
+      "file": "Integrations\\Purchasing\\Creating-a-CPQ-proposal-with-SRS-pricing.md"
+    },
+    {
+      "title": "Placing Material Order to SRS",
+      "url": "https://docs.zuper.co/Integrations/Purchasing/Creating%20a%20Purchase%20Order%20from%20a%20Quote%20with%20SRS%20Items.md",
+      "file": "Integrations\\Purchasing\\Creating-a-Purchase-Order-from-a-Quote-with-SRS-Items.md"
+    },
+    {
+      "title": "Setup Your Catalog",
+      "url": "https://docs.zuper.co/Integrations/Purchasing/Link%20Catalog%20Products%20to%20SRS.md",
+      "file": "Integrations\\Purchasing\\Link-Catalog-Products-to-SRS.md"
+    },
+    {
+      "title": "Connect Your SRS Account",
+      "url": "https://docs.zuper.co/Integrations/Purchasing/SRS-setup.md",
+      "file": "Integrations\\Purchasing\\SRS-setup.md"
+    },
+    {
+      "title": "Aircall",
+      "url": "https://docs.zuper.co/Integrations/SMS_and_Telephony/Aircall.md",
+      "file": "Integrations\\SMS_and_Telephony\\Aircall.md"
+    },
+    {
+      "title": "CloudTalk",
+      "url": "https://docs.zuper.co/Integrations/SMS_and_Telephony/CloudTalk.md",
+      "file": "Integrations\\SMS_and_Telephony\\CloudTalk.md"
+    },
+    {
+      "title": "Gupshup",
+      "url": "https://docs.zuper.co/Integrations/SMS_and_Telephony/Gupshup.md",
+      "file": "Integrations\\SMS_and_Telephony\\Gupshup.md"
+    },
+    {
+      "title": "Infobip",
+      "url": "https://docs.zuper.co/Integrations/SMS_and_Telephony/Infobip.md",
+      "file": "Integrations\\SMS_and_Telephony\\Infobip.md"
+    },
+    {
+      "title": "Invisible Link",
+      "url": "https://docs.zuper.co/Integrations/SMS_and_Telephony/Invisible_Link.md",
+      "file": "Integrations\\SMS_and_Telephony\\Invisible_Link.md"
+    },
+    {
+      "title": "Message Media",
+      "url": "https://docs.zuper.co/Integrations/SMS_and_Telephony/Message_Media.md",
+      "file": "Integrations\\SMS_and_Telephony\\Message_Media.md"
+    },
+    {
+      "title": "RingCentral",
+      "url": "https://docs.zuper.co/Integrations/SMS_and_Telephony/RingCentral.md",
+      "file": "Integrations\\SMS_and_Telephony\\RingCentral.md"
+    },
+    {
+      "title": "Sakari",
+      "url": "https://docs.zuper.co/Integrations/SMS_and_Telephony/Sakari_with_Zuper.md",
+      "file": "Integrations\\SMS_and_Telephony\\Sakari_with_Zuper.md"
+    },
+    {
+      "title": "Sales Message",
+      "url": "https://docs.zuper.co/Integrations/SMS_and_Telephony/Sales_Message.md",
+      "file": "Integrations\\SMS_and_Telephony\\Sales_Message.md"
+    },
+    {
+      "title": "SimpleTexting",
+      "url": "https://docs.zuper.co/Integrations/SMS_and_Telephony/SimpleTexting.md",
+      "file": "Integrations\\SMS_and_Telephony\\SimpleTexting.md"
+    },
+    {
+      "title": "Twilio",
+      "url": "https://docs.zuper.co/Integrations/SMS_and_Telephony/Twilio.md",
+      "file": "Integrations\\SMS_and_Telephony\\Twilio.md"
+    },
+    {
+      "title": "Zapier",
+      "url": "https://docs.zuper.co/Integrations/Work_Flow_Automation/Zapier.md",
+      "file": "Integrations\\Work_Flow_Automation\\Zapier.md"
+    },
+    {
+      "title": "FieldNation",
+      "url": "https://docs.zuper.co/Integrations/Workforce_and_Time_Tracking/FieldNation.md",
+      "file": "Integrations\\Workforce_and_Time_Tracking\\FieldNation.md"
+    },
+    {
+      "title": "QuickBooks Time",
+      "url": "https://docs.zuper.co/Integrations/Workforce_and_Time_Tracking/QuickBooks_Time.md",
+      "file": "Integrations\\Workforce_and_Time_Tracking\\QuickBooks_Time.md"
+    },
+    {
+      "title": "Overview",
+      "url": "https://docs.zuper.co/Inventory_Management/Overview.md",
+      "file": "Inventory_Management\\Overview.md"
+    },
+    {
+      "title": "Product Bundles",
+      "url": "https://docs.zuper.co/Inventory_Management/Parts_Services/Bundles.md",
+      "file": "Inventory_Management\\Parts_Services\\Bundles.md"
+    },
+    {
+      "title": "Create a new part/product or service",
+      "url": "https://docs.zuper.co/Inventory_Management/Parts_Services/Create_New_Part_Service.md",
+      "file": "Inventory_Management\\Parts_Services\\Create_New_Part_Service.md"
+    },
+    {
+      "title": "Product/Item Groups",
+      "url": "https://docs.zuper.co/Inventory_Management/Parts_Services/group.md",
+      "file": "Inventory_Management\\Parts_Services\\group.md"
+    },
+    {
+      "title": "Apply a pricelist to a transaction",
+      "url": "https://docs.zuper.co/Inventory_Management/Pricelists/Apply_Pricelist.md",
+      "file": "Inventory_Management\\Pricelists\\Apply_Pricelist.md"
+    },
+    {
+      "title": "Create, edit, and delete a pricelist",
+      "url": "https://docs.zuper.co/Inventory_Management/Pricelists/Create_Pricelist.md",
+      "file": "Inventory_Management\\Pricelists\\Create_Pricelist.md"
+    },
+    {
+      "title": "Overview",
+      "url": "https://docs.zuper.co/Inventory_Management/Pricelists/Overview.md",
+      "file": "Inventory_Management\\Pricelists\\Overview.md"
+    },
+    {
+      "title": "Overview",
+      "url": "https://docs.zuper.co/Inventory_Management/transfer_order.md",
+      "file": "Inventory_Management\\transfer_order.md"
+    },
+    {
+      "title": "Create a new transfer order",
+      "url": "https://docs.zuper.co/Inventory_Management/transfer/Create_Transfer.md",
+      "file": "Inventory_Management\\transfer\\Create_Transfer.md"
+    },
+    {
+      "title": "Manage your transfer order",
+      "url": "https://docs.zuper.co/Inventory_Management/transfer/managing_transfer.md",
+      "file": "Inventory_Management\\transfer\\managing_transfer.md"
+    },
+    {
+      "title": "Configuring Job Costing",
+      "url": "https://docs.zuper.co/Job_Costing/Configuring_Job_Costing.md",
+      "file": "Job_Costing\\Configuring_Job_Costing.md"
+    },
+    {
+      "title": "Calculating Job Profitability for Fixed Price Service Jobs",
+      "url": "https://docs.zuper.co/Job_Costing/Fixed_Price.md",
+      "file": "Job_Costing\\Fixed_Price.md"
+    },
+    {
+      "title": "Labor Service",
+      "url": "https://docs.zuper.co/Job_Costing/Labor_Service.md",
+      "file": "Job_Costing\\Labor_Service.md"
+    },
+    {
+      "title": "Overview",
+      "url": "https://docs.zuper.co/Job_Costing/Overview.md",
+      "file": "Job_Costing\\Overview.md"
+    },
+    {
+      "title": "Calculating Job Profitability for Time and Material Jobs",
+      "url": "https://docs.zuper.co/Job_Costing/Time_and_Material.md",
+      "file": "Job_Costing\\Time_and_Material.md"
+    },
+    {
+      "title": "Understanding job costing details",
+      "url": "https://docs.zuper.co/Job_Costing/Understanding_Job_Costing_details.md",
+      "file": "Job_Costing\\Understanding_Job_Costing_details.md"
+    },
+    {
+      "title": "Reports",
+      "url": "https://docs.zuper.co/Legacy_Reports/Legacy_Reports.md",
+      "file": "Legacy_Reports\\Legacy_Reports.md"
+    },
+    {
+      "title": "Overview of Legacy Reports",
+      "url": "https://docs.zuper.co/Legacy_Reports/Overview.md",
+      "file": "Legacy_Reports\\Overview.md"
+    },
+    {
+      "title": "Managing commission payouts",
+      "url": "https://docs.zuper.co/Managing-commission-payouts.md",
+      "file": "Managing-commission-payouts.md"
+    },
+    {
+      "title": "Photo Annotation",
+      "url": "https://docs.zuper.co/photo-annotation-editor.md",
+      "file": "photo-annotation-editor.md"
+    },
+    {
+      "title": "Creating a new project",
+      "url": "https://docs.zuper.co/Projects/Creating_a_new_project.md",
+      "file": "Projects\\Creating_a_new_project.md"
+    },
+    {
+      "title": "Managing your projects",
+      "url": "https://docs.zuper.co/Projects/Managing_your_projects.md",
+      "file": "Projects\\Managing_your_projects.md"
+    },
+    {
+      "title": "Milestones & dependencies",
+      "url": "https://docs.zuper.co/Projects/Milestones_and_dependencies.md",
+      "file": "Projects\\Milestones_and_dependencies.md"
+    },
+    {
+      "title": "Overview",
+      "url": "https://docs.zuper.co/Projects/Overview_of_projects.md",
+      "file": "Projects\\Overview_of_projects.md"
+    },
+    {
+      "title": "Progressive invoicing",
+      "url": "https://docs.zuper.co/Projects/Progressive_invoicing.md",
+      "file": "Projects\\Progressive_invoicing.md"
+    },
+    {
+      "title": "Purchase Tax on parts and products",
+      "url": "https://docs.zuper.co/Purchase-Tax.md",
+      "file": "Purchase-Tax.md"
+    },
+    {
+      "title": "Creating a Material Request from the Mobile App",
+      "url": "https://docs.zuper.co/Purchasing/Material-Requests/Creating-Material-request-from-mobile.md",
+      "file": "Purchasing\\Material-Requests\\Creating-Material-request-from-mobile.md"
+    },
+    {
+      "title": "Creating a Material Request in Web",
+      "url": "https://docs.zuper.co/Purchasing/Material-Requests/Creating-material-request.md",
+      "file": "Purchasing\\Material-Requests\\Creating-material-request.md"
+    },
+    {
+      "title": "Managing Material Request",
+      "url": "https://docs.zuper.co/Purchasing/Material-Requests/Managing-material-request.md",
+      "file": "Purchasing\\Material-Requests\\Managing-material-request.md"
+    },
+    {
+      "title": "Understanding Material Request Status",
+      "url": "https://docs.zuper.co/Purchasing/Material-Requests/Material-request-status.md",
+      "file": "Purchasing\\Material-Requests\\Material-request-status.md"
+    },
+    {
+      "title": "Overview",
+      "url": "https://docs.zuper.co/Purchasing/Material-Requests/Overview.md",
+      "file": "Purchasing\\Material-Requests\\Overview.md"
+    },
+    {
+      "title": "Creating Purchase Order",
+      "url": "https://docs.zuper.co/Purchasing/Purchase-Orders/Creating-purchase-order.md",
+      "file": "Purchasing\\Purchase-Orders\\Creating-purchase-order.md"
+    },
+    {
+      "title": "Managing Purchase Order",
+      "url": "https://docs.zuper.co/Purchasing/Purchase-Orders/Manage-Purchase-Order.md",
+      "file": "Purchasing\\Purchase-Orders\\Manage-Purchase-Order.md"
+    },
+    {
+      "title": "Overview",
+      "url": "https://docs.zuper.co/Purchasing/Purchase-Orders/Overview.md",
+      "file": "Purchasing\\Purchase-Orders\\Overview.md"
+    },
+    {
+      "title": "Understanding Purchase Order Status",
+      "url": "https://docs.zuper.co/Purchasing/Purchase-Orders/Purchase-order-status.md",
+      "file": "Purchasing\\Purchase-Orders\\Purchase-order-status.md"
+    },
+    {
+      "title": "Vendors",
+      "url": "https://docs.zuper.co/Purchasing/Vendors/Vendors.md",
+      "file": "Purchasing\\Vendors\\Vendors.md"
+    },
+    {
+      "title": "Accept or Reject a Work Order",
+      "url": "https://docs.zuper.co/Purchasing/Work%20Orders/Accept%20reject%20work%20order.md",
+      "file": "Purchasing\\Work-Orders\\Accept-reject-work-order.md"
+    },
+    {
+      "title": "Creating Work Orders",
+      "url": "https://docs.zuper.co/Purchasing/Work%20Orders/Creating%20work%20orders.md",
+      "file": "Purchasing\\Work-Orders\\Creating-work-orders.md"
+    },
+    {
+      "title": "Subcontractors",
+      "url": "https://docs.zuper.co/Purchasing/Work%20Orders/Subcontractors/Subcontractors.md",
+      "file": "Purchasing\\Work-Orders\\Subcontractors\\Subcontractors.md"
+    },
+    {
+      "title": "Work Order Status",
+      "url": "https://docs.zuper.co/Purchasing/Work%20Orders/Work%20order%20status.md",
+      "file": "Purchasing\\Work-Orders\\Work-order-status.md"
+    },
+    {
+      "title": "Detailed Report",
+      "url": "https://docs.zuper.co/Reports/Detailed_report.md",
+      "file": "Reports\\Detailed_report.md"
+    },
+    {
+      "title": "Managing your reports",
+      "url": "https://docs.zuper.co/Reports/Managing_report.md",
+      "file": "Reports\\Managing_report.md"
+    },
+    {
+      "title": "Overview",
+      "url": "https://docs.zuper.co/Reports/Overview.md",
+      "file": "Reports\\Overview.md"
+    },
+    {
+      "title": "Scheduling a report",
+      "url": "https://docs.zuper.co/Reports/Scheduling_report.md",
+      "file": "Reports\\Scheduling_report.md"
+    },
+    {
+      "title": "Summary Report",
+      "url": "https://docs.zuper.co/Reports/Summary_report.md",
+      "file": "Reports\\Summary_report.md"
+    },
+    {
+      "title": "Template Reports",
+      "url": "https://docs.zuper.co/Reports/Template.md",
+      "file": "Reports\\Template.md"
+    },
+    {
+      "title": "Accessing the Calendar/Schedule board",
+      "url": "https://docs.zuper.co/Scheduling_and_Dispatching/Calendar.md",
+      "file": "Scheduling_and_Dispatching\\Calendar.md"
+    },
+    {
+      "title": "Set up communications",
+      "url": "https://docs.zuper.co/set-up-communications.md",
+      "file": "set-up-communications.md"
+    },
+    {
+      "title": "Setting up an Online Booking widget",
+      "url": "https://docs.zuper.co/Setting-up-Online-Booking-Widget.md",
+      "file": "Setting-up-Online-Booking-Widget.md"
+    },
+    {
+      "title": "Customer Portal",
+      "url": "https://docs.zuper.co/Settings/Customer_Portal/Customer_Portal.md",
+      "file": "Settings\\Customer_Portal\\Customer_Portal.md"
+    },
+    {
+      "title": "Data Import",
+      "url": "https://docs.zuper.co/Settings/Data_Adminstration/Data_Import.md",
+      "file": "Settings\\Data_Adminstration\\Data_Import.md"
+    },
+    {
+      "title": "Recovery",
+      "url": "https://docs.zuper.co/Settings/Data_Adminstration/Recovery.md",
+      "file": "Settings\\Data_Adminstration\\Recovery.md"
+    },
+    {
+      "title": "API Keys",
+      "url": "https://docs.zuper.co/Settings/Developer_Hub/API_Keys.md",
+      "file": "Settings\\Developer_Hub\\API_Keys.md"
+    },
+    {
+      "title": "Custom Functions",
+      "url": "https://docs.zuper.co/Settings/Developer_Hub/Custom_Functions.md",
+      "file": "Settings\\Developer_Hub\\Custom_Functions.md"
+    },
+    {
+      "title": "Webhooks",
+      "url": "https://docs.zuper.co/Settings/Developer_Hub/Webhooks.md",
+      "file": "Settings\\Developer_Hub\\Webhooks.md"
+    },
+    {
+      "title": "Edit Company Details",
+      "url": "https://docs.zuper.co/Settings/Home/Edit_Company_Details.md",
+      "file": "Settings\\Home\\Edit_Company_Details.md"
+    },
+    {
+      "title": "Settings Home",
+      "url": "https://docs.zuper.co/Settings/Home/Home.md",
+      "file": "Settings\\Home\\Home.md"
+    },
+    {
+      "title": "Enable Modules",
+      "url": "https://docs.zuper.co/Settings/Home/Modules_enablement.md",
+      "file": "Settings\\Home\\Modules_enablement.md"
+    },
+    {
+      "title": "Broadcast",
+      "url": "https://docs.zuper.co/Settings/Miscellaneous/broadcast.md",
+      "file": "Settings\\Miscellaneous\\broadcast.md"
+    },
+    {
+      "title": "Custom Dashboards",
+      "url": "https://docs.zuper.co/Settings/Miscellaneous/Custom_dashboards.md",
+      "file": "Settings\\Miscellaneous\\Custom_dashboards.md"
+    },
+    {
+      "title": "Email Templates",
+      "url": "https://docs.zuper.co/Settings/Miscellaneous/Email_Templates.md",
+      "file": "Settings\\Miscellaneous\\Email_Templates.md"
+    },
+    {
+      "title": "Holidays",
+      "url": "https://docs.zuper.co/Settings/Miscellaneous/Holidays.md",
+      "file": "Settings\\Miscellaneous\\Holidays.md"
+    },
+    {
+      "title": "Master Tags",
+      "url": "https://docs.zuper.co/Settings/Miscellaneous/Master_tags.md",
+      "file": "Settings\\Miscellaneous\\Master_tags.md"
+    },
+    {
+      "title": "Outbound Email Settings",
+      "url": "https://docs.zuper.co/Settings/Miscellaneous/Outbound_email_templates.md",
+      "file": "Settings\\Miscellaneous\\Outbound_email_templates.md"
+    },
+    {
+      "title": "PDF Library",
+      "url": "https://docs.zuper.co/Settings/Miscellaneous/pdf-library.md",
+      "file": "Settings\\Miscellaneous\\pdf-library.md"
+    },
+    {
+      "title": "Service Territory",
+      "url": "https://docs.zuper.co/Settings/Miscellaneous/service_territory.md",
+      "file": "Settings\\Miscellaneous\\service_territory.md"
+    },
+    {
+      "title": "SOS Settings",
+      "url": "https://docs.zuper.co/Settings/Miscellaneous/sos_settings.md",
+      "file": "Settings\\Miscellaneous\\sos_settings.md"
+    },
+    {
+      "title": "Workflows",
+      "url": "https://docs.zuper.co/Settings/Miscellaneous/workflows.md",
+      "file": "Settings\\Miscellaneous\\workflows.md"
+    },
+    {
+      "title": "Configuring Asset Settings",
+      "url": "https://docs.zuper.co/Settings/Modules/Assets/Assets-Settings.md",
+      "file": "Settings\\Modules\\Assets\\Assets-Settings.md"
+    },
+    {
+      "title": "Configuring Contract Settings",
+      "url": "https://docs.zuper.co/Settings/Modules/Contracts/contracts-settings.md",
+      "file": "Settings\\Modules\\Contracts\\contracts-settings.md"
+    },
+    {
+      "title": "Configuring Customer-Contact Settings",
+      "url": "https://docs.zuper.co/Settings/Modules/Customers-Contacts/Customers-Contacts-Settings.md",
+      "file": "Settings\\Modules\\Customers-Contacts\\Customers-Contacts-Settings.md"
+    },
+    {
+      "title": "Configuring Expenses",
+      "url": "https://docs.zuper.co/Settings/Modules/Jobs/Configuring_expense.md",
+      "file": "Settings\\Modules\\Jobs\\Configuring_expense.md"
+    },
+    {
+      "title": "Configuring General Job Settings",
+      "url": "https://docs.zuper.co/Settings/Modules/Jobs/Configuring_General_Job_settings.md",
+      "file": "Settings\\Modules\\Jobs\\Configuring_General_Job_settings.md"
+    },
+    {
+      "title": "Configuring Inspection Forms",
+      "url": "https://docs.zuper.co/Settings/Modules/Jobs/Configuring_inspection_form.md",
+      "file": "Settings\\Modules\\Jobs\\Configuring_inspection_form.md"
+    },
+    {
+      "title": "Configuring Job Categories",
+      "url": "https://docs.zuper.co/Settings/Modules/Jobs/configuring_Job_categories.md",
+      "file": "Settings\\Modules\\Jobs\\configuring_Job_categories.md"
+    },
+    {
+      "title": "Configuring Job Custom Fields",
+      "url": "https://docs.zuper.co/Settings/Modules/Jobs/Configuring_job_custom_fields.md",
+      "file": "Settings\\Modules\\Jobs\\Configuring_job_custom_fields.md"
+    },
+    {
+      "title": "Configuring Job Notifications",
+      "url": "https://docs.zuper.co/Settings/Modules/Jobs/configuring_job_notifications.md",
+      "file": "Settings\\Modules\\Jobs\\configuring_job_notifications.md"
+    },
+    {
+      "title": "Configuring Measurements",
+      "url": "https://docs.zuper.co/Settings/Modules/Jobs/Configuring_Measurements.md",
+      "file": "Settings\\Modules\\Jobs\\Configuring_Measurements.md"
+    },
+    {
+      "title": "Configuring Non Job Event",
+      "url": "https://docs.zuper.co/Settings/Modules/Jobs/Configuring_non_job_events.md",
+      "file": "Settings\\Modules\\Jobs\\Configuring_non_job_events.md"
+    },
+    {
+      "title": "Configuring Task Templates",
+      "url": "https://docs.zuper.co/Settings/Modules/Jobs/Configuring_task_templates.md",
+      "file": "Settings\\Modules\\Jobs\\Configuring_task_templates.md"
+    },
+    {
+      "title": "Configuring Job Card Templates",
+      "url": "https://docs.zuper.co/Settings/Modules/Jobs/Configuring-job-card-template.md",
+      "file": "Settings\\Modules\\Jobs\\Configuring-job-card-template.md"
+    },
+    {
+      "title": "Configuring Job Checklist",
+      "url": "https://docs.zuper.co/Settings/Modules/Jobs/Configuring-job-checklist.md",
+      "file": "Settings\\Modules\\Jobs\\Configuring-job-checklist.md"
+    },
+    {
+      "title": "Configuring Service Tasks",
+      "url": "https://docs.zuper.co/Settings/Modules/Jobs/configuring-service-tasks.md",
+      "file": "Settings\\Modules\\Jobs\\configuring-service-tasks.md"
+    },
+    {
+      "title": "Configuring Skillsets",
+      "url": "https://docs.zuper.co/Settings/Modules/Jobs/Configuring-skillsets.md",
+      "file": "Settings\\Modules\\Jobs\\Configuring-skillsets.md"
+    },
+    {
+      "title": "Configuring organization settings",
+      "url": "https://docs.zuper.co/Settings/Modules/Organization_Settings/Organization_Settings.md",
+      "file": "Settings\\Modules\\Organization_Settings\\Organization_Settings.md"
+    },
+    {
+      "title": "Configuring Parts & Services Settings",
+      "url": "https://docs.zuper.co/Settings/Modules/Parts-Services/Parts-Services-Settings.md",
+      "file": "Settings\\Modules\\Parts-Services\\Parts-Services-Settings.md"
+    },
+    {
+      "title": "Configuring Project Settings",
+      "url": "https://docs.zuper.co/Settings/Modules/Projects/Project_Settings.md",
+      "file": "Settings\\Modules\\Projects\\Project_Settings.md"
+    },
+    {
+      "title": "Configuring Properties Settings",
+      "url": "https://docs.zuper.co/Settings/Modules/Properties/Properties_Settings.md",
+      "file": "Settings\\Modules\\Properties\\Properties_Settings.md"
+    },
+    {
+      "title": "Configuring Purchasing Settings",
+      "url": "https://docs.zuper.co/Settings/Modules/Purchasing/Configure-PO.md",
+      "file": "Settings\\Modules\\Purchasing\\Configure-PO.md"
+    },
+    {
+      "title": "Custom financing configuration",
+      "url": "https://docs.zuper.co/Settings/Modules/Quotes-Invoices/Financing.md",
+      "file": "Settings\\Modules\\Quotes-Invoices\\Financing.md"
+    },
+    {
+      "title": "Proposal Layouts",
+      "url": "https://docs.zuper.co/Settings/Modules/Quotes-Invoices/Proposal_Layout_builder.md",
+      "file": "Settings\\Modules\\Quotes-Invoices\\Proposal_Layout_builder.md"
+    },
+    {
+      "title": "Configuring Quotes and Invoices",
+      "url": "https://docs.zuper.co/Settings/Modules/Quotes-Invoices/Quotes-Invoices-Settings.md",
+      "file": "Settings\\Modules\\Quotes-Invoices\\Quotes-Invoices-Settings.md"
+    },
+    {
+      "title": "Standard Proposal Template",
+      "url": "https://docs.zuper.co/Settings/Modules/Quotes-Invoices/Standard_proposal_template.md",
+      "file": "Settings\\Modules\\Quotes-Invoices\\Standard_proposal_template.md"
+    },
+    {
+      "title": "Configuring Request Settings",
+      "url": "https://docs.zuper.co/Settings/Modules/Requests/Request_Settings.md",
+      "file": "Settings\\Modules\\Requests\\Request_Settings.md"
+    },
+    {
+      "title": "Configuring Timesheets",
+      "url": "https://docs.zuper.co/Settings/Modules/Timesheets/Timesheets_Settings.md",
+      "file": "Settings\\Modules\\Timesheets\\Timesheets_Settings.md"
+    },
+    {
+      "title": "Edit Profile",
+      "url": "https://docs.zuper.co/Settings/Profile/Profile.md",
+      "file": "Settings\\Profile\\Profile.md"
+    },
+    {
+      "title": "Login Logs",
+      "url": "https://docs.zuper.co/Settings/Security/login_logs.md",
+      "file": "Settings\\Security\\login_logs.md"
+    },
+    {
+      "title": "Login using Google",
+      "url": "https://docs.zuper.co/Settings/Security/Login_using_google.md",
+      "file": "Settings\\Security\\Login_using_google.md"
+    },
+    {
+      "title": "Password Policy",
+      "url": "https://docs.zuper.co/Settings/Security/password_policy.md",
+      "file": "Settings\\Security\\password_policy.md"
+    },
+    {
+      "title": "Single Sign On (SAML)",
+      "url": "https://docs.zuper.co/Settings/Security/single-sign-on.md",
+      "file": "Settings\\Security\\single-sign-on.md"
+    },
+    {
+      "title": "User & Team Settings",
+      "url": "https://docs.zuper.co/Settings/Users_Teams/General.md",
+      "file": "Settings\\Users_Teams\\General.md"
+    },
+    {
+      "title": "Managing your users",
+      "url": "https://docs.zuper.co/Settings/Users_Teams/Users_Creation.md",
+      "file": "Settings\\Users_Teams\\Users_Creation.md"
+    },
+    {
+      "title": "California Time Rule",
+      "url": "https://docs.zuper.co/Timesheets_Management/California_time_rule.md",
+      "file": "Timesheets_Management\\California_time_rule.md"
+    },
+    {
+      "title": "Shifts",
+      "url": "https://docs.zuper.co/Timesheets_Management/Shifts.md",
+      "file": "Timesheets_Management\\Shifts.md"
+    },
+    {
+      "title": "Configure automatic clock-in & clock-out",
+      "url": "https://docs.zuper.co/Timesheets_Management/Timelogs/Configure_automatic.md",
+      "file": "Timesheets_Management\\Timelogs\\Configure_automatic.md"
+    },
+    {
+      "title": "Log work and travel time on the Job",
+      "url": "https://docs.zuper.co/Timesheets_Management/Timelogs/Log_time.md",
+      "file": "Timesheets_Management\\Timelogs\\Log_time.md"
+    },
+    {
+      "title": "Manage timelog summary",
+      "url": "https://docs.zuper.co/Timesheets_Management/Timelogs/Manage_Timelogs.md",
+      "file": "Timesheets_Management\\Timelogs\\Manage_Timelogs.md"
+    },
+    {
+      "title": "Overview",
+      "url": "https://docs.zuper.co/Timesheets_Management/Timelogs/Overview.md",
+      "file": "Timesheets_Management\\Timelogs\\Overview.md"
+    },
+    {
+      "title": "Enabling Timelogs",
+      "url": "https://docs.zuper.co/Timesheets_Management/Timelogs/Settings.md",
+      "file": "Timesheets_Management\\Timelogs\\Settings.md"
+    },
+    {
+      "title": "Tracking users’ real time location",
+      "url": "https://docs.zuper.co/Timesheets_Management/Timelogs/Tracking_Users.md",
+      "file": "Timesheets_Management\\Timelogs\\Tracking_Users.md"
+    },
+    {
+      "title": "Timeoffs",
+      "url": "https://docs.zuper.co/Timesheets_Management/Timeoffs.md",
+      "file": "Timesheets_Management\\Timeoffs.md"
+    },
+    {
+      "title": "Timesheets",
+      "url": "https://docs.zuper.co/Timesheets_Management/Timesheets.md",
+      "file": "Timesheets_Management\\Timesheets.md"
+    },
+    {
+      "title": "Trade Types",
+      "url": "https://docs.zuper.co/Trade_Types/Trades.md",
+      "file": "Trade_Types\\Trades.md"
+    },
+    {
+      "title": "Configuring inboxes",
+      "url": "https://docs.zuper.co/untitled-page-2.md",
+      "file": "untitled-page-2.md"
+    },
+    {
+      "title": "Creating a new request",
+      "url": "https://docs.zuper.co/Work_Order_Management/creating_request.md",
+      "file": "Work_Order_Management\\creating_request.md"
+    },
+    {
+      "title": "Managing Job Details",
+      "url": "https://docs.zuper.co/Work_Order_Management/Job-detail-page.md",
+      "file": "Work_Order_Management\\Job-detail-page.md"
+    },
+    {
+      "title": "Adding expenses to a Job",
+      "url": "https://docs.zuper.co/Work_Order_Management/Jobs/Add_expenses_to_Job.md",
+      "file": "Work_Order_Management\\Jobs\\Add_expenses_to_Job.md"
+    },
+    {
+      "title": "Albums",
+      "url": "https://docs.zuper.co/Work_Order_Management/Jobs/Albums.md",
+      "file": "Work_Order_Management\\Jobs\\Albums.md"
+    },
+    {
+      "title": "Assisted Scheduling",
+      "url": "https://docs.zuper.co/Work_Order_Management/Jobs/Assisted_Scheduling.md",
+      "file": "Work_Order_Management\\Jobs\\Assisted_Scheduling.md"
+    },
+    {
+      "title": "Before After Image Effect",
+      "url": "https://docs.zuper.co/Work_Order_Management/Jobs/before-after.md",
+      "file": "Work_Order_Management\\Jobs\\before-after.md"
+    },
+    {
+      "title": "Creating a new job",
+      "url": "https://docs.zuper.co/Work_Order_Management/Jobs/creating_a_new_job.md",
+      "file": "Work_Order_Management\\Jobs\\creating_a_new_job.md"
+    },
+    {
+      "title": "Creating and managing service tasks",
+      "url": "https://docs.zuper.co/Work_Order_Management/Jobs/Creating_and_managing_service_tasks.md",
+      "file": "Work_Order_Management\\Jobs\\Creating_and_managing_service_tasks.md"
+    },
+    {
+      "title": "Jobs Gallery",
+      "url": "https://docs.zuper.co/Work_Order_Management/Jobs/Jobs_gallery.md",
+      "file": "Work_Order_Management\\Jobs\\Jobs_gallery.md"
+    },
+    {
+      "title": "Kanban Views",
+      "url": "https://docs.zuper.co/Work_Order_Management/Jobs/Kanban_View.md",
+      "file": "Work_Order_Management\\Jobs\\Kanban_View.md"
+    },
+    {
+      "title": "Managing job timelogs",
+      "url": "https://docs.zuper.co/Work_Order_Management/Jobs/Manage_timelog_summary.md",
+      "file": "Work_Order_Management\\Jobs\\Manage_timelog_summary.md"
+    },
+    {
+      "title": "Managing job listing page",
+      "url": "https://docs.zuper.co/Work_Order_Management/Jobs/managing_your_jobs.md",
+      "file": "Work_Order_Management\\Jobs\\managing_your_jobs.md"
+    },
+    {
+      "title": "Managing your requests",
+      "url": "https://docs.zuper.co/Work_Order_Management/Jobs/managing_your_requests.md",
+      "file": "Work_Order_Management\\Jobs\\managing_your_requests.md"
+    },
+    {
+      "title": "Notes and chats",
+      "url": "https://docs.zuper.co/Work_Order_Management/Jobs/notes_and_chats.md",
+      "file": "Work_Order_Management\\Jobs\\notes_and_chats.md"
+    },
+    {
+      "title": "Overview of Job",
+      "url": "https://docs.zuper.co/Work_Order_Management/Jobs/Overview_of_jobs.md",
+      "file": "Work_Order_Management\\Jobs\\Overview_of_jobs.md"
+    },
+    {
+      "title": "Photo Feed",
+      "url": "https://docs.zuper.co/Work_Order_Management/Jobs/photofeed.md",
+      "file": "Work_Order_Management\\Jobs\\photofeed.md"
+    },
+    {
+      "title": "Lightning Search",
+      "url": "https://docs.zuper.co/Work_Order_Management/Lightning-search.md",
+      "file": "Work_Order_Management\\Lightning-search.md"
+    },
+    {
+      "title": "Adding and managing cards in your wallet",
+      "url": "https://docs.zuper.co/Work_Order_Management/Managing_cards.md",
+      "file": "Work_Order_Management\\Managing_cards.md"
+    },
+    {
+      "title": "Overview",
+      "url": "https://docs.zuper.co/Work_Order_Management/Overview_of_requests.md",
+      "file": "Work_Order_Management\\Overview_of_requests.md"
+    },
+    {
+      "title": "Using with Customer Portal",
+      "url": "https://docs.zuper.co/Work_Order_Management/Request_Customer_Portal.md",
+      "file": "Work_Order_Management\\Request_Customer_Portal.md"
+    },
+    {
+      "title": "Building a workflow",
+      "url": "https://docs.zuper.co/Workflow_builder/Building_a_workflow.md",
+      "file": "Workflow_builder\\Building_a_workflow.md"
+    },
+    {
+      "title": "Monitoring and version control",
+      "url": "https://docs.zuper.co/Workflow_builder/Monitoring_and_version_control.md",
+      "file": "Workflow_builder\\Monitoring_and_version_control.md"
+    },
+    {
+      "title": "Triggers",
+      "url": "https://docs.zuper.co/Workflow_builder/Triggers.md",
+      "file": "Workflow_builder\\Triggers.md"
+    },
+    {
+      "title": "Workflow Builder Nodes",
+      "url": "https://docs.zuper.co/Workflow_builder/workflow_builder_nodes.md",
+      "file": "Workflow_builder\\workflow_builder_nodes.md"
+    },
+    {
+      "title": "Overview",
+      "url": "https://docs.zuper.co/Workflow_builder/Workflow_overview.md",
+      "file": "Workflow_builder\\Workflow_overview.md"
+    },
+    {
+      "title": "Navigation & Key Pages",
+      "url": "https://docs.zuper.co/Workflow_builder/workflow.md",
+      "file": "Workflow_builder\\workflow.md"
+    },
+    {
+      "title": "AI Take and Talk",
+      "url": "https://docs.zuper.co/Zuper_AI/AI_Take_and_Talk.md",
+      "file": "Zuper_AI\\AI_Take_and_Talk.md"
+    },
+    {
+      "title": "AI Voice Notes",
+      "url": "https://docs.zuper.co/Zuper_AI/AI_voice_notes.md",
+      "file": "Zuper_AI\\AI_voice_notes.md"
+    },
+    {
+      "title": "Capturing Photos",
+      "url": "https://docs.zuper.co/Zuper_AI/AI_Walkthrough_Note/Capturing_Photo.md",
+      "file": "Zuper_AI\\AI_Walkthrough_Note\\Capturing_Photo.md"
+    },
+    {
+      "title": "Capturing Videos and using Dual Camera Mode",
+      "url": "https://docs.zuper.co/Zuper_AI/AI_Walkthrough_Note/Capturing_Videos.md",
+      "file": "Zuper_AI\\AI_Walkthrough_Note\\Capturing_Videos.md"
+    },
+    {
+      "title": "AI Job Summary",
+      "url": "https://docs.zuper.co/Zuper_AI/AI-Jobs-Summary.md",
+      "file": "Zuper_AI\\AI-Jobs-Summary.md"
+    },
+    {
+      "title": "Record a Walkthrough Video on a Checklist & Inspection Form",
+      "url": "https://docs.zuper.co/Zuper_AI/Record-a-Walkthrough-Video-on-a-Checklist.md",
+      "file": "Zuper_AI\\Record-a-Walkthrough-Video-on-a-Checklist.md"
+    },
+    {
+      "title": "A2P 10DLC Setup",
+      "url": "https://docs.zuper.co/Zuper_Connect/10DLC.md",
+      "file": "Zuper_Connect\\10DLC.md"
+    },
+    {
+      "title": "Auto Create Contacts",
+      "url": "https://docs.zuper.co/Zuper_Connect/Autocreate-Contact.md",
+      "file": "Zuper_Connect\\Autocreate-Contact.md"
+    },
+    {
+      "title": "AI Call Summary",
+      "url": "https://docs.zuper.co/Zuper_Connect/Call-summary.md",
+      "file": "Zuper_Connect\\Call-summary.md"
+    },
+    {
+      "title": "Call Transcript",
+      "url": "https://docs.zuper.co/Zuper_Connect/Call-transcript.md",
+      "file": "Zuper_Connect\\Call-transcript.md"
+    },
+    {
+      "title": "Using Chrome Extension",
+      "url": "https://docs.zuper.co/Zuper_Connect/Chrome_Extension.md",
+      "file": "Zuper_Connect\\Chrome_Extension.md"
+    },
+    {
+      "title": "Chrome Browser Configuration",
+      "url": "https://docs.zuper.co/Zuper_Connect/Chrome-Browser-Configuration.md",
+      "file": "Zuper_Connect\\Chrome-Browser-Configuration.md"
+    },
+    {
+      "title": "Using Connect on Mobile",
+      "url": "https://docs.zuper.co/Zuper_Connect/conversation.md",
+      "file": "Zuper_Connect\\conversation.md"
+    },
+    {
+      "title": "AI CSR Agent",
+      "url": "https://docs.zuper.co/Zuper_Connect/CSR-Agent.md",
+      "file": "Zuper_Connect\\CSR-Agent.md"
+    },
+    {
+      "title": "Call logs & History",
+      "url": "https://docs.zuper.co/Zuper_Connect/navigating_Call_Logs.md",
+      "file": "Zuper_Connect\\navigating_Call_Logs.md"
+    },
+    {
+      "title": "OTP and 2FA Codes on Connect Numbers",
+      "url": "https://docs.zuper.co/Zuper_Connect/OTP/2FA%20Verification%20Codes.md",
+      "file": "Zuper_Connect\\OTP\\2FA-Verification-Codes.md"
+    },
+    {
+      "title": "Overview",
+      "url": "https://docs.zuper.co/Zuper_Connect/Overview.md",
+      "file": "Zuper_Connect\\Overview.md"
+    },
+    {
+      "title": "Porting Phone Numbers to Zuper Connect",
+      "url": "https://docs.zuper.co/Zuper_Connect/Port-Number.md",
+      "file": "Zuper_Connect\\Port-Number.md"
+    },
+    {
+      "title": "Resetting Dialer Status",
+      "url": "https://docs.zuper.co/Zuper_Connect/Reset-dialer.md",
+      "file": "Zuper_Connect\\Reset-dialer.md"
+    },
+    {
+      "title": "Configuring Attribution and Tags",
+      "url": "https://docs.zuper.co/Zuper_Connect/Setup-Zuper-Connect/Attribution-and-tags.md",
+      "file": "Zuper_Connect\\Setup-Zuper-Connect\\Attribution-and-tags.md"
+    },
+    {
+      "title": "Creating Call Groups",
+      "url": "https://docs.zuper.co/Zuper_Connect/Setup-Zuper-Connect/Call_groups.md",
+      "file": "Zuper_Connect\\Setup-Zuper-Connect\\Call_groups.md"
+    },
+    {
+      "title": "Creating Call Routing",
+      "url": "https://docs.zuper.co/Zuper_Connect/Setup-Zuper-Connect/call_routing.md",
+      "file": "Zuper_Connect\\Setup-Zuper-Connect\\call_routing.md"
+    },
+    {
+      "title": "Getting a New Phone number",
+      "url": "https://docs.zuper.co/Zuper_Connect/Setup-Zuper-Connect/getting_zuper_phone_number.md",
+      "file": "Zuper_Connect\\Setup-Zuper-Connect\\getting_zuper_phone_number.md"
+    },
+    {
+      "title": "Configuring IVR",
+      "url": "https://docs.zuper.co/Zuper_Connect/Setup-Zuper-Connect/IVR.md",
+      "file": "Zuper_Connect\\Setup-Zuper-Connect\\IVR.md"
+    },
+    {
+      "title": "Manage User Permissions",
+      "url": "https://docs.zuper.co/Zuper_Connect/Setup-Zuper-Connect/User_permissions.md",
+      "file": "Zuper_Connect\\Setup-Zuper-Connect\\User_permissions.md"
+    },
+    {
+      "title": "Call Sidekick",
+      "url": "https://docs.zuper.co/Zuper_Connect/Sidekick.md",
+      "file": "Zuper_Connect\\Sidekick.md"
+    },
+    {
+      "title": "SMS Usage and Text Limitations for US Carriers",
+      "url": "https://docs.zuper.co/Zuper_Connect/sms-usage-and-text.md",
+      "file": "Zuper_Connect\\sms-usage-and-text.md"
+    },
+    {
+      "title": "Using Connect on Web",
+      "url": "https://docs.zuper.co/Zuper_Connect/Using_Connect_on_web.md",
+      "file": "Zuper_Connect\\Using_Connect_on_web.md"
+    },
+    {
+      "title": "Inbox & Conversations",
+      "url": "https://docs.zuper.co/Zuper_Connect/View_Manage_Web_Conversations.md",
+      "file": "Zuper_Connect\\View_Manage_Web_Conversations.md"
+    },
+    {
+      "title": "Connect Dialer in HubSpot",
+      "url": "https://docs.zuper.co/Zuper_Connect/Zuper-Connect-Dialer-in-HS.md",
+      "file": "Zuper_Connect\\Zuper-Connect-Dialer-in-HS.md"
+    },
+    {
+      "title": "HubSpot Integration",
+      "url": "https://docs.zuper.co/Zuper_Connect/Zuperconnect-HubSpot-Integration.md",
+      "file": "Zuper_Connect\\Zuperconnect-HubSpot-Integration.md"
+    },
+    {
+      "title": "Dashboard 101: Customization",
+      "url": "https://docs.zuper.co/Zuper_Dashboard/Dashboard101-Customization.md",
+      "file": "Zuper_Dashboard\\Dashboard101-Customization.md"
+    },
+    {
+      "title": "Dashboard 101: Getting started",
+      "url": "https://docs.zuper.co/Zuper_Dashboard/Dashboard101-Gettingstarted.md",
+      "file": "Zuper_Dashboard\\Dashboard101-Gettingstarted.md"
+    },
+    {
+      "title": "Managing Tasks",
+      "url": "https://docs.zuper.co/Zuper_Dashboard/Tasks.md",
+      "file": "Zuper_Dashboard\\Tasks.md"
+    },
+    {
+      "title": "Using Conditional Rules",
+      "url": "https://docs.zuper.co/Zuper_for_Roofing/Conditional_Rule.md",
+      "file": "Zuper_for_Roofing\\Conditional_Rule.md"
+    },
+    {
+      "title": "How Zuper CPQ Works",
+      "url": "https://docs.zuper.co/Zuper_for_Roofing/CPQ_works.md",
+      "file": "Zuper_for_Roofing\\CPQ_works.md"
+    },
+    {
+      "title": "Create Your First Inspection Job",
+      "url": "https://docs.zuper.co/Zuper_for_Roofing/create_inspection.md",
+      "file": "Zuper_for_Roofing\\create_inspection.md"
+    },
+    {
+      "title": "Production Take Off",
+      "url": "https://docs.zuper.co/Zuper_for_Roofing/create_your_installation_job.md",
+      "file": "Zuper_for_Roofing\\create_your_installation_job.md"
+    },
+    {
+      "title": "Create Your Invoice",
+      "url": "https://docs.zuper.co/Zuper_for_Roofing/create_your_invoice.md",
+      "file": "Zuper_for_Roofing\\create_your_invoice.md"
+    },
+    {
+      "title": "Build and Sign Proposal",
+      "url": "https://docs.zuper.co/Zuper_for_Roofing/create_your_proposal.md",
+      "file": "Zuper_for_Roofing\\create_your_proposal.md"
+    },
+    {
+      "title": "Setting up an Estimate and Book widget",
+      "url": "https://docs.zuper.co/Zuper_for_Roofing/Estimate_and_Book_widget.md",
+      "file": "Zuper_for_Roofing\\Estimate_and_Book_widget.md"
+    },
+    {
+      "title": "Custom financing configuration",
+      "url": "https://docs.zuper.co/Zuper_for_Roofing/Financing.md",
+      "file": "Zuper_for_Roofing\\Financing.md"
+    },
+    {
+      "title": "Formula Library",
+      "url": "https://docs.zuper.co/Zuper_for_Roofing/Formula_Library.md",
+      "file": "Zuper_for_Roofing\\Formula_Library.md"
+    },
+    {
+      "title": "Get Paid",
+      "url": "https://docs.zuper.co/Zuper_for_Roofing/getting-paid.md",
+      "file": "Zuper_for_Roofing\\getting-paid.md"
+    },
+    {
+      "title": "Getting started with your Zuper roofing trial",
+      "url": "https://docs.zuper.co/Zuper_for_Roofing/Getting-started-with-your-Zuper-roofing-trial.md",
+      "file": "Zuper_for_Roofing\\Getting-started-with-your-Zuper-roofing-trial.md"
+    },
+    {
+      "title": "Job Costing Settings",
+      "url": "https://docs.zuper.co/Zuper_for_Roofing/Job_Costing_Settings.md",
+      "file": "Zuper_for_Roofing\\Job_Costing_Settings.md"
+    },
+    {
+      "title": "Job Costing and Profitability",
+      "url": "https://docs.zuper.co/Zuper_for_Roofing/Job_Costing.md",
+      "file": "Zuper_for_Roofing\\Job_Costing.md"
+    },
+    {
+      "title": "Creating a Material Order",
+      "url": "https://docs.zuper.co/Zuper_for_Roofing/manage-material-order-and%20-work-order/material-orders/creating-a-material-order.md",
+      "file": "Zuper_for_Roofing\\manage-material-order-and--work-order\\material-orders\\creating-a-material-order.md"
+    },
+    {
+      "title": "Material Orders: An Overview",
+      "url": "https://docs.zuper.co/Zuper_for_Roofing/manage-material-order-and%20-work-order/material-orders/material-orders-overview.md",
+      "file": "Zuper_for_Roofing\\manage-material-order-and--work-order\\material-orders\\material-orders-overview.md"
+    },
+    {
+      "title": "Understanding Material Order Status",
+      "url": "https://docs.zuper.co/Zuper_for_Roofing/manage-material-order-and%20-work-order/material-orders/title-understanding-material-order-status-description-learn-what-each-material-order-status-means-in-zuper-for-roofing-and-which-actions-are-available-at-every-stage-understanding-material-order-s.md",
+      "file": "Zuper_for_Roofing\\manage-material-order-and--work-order\\material-orders\\title-understanding-material-order-status-description-learn-what-each-material-order-status-means-in-zuper-for-roofing-and-which-actions-are-available-at-every-stage-understanding-material-order-s.md"
+    },
+    {
+      "title": "Managing Material Order",
+      "url": "https://docs.zuper.co/Zuper_for_Roofing/manage-material-order-and%20-work-order/material-orders/untitled-page-2.md",
+      "file": "Zuper_for_Roofing\\manage-material-order-and--work-order\\material-orders\\untitled-page-2.md"
+    },
+    {
+      "title": "Multi Trade Groups in CPQ Proposals",
+      "url": "https://docs.zuper.co/Zuper_for_Roofing/Multi-trade%20groups%20in%20CPQ%20proposals.md",
+      "file": "Zuper_for_Roofing\\Multi-trade-groups-in-CPQ-proposals.md"
+    },
+    {
+      "title": "Overview",
+      "url": "https://docs.zuper.co/Zuper_for_Roofing/Overview_Roof.md",
+      "file": "Zuper_for_Roofing\\Overview_Roof.md"
+    },
+    {
+      "title": "Proposal Template with CPQ",
+      "url": "https://docs.zuper.co/Zuper_for_Roofing/Proposal_Template_with_CPQ.md",
+      "file": "Zuper_for_Roofing\\Proposal_Template_with_CPQ.md"
+    },
+    {
+      "title": "Overview",
+      "url": "https://docs.zuper.co/Zuper_for_Roofing/Proposal_Template.md",
+      "file": "Zuper_for_Roofing\\Proposal_Template.md"
+    },
+    {
+      "title": "Update Tasks",
+      "url": "https://docs.zuper.co/Zuper_for_Roofing/Roof_Service_Tasks.md",
+      "file": "Zuper_for_Roofing\\Roof_Service_Tasks.md"
+    },
+    {
+      "title": "Setting up a Lead Capture widget",
+      "url": "https://docs.zuper.co/Zuper_for_Roofing/Setting-up-Lead-Capture-widget.md",
+      "file": "Zuper_for_Roofing\\Setting-up-Lead-Capture-widget.md"
+    },
+    {
+      "title": "Sharing and embedding your widget",
+      "url": "https://docs.zuper.co/Zuper_for_Roofing/Sharing-and-embedding-widget.md",
+      "file": "Zuper_for_Roofing\\Sharing-and-embedding-widget.md"
+    },
+    {
+      "title": "Standard Proposal Template",
+      "url": "https://docs.zuper.co/Zuper_for_Roofing/standard_proposal.md",
+      "file": "Zuper_for_Roofing\\standard_proposal.md"
+    },
+    {
+      "title": "Using Trade Types for Multi-Trade Roofing Businesses",
+      "url": "https://docs.zuper.co/Zuper_for_Roofing/Trade.md",
+      "file": "Zuper_for_Roofing\\Trade.md"
+    },
+    {
+      "title": "Overview",
+      "url": "https://docs.zuper.co/Zuper_for_Roofing/Website_widget.md",
+      "file": "Zuper_for_Roofing\\Website_widget.md"
+    },
+    {
+      "title": "Setting up an Instant Estimate Widget",
+      "url": "https://docs.zuper.co/Zuper_for_Roofing/Website_Widget/Instant_Estimate.md",
+      "file": "Zuper_for_Roofing\\Website_Widget\\Instant_Estimate.md"
+    },
+    {
+      "title": "AI Field Agent",
+      "url": "https://docs.zuper.co/Zuper_Mobile_Apps/complete-checklist-with-field-agent.md",
+      "file": "Zuper_Mobile_Apps\\complete-checklist-with-field-agent.md"
+    },
+    {
+      "title": "Customer/Contact Gallery on Mobile",
+      "url": "https://docs.zuper.co/Zuper_Mobile_Apps/customer-contact-gallery-on-mobile.md",
+      "file": "Zuper_Mobile_Apps\\customer-contact-gallery-on-mobile.md"
+    },
+    {
+      "title": "Device Requirements",
+      "url": "https://docs.zuper.co/Zuper_Mobile_Apps/Device_Requirements.md",
+      "file": "Zuper_Mobile_Apps\\Device_Requirements.md"
+    },
+    {
+      "title": "Albums",
+      "url": "https://docs.zuper.co/Zuper_Mobile_Apps/Mobile%20Albums.md",
+      "file": "Zuper_Mobile_Apps\\Mobile-Albums.md"
+    },
+    {
+      "title": "Annotating Images",
+      "url": "https://docs.zuper.co/Zuper_Mobile_Apps/Mobile-image-annotations.md",
+      "file": "Zuper_Mobile_Apps\\Mobile-image-annotations.md"
+    },
+    {
+      "title": "Photofeed",
+      "url": "https://docs.zuper.co/Zuper_Mobile_Apps/Mobile-Photofeed.md",
+      "file": "Zuper_Mobile_Apps\\Mobile-Photofeed.md"
+    },
+    {
+      "title": "Non-Job Events",
+      "url": "https://docs.zuper.co/Zuper_Mobile_Apps/Non-job-event-on-mobile.md",
+      "file": "Zuper_Mobile_Apps\\Non-job-event-on-mobile.md"
+    },
+    {
+      "title": "Project Gallery on Mobile",
+      "url": "https://docs.zuper.co/Zuper_Mobile_Apps/project-gallery-on-mobile.md",
+      "file": "Zuper_Mobile_Apps\\project-gallery-on-mobile.md"
+    },
+    {
+      "title": "Quickstart Guide",
+      "url": "https://docs.zuper.co/Zuper_Mobile_Apps/Quickstart-guide-for-FE.md",
+      "file": "Zuper_Mobile_Apps\\Quickstart-guide-for-FE.md"
+    },
+    {
+      "title": "Tasks",
+      "url": "https://docs.zuper.co/Zuper_Mobile_Apps/Tasks.md",
+      "file": "Zuper_Mobile_Apps\\Tasks.md"
+    },
+    {
+      "title": "Using Zuper Offline",
+      "url": "https://docs.zuper.co/Zuper_Mobile_Apps/Using_Zuper_Offline.md",
+      "file": "Zuper_Mobile_Apps\\Using_Zuper_Offline.md"
+    },
+    {
+      "title": "Agent anatomy",
+      "url": "https://docs.zuper.co/Zuper_Sense/Agent_Studio/Agent_Anatomy.md",
+      "file": "Zuper_Sense\\Agent_Studio\\Agent_Anatomy.md"
+    },
+    {
+      "title": "Knowledge Base",
+      "url": "https://docs.zuper.co/Zuper_Sense/Agent_Studio/Knowledge_Base.md",
+      "file": "Zuper_Sense\\Agent_Studio\\Knowledge_Base.md"
+    },
+    {
+      "title": "Marketplace agents",
+      "url": "https://docs.zuper.co/Zuper_Sense/Agent_Studio/Marketplace.md",
+      "file": "Zuper_Sense\\Agent_Studio\\Marketplace.md"
+    },
+    {
+      "title": "Agent Studio overview",
+      "url": "https://docs.zuper.co/Zuper_Sense/Agent_Studio/Overview.md",
+      "file": "Zuper_Sense\\Agent_Studio\\Overview.md"
+    },
+    {
+      "title": "Skills",
+      "url": "https://docs.zuper.co/Zuper_Sense/Agent_Studio/Skills.md",
+      "file": "Zuper_Sense\\Agent_Studio\\Skills.md"
+    },
+    {
+      "title": "How answers work",
+      "url": "https://docs.zuper.co/Zuper_Sense/Ask_Sense/How_Answers_Work.md",
+      "file": "Zuper_Sense\\Ask_Sense\\How_Answers_Work.md"
+    },
+    {
+      "title": "Insights",
+      "url": "https://docs.zuper.co/Zuper_Sense/Ask_Sense/Insights.md",
+      "file": "Zuper_Sense\\Ask_Sense\\Insights.md"
+    },
+    {
+      "title": "Managing your threads",
+      "url": "https://docs.zuper.co/Zuper_Sense/Ask_Sense/Managing_Your_Threads.md",
+      "file": "Zuper_Sense\\Ask_Sense\\Managing_Your_Threads.md"
+    },
+    {
+      "title": "Personalization",
+      "url": "https://docs.zuper.co/Zuper_Sense/Ask_Sense/Personalization.md",
+      "file": "Zuper_Sense\\Ask_Sense\\Personalization.md"
+    },
+    {
+      "title": "Reasoning",
+      "url": "https://docs.zuper.co/Zuper_Sense/Ask_Sense/Reasoning.md",
+      "file": "Zuper_Sense\\Ask_Sense\\Reasoning.md"
+    },
+    {
+      "title": "Zuper Help",
+      "url": "https://docs.zuper.co/Zuper_Sense/Ask_Sense/Zuper_Help.md",
+      "file": "Zuper_Sense\\Ask_Sense\\Zuper_Help.md"
+    },
+    {
+      "title": "Changelog",
+      "url": "https://docs.zuper.co/Zuper_Sense/Changelog.md",
+      "file": "Zuper_Sense\\Changelog.md"
+    },
+    {
+      "title": "Reputation Agent",
+      "url": "https://docs.zuper.co/Zuper_Sense/Marketplace_Agents/Reputation_Agent.md",
+      "file": "Zuper_Sense\\Marketplace_Agents\\Reputation_Agent.md"
+    },
+    {
+      "title": "Weather Agent",
+      "url": "https://docs.zuper.co/Zuper_Sense/Marketplace_Agents/Weather_Agent.md",
+      "file": "Zuper_Sense\\Marketplace_Agents\\Weather_Agent.md"
+    },
+    {
+      "title": "Overview",
+      "url": "https://docs.zuper.co/Zuper_Sense/Overview.md",
+      "file": "Zuper_Sense\\Overview.md"
+    },
+    {
+      "title": "Radar overview",
+      "url": "https://docs.zuper.co/Zuper_Sense/Radar/Overview.md",
+      "file": "Zuper_Sense\\Radar\\Overview.md"
+    },
+    {
+      "title": "Radar on mobile",
+      "url": "https://docs.zuper.co/Zuper_Sense/Radar/Radar_Mobile.md",
+      "file": "Zuper_Sense\\Radar\\Radar_Mobile.md"
+    },
+    {
+      "title": "Set up Radars",
+      "url": "https://docs.zuper.co/Zuper_Sense/Radar/Setup_Radars.md",
+      "file": "Zuper_Sense\\Radar\\Setup_Radars.md"
+    },
+    {
+      "title": "Sharing",
+      "url": "https://docs.zuper.co/Zuper_Sense/Radar/Sharing.md",
+      "file": "Zuper_Sense\\Radar\\Sharing.md"
+    },
+    {
+      "title": "Supported modules",
+      "url": "https://docs.zuper.co/Zuper_Sense/Reference/Supported_Modules.md",
+      "file": "Zuper_Sense\\Reference\\Supported_Modules.md"
+    },
+    {
+      "title": "Zuper Sense FAQ",
+      "url": "https://docs.zuper.co/Zuper_Sense/Resources/FAQ.md",
+      "file": "Zuper_Sense\\Resources\\FAQ.md"
+    },
+    {
+      "title": "Pricing",
+      "url": "https://docs.zuper.co/Zuper_Sense/Resources/Pricing.md",
+      "file": "Zuper_Sense\\Resources\\Pricing.md"
+    },
+    {
+      "title": "Connect a Supplier",
+      "url": "https://docs.zuper.co/zuper-for-roofing/connect-a-supplier.md",
+      "file": "zuper-for-roofing\\connect-a-supplier.md"
+    },
+    {
+      "title": "Use Zuper on mobile",
+      "url": "https://docs.zuper.co/zuper-for-rooofing/use-zuper-on-mobile.md",
+      "file": "zuper-for-rooofing\\use-zuper-on-mobile.md"
+    },
+    {
+      "title": "Automatic Payments",
+      "url": "https://docs.zuper.co/Zuper-pay/Automatic-payments.md",
+      "file": "Zuper-pay\\Automatic-payments.md"
+    },
+    {
+      "title": "Add a customer card on file",
+      "url": "https://docs.zuper.co/Zuper-pay/Card-on-File.md",
+      "file": "Zuper-pay\\Card-on-File.md"
+    },
+    {
+      "title": "Zuper Pay Dashboard",
+      "url": "https://docs.zuper.co/Zuper-pay/Dasboard.md",
+      "file": "Zuper-pay\\Dasboard.md"
+    },
+    {
+      "title": "Disputing transactions",
+      "url": "https://docs.zuper.co/Zuper-pay/disputes.md",
+      "file": "Zuper-pay\\disputes.md"
+    },
+    {
+      "title": "E-Check Deposit on Mobile",
+      "url": "https://docs.zuper.co/Zuper-pay/E_Check.md",
+      "file": "Zuper-pay\\E_Check.md"
+    },
+    {
+      "title": "Onboarding Process",
+      "url": "https://docs.zuper.co/Zuper-pay/Onboarding.md",
+      "file": "Zuper-pay\\Onboarding.md"
+    },
+    {
+      "title": "Overview",
+      "url": "https://docs.zuper.co/Zuper-pay/Overview.md",
+      "file": "Zuper-pay\\Overview.md"
+    },
+    {
+      "title": "Payout Timelines",
+      "url": "https://docs.zuper.co/Zuper-pay/Payout-Timelines.md",
+      "file": "Zuper-pay\\Payout-Timelines.md"
+    },
+    {
+      "title": "Issuing refunds",
+      "url": "https://docs.zuper.co/Zuper-pay/Refunds.md",
+      "file": "Zuper-pay\\Refunds.md"
+    },
+    {
+      "title": "Setup Zuper Pay",
+      "url": "https://docs.zuper.co/Zuper-pay/Settings.md",
+      "file": "Zuper-pay\\Settings.md"
+    },
+    {
+      "title": "Surcharge Fee",
+      "url": "https://docs.zuper.co/Zuper-pay/Surcharge.md",
+      "file": "Zuper-pay\\Surcharge.md"
+    },
+    {
+      "title": "Tap to Pay on Android",
+      "url": "https://docs.zuper.co/Zuper-pay/Tap-to-pay-Android.md",
+      "file": "Zuper-pay\\Tap-to-pay-Android.md"
+    },
+    {
+      "title": "Tap to Pay on iPhone",
+      "url": "https://docs.zuper.co/Zuper-pay/Tap-to-pay-iphone.md",
+      "file": "Zuper-pay\\Tap-to-pay-iphone.md"
+    },
+    {
+      "title": "BBPOS WisePOS E Reader",
+      "url": "https://docs.zuper.co/Zuper-pay/terminal-bbpos.md",
+      "file": "Zuper-pay\\terminal-bbpos.md"
+    },
+    {
+      "title": "M2 Reader",
+      "url": "https://docs.zuper.co/Zuper-pay/terminal.md",
+      "file": "Zuper-pay\\terminal.md"
+    },
+    {
+      "title": "Zuper Pay Reports",
+      "url": "https://docs.zuper.co/Zuper-pay/Zuper-pay-reports.md",
+      "file": "Zuper-pay\\Zuper-pay-reports.md"
+    }
+  ],
+  "failures": []
+}

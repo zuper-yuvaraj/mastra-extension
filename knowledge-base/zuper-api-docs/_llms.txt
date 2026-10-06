@@ -1,0 +1,543 @@
+# Zuper Pro Documentation
+
+> Documentation for Zuper Pro
+
+## Guides: Documentation
+- [Getting Started with Zuper Pro](https://developers.zuper.co/docs/getting-started.md): This page will help you get started with Zuper Pro. You'll be up and running in a jiffy!
+- [Zuper's Model Context Protocol (MCP) Server](https://developers.zuper.co/docs/zupers-model-context-protocol-mcp-server.md)
+
+## API Reference: Zuper Pro API
+- [Getting Started with Zuper API](https://developers.zuper.co/reference/getting-started-with-your-api.md): This page will help you get started with Zuper Pro API.
+- [Generating API Key](https://developers.zuper.co/reference/generate-api-key.md)
+
+## API Reference: WORK ORDER MANAGEMENT
+- [Create a Job](https://developers.zuper.co/reference/create-job.md)
+- [Get Jobs](https://developers.zuper.co/reference/get-all-jobs.md)
+- [Get Job Details](https://developers.zuper.co/reference/get-job-details.md)
+- [Update Job Assignment](https://developers.zuper.co/reference/update-job-assignment.md): Only check_assignment_conflict is listed below, but the endpoint also accepts notify_users (boolean) and update_all_jobs (boolean), both undocumented but functional. notify_users=false suppresses the…
+- [Accept / Decline Job](https://developers.zuper.co/reference/update-job-accept.md)
+- [Update a Job](https://developers.zuper.co/reference/update-job.md)
+- [Generate / Share Job Card PDF](https://developers.zuper.co/reference/update-a-job-assignment-copy.md)
+- [Delete a Job](https://developers.zuper.co/reference/delete-job.md)
+- [Restore Job](https://developers.zuper.co/reference/recover-jobs.md)
+- [Update Status & Checklist](https://developers.zuper.co/reference/update-job-status.md)
+- [Update Job Checklist](https://developers.zuper.co/reference/update-job-checklist.md)
+- [Rollback / Delete a Job Status](https://developers.zuper.co/reference/rollback-job-status.md)
+- [Reschedule Job](https://developers.zuper.co/reference/print-save-as-pdf-share-via-email-job-card-copy.md)
+- [Get Unscheduled Jobs](https://developers.zuper.co/reference/get-unassigned-jobs-copy.md)
+- [Assisted Scheduling](https://developers.zuper.co/reference/assisted-scheduling.md)
+- [Conflicting Jobs & Time off](https://developers.zuper.co/reference/conflicting-jobs-and-time-off.md)
+- [Create a Job Timelog](https://developers.zuper.co/reference/create-a-job-timelog-copy-1.md)
+- [Update a Job Timelog](https://developers.zuper.co/reference/create-a-job-timelog-copy.md)
+- [Get Job Timelog](https://developers.zuper.co/reference/get-job-timelog-summary-copy.md)
+- [Get Job Timelog Summary](https://developers.zuper.co/reference/create-a-job-copy.md)
+- [Get Job Timelog Summary Details](https://developers.zuper.co/reference/get-job-timelog-summary-copy-copy.md)
+- [Delete Job Timelog](https://developers.zuper.co/reference/delete-job-timelog.md)
+- [Create Job Note](https://developers.zuper.co/reference/create-job-note.md)
+- [Get Job Notes](https://developers.zuper.co/reference/get-job-notes.md)
+- [Update Job Note](https://developers.zuper.co/reference/update-job-note.md)
+- [Change Note Privacy](https://developers.zuper.co/reference/change-job-note-privacy.md)
+- [Delete Job Note](https://developers.zuper.co/reference/delete-job-note.md)
+- [Create Route](https://developers.zuper.co/reference/create-route.md)
+- [Get Routes](https://developers.zuper.co/reference/get-routes.md)
+- [Get Route Details](https://developers.zuper.co/reference/get-route-details.md)
+- [Get Routes Count](https://developers.zuper.co/reference/get-routes-count-1.md)
+- [Update Route Details](https://developers.zuper.co/reference/update-route-details.md)
+- [Add Job To Route](https://developers.zuper.co/reference/add-job-to-route.md)
+- [Assign User Team To Route](https://developers.zuper.co/reference/assign-user-team-to-route.md)
+- [Unassign User Team To Route](https://developers.zuper.co/reference/assign-user-team-to-route-copy.md)
+- [Reassign Job From Route](https://developers.zuper.co/reference/reassign-job-from-route.md)
+- [Reorder Jobs In Route](https://developers.zuper.co/reference/reorder-jobs-in-route.md)
+- [Clone Job Route](https://developers.zuper.co/reference/clone-job-route.md)
+- [Optimize Job Route](https://developers.zuper.co/reference/optimize-job-route.md)
+- [Lock Job Route](https://developers.zuper.co/reference/lock-job-route.md)
+- [Delete Job Route](https://developers.zuper.co/reference/delete-job-route.md)
+- [Delete Job From Route](https://developers.zuper.co/reference/delete-job-from-route.md)
+- [Get Job Routes By Filter](https://developers.zuper.co/reference/get-job-routes-by-filter.md): Rule-engine-based list endpoint — an alternative to the simple `filter.*` query params on the plain list endpoint, for building complex AND/OR filter conditions. Unlike other modules, `keyword` here…
+- [Get Job Route Meta Filter](https://developers.zuper.co/reference/get-job-route-meta-filter.md): Returns the set of fields available to filter this module on, along with each field's supported operators. `fieldDataKey` values are exactly the `key` values accepted by this module's generic-filter…
+- [Get Recurring Jobs](https://developers.zuper.co/reference/get-all-recurring-jobs.md)
+- [Update Recurring Job Schedule](https://developers.zuper.co/reference/update-recurring-jobs.md)
+- [Delete Reccurring Job](https://developers.zuper.co/reference/delete-reccurring-job.md)
+- [Add Job Attachment](https://developers.zuper.co/reference/create-job-attachment.md)
+- [Update Job Attachment](https://developers.zuper.co/reference/update-job-attachment.md)
+- [Delete Job Attachment](https://developers.zuper.co/reference/delete-job-attachment.md)
+- [Create Expense](https://developers.zuper.co/reference/createexpense.md)
+- [Update Expense](https://developers.zuper.co/reference/update-expense.md)
+- [Get All Expenses](https://developers.zuper.co/reference/get-all-expenses.md)
+- [Get Expense Details](https://developers.zuper.co/reference/get-expense-details.md)
+- [Delete Expense](https://developers.zuper.co/reference/delete-expense.md)
+- [Create Job Status](https://developers.zuper.co/reference/create-job-status.md)
+- [Get All Job Status](https://developers.zuper.co/reference/get-all-job-status.md)
+- [Update Job Status](https://developers.zuper.co/reference/update-job-status-1.md)
+- [Rearrange Job Status](https://developers.zuper.co/reference/rearrange-job-status.md)
+- [Delete Job Status](https://developers.zuper.co/reference/delete-job-status.md)
+- [Get Jobs By Filter](https://developers.zuper.co/reference/get-job-details-v3-1.md): Rule-engine-based list endpoint — an alternative to the simple `filter.*` query params on the plain list endpoint, for building complex AND/OR filter conditions. Get the field key enum for…
+- [Create Job Category](https://developers.zuper.co/reference/create-job-category.md)
+- [Get All Job Category](https://developers.zuper.co/reference/get-all-job-category.md)
+- [Edit Job Category](https://developers.zuper.co/reference/edit-job-category.md)
+- [Delete a job category](https://developers.zuper.co/reference/delete-a-job-category.md)
+- [Reorder Job Category](https://developers.zuper.co/reference/reorder-job-category.md)
+- [/attachments/folders](https://developers.zuper.co/reference/create-folder.md)
+- [/attachments/folders](https://developers.zuper.co/reference/get-folders.md)
+- [/attachments/folders/{folder_uid}](https://developers.zuper.co/reference/update-folder.md)
+- [/attachments/folders/{folder_uid}](https://developers.zuper.co/reference/delete-folder.md)
+- [/attachments/folders/{folder_uid}/association](https://developers.zuper.co/reference/add-files-to-folder.md)
+- [/attachments/folders/{folder_uid}/association](https://developers.zuper.co/reference/remove-files-from-folder.md)
+- [/attachments/folders/{folder_uid}/share](https://developers.zuper.co/reference/share-folder.md)
+- [/attachments/folders/{folder_uid}/share](https://developers.zuper.co/reference/get-folder-shares.md)
+- [/attachments/folders/{folder_uid}/share/{share_uid}](https://developers.zuper.co/reference/update-folder-share.md)
+- [/attachments/folders/{folder_uid}/share/{share_uid}](https://developers.zuper.co/reference/delete-folder-share.md)
+- [Create Comment](https://developers.zuper.co/reference/create-comment.md)
+- [Get Comments](https://developers.zuper.co/reference/get-comments.md)
+- [Update Comment](https://developers.zuper.co/reference/update-comment.md)
+- [Delete Comment](https://developers.zuper.co/reference/delete-comment.md)
+- [Gallery](https://developers.zuper.co/reference/get-attachments.md)
+- [Bulk Delete Attachments](https://developers.zuper.co/reference/bulk-delete-attachments.md)
+- [Bulk Recover Attachments](https://developers.zuper.co/reference/bulk-recover-attachments.md)
+- [Create New Appointment](https://developers.zuper.co/reference/create-new-appointment.md)
+- [Get Appointments](https://developers.zuper.co/reference/get-appointments.md)
+- [Get Appointment Details](https://developers.zuper.co/reference/get-appointment-details.md)
+- [Update Appointment](https://developers.zuper.co/reference/update-appointment.md)
+- [Update Appointment Associations](https://developers.zuper.co/reference/update-appointment-associations.md)
+- [Appointment - Service task reorder](https://developers.zuper.co/reference/appointment-service-task-reorder.md)
+- [Assign Appointment](https://developers.zuper.co/reference/assign-appointment.md)
+- [Delete Appointment](https://developers.zuper.co/reference/delete-appointment.md)
+- [Get Job Financial Summary](https://developers.zuper.co/reference/get-job-financial-summary.md)
+- [Create Service Tasks](https://developers.zuper.co/reference/create-service-tasks.md)
+- [Get  Service Tasks](https://developers.zuper.co/reference/get-service-task.md)
+- [Get Service Task Details](https://developers.zuper.co/reference/get-service-tasks.md)
+- [Update Service Task Status](https://developers.zuper.co/reference/update-service-task-status.md)
+- [Update Service Task](https://developers.zuper.co/reference/update-service-task.md)
+- [Assign Service Task](https://developers.zuper.co/reference/assign-service-task.md)
+- [Reorder Service Tasks](https://developers.zuper.co/reference/reorder-service-tasks.md)
+- [Bulk Action Service Task](https://developers.zuper.co/reference/bulk-action-service-task.md)
+- [Delete Service Task](https://developers.zuper.co/reference/delete-service-task.md)
+- [Create Project](https://developers.zuper.co/reference/create-project.md)
+- [Get All Projects](https://developers.zuper.co/reference/get-all-projects.md)
+- [Get Project Details](https://developers.zuper.co/reference/get-project-details.md)
+- [Update a project](https://developers.zuper.co/reference/update-a-project.md)
+- [Update Project Status](https://developers.zuper.co/reference/update-project-status-1.md)
+- [Update Assignment](https://developers.zuper.co/reference/update-assignment.md)
+- [Delete Project](https://developers.zuper.co/reference/delete-project.md)
+- [Get Projects By Filter](https://developers.zuper.co/reference/get-projects-by-filter.md): Rule-engine-based list endpoint — an alternative to the simple `filter.*` query params on the plain list endpoint, for building complex AND/OR filter conditions. `sort_by: "project_priority"` is…
+- [Get Project Meta](https://developers.zuper.co/reference/get-project-meta.md): Returns the column/field configuration used to render this module's list view.
+- [Get Project Meta Filter](https://developers.zuper.co/reference/get-project-meta-filter.md): Returns the set of fields available to filter this module on, along with each field's supported operators. `fieldDataKey` values are exactly the `key` values accepted by this module's generic-filter…
+- [Link Job to Project](https://developers.zuper.co/reference/link-job-to-project.md)
+- [Reorder Jobs in Project](https://developers.zuper.co/reference/reorder-jobs-in-project.md)
+- [Remove Job from Project](https://developers.zuper.co/reference/remove-job-from-project.md)
+- [Create Milestone](https://developers.zuper.co/reference/create-milestone.md)
+- [Update Milestone](https://developers.zuper.co/reference/update-milestone.md)
+- [Update Milestone Status](https://developers.zuper.co/reference/update-milestone-status.md)
+- [Delete Milestone](https://developers.zuper.co/reference/delete-milestone.md)
+- [Create Phase](https://developers.zuper.co/reference/create-phase.md)
+- [Update Phase](https://developers.zuper.co/reference/update-phase.md)
+- [Update Phase Items](https://developers.zuper.co/reference/update-phase-items.md)
+- [Get All Phases](https://developers.zuper.co/reference/get-phase.md)
+- [Reorder Phase](https://developers.zuper.co/reference/reorder-phase.md)
+- [Reorder Phase Items](https://developers.zuper.co/reference/reorder-phase-items.md)
+- [Delete Phase](https://developers.zuper.co/reference/delete-phase.md)
+- [Delete Phase Items](https://developers.zuper.co/reference/delete-phase-items.md)
+- [Create Dependency](https://developers.zuper.co/reference/create-dependency.md)
+- [Update Dependency](https://developers.zuper.co/reference/update-dependency.md)
+- [Check Dependency](https://developers.zuper.co/reference/check-dependency.md)
+- [Delete Dependency](https://developers.zuper.co/reference/delete-dependency.md)
+- [/projects/{project_uid}/finance/stats](https://developers.zuper.co/reference/get-project-finance-stats.md)
+- [Create Measurement](https://developers.zuper.co/reference/create-measurement.md)
+- [Get Measurements](https://developers.zuper.co/reference/get-measurements.md)
+- [Get Measurement Details](https://developers.zuper.co/reference/get-measurement-details.md)
+- [Update Measurement](https://developers.zuper.co/reference/update-measurement.md)
+- [Delete Measurement](https://developers.zuper.co/reference/delete-measurement.md)
+- [Create Measurement Token](https://developers.zuper.co/reference/create-measurement-token.md)
+- [Update Custom Measurement Token](https://developers.zuper.co/reference/update-custom-measurement-token.md)
+- [Delete Custom Measurement Token](https://developers.zuper.co/reference/delete-custom-measurement-token.md)
+- [Upload Measurement](https://developers.zuper.co/reference/upload-measurement.md)
+- [Sync Measurement](https://developers.zuper.co/reference/sync-measurement.md)
+- [Create a Customer](https://developers.zuper.co/reference/get-all-customers-copy-1.md)
+- [Get all Customers](https://developers.zuper.co/reference/get-all-customers.md)
+- [Get Customer Details](https://developers.zuper.co/reference/get-all-customers-copy.md)
+- [Update Customer](https://developers.zuper.co/reference/get-all-customers-copy-2.md)
+- [Merge Customers](https://developers.zuper.co/reference/merge-customers.md)
+- [Activate / Deactivate Customer](https://developers.zuper.co/reference/get-all-customers-copy-3.md)
+- [Delete Customer](https://developers.zuper.co/reference/get-all-customers-copy-4.md)
+- [Restore Customer](https://developers.zuper.co/reference/customer-recovery.md): Recover deleted customers
+- [/customers/{customer_uid}/summary](https://developers.zuper.co/reference/get-customer-summary.md)
+- [Get Customers By Filter](https://developers.zuper.co/reference/get-customers-by-filter.md): Rule-engine-based list endpoint — an alternative to the simple `filter.*` query params on the plain list endpoint, for building complex AND/OR filter conditions. This endpoint is served by a separate…
+- [Get Customer Meta](https://developers.zuper.co/reference/get-customer-meta.md): Returns the column/field configuration used to render this module's list view.
+- [Get Customer Meta Filter](https://developers.zuper.co/reference/get-customer-meta-filter.md): Returns the set of fields available to filter this module on, along with each field's supported operators. `fieldDataKey` values are exactly the `key` values accepted by this module's generic-filter…
+- [Add Attachments](https://developers.zuper.co/reference/create-customer-attachments.md)
+- [Update Attachment](https://developers.zuper.co/reference/delete-customer-attachments-copy.md)
+- [Delete Attachment](https://developers.zuper.co/reference/create-customer-attachments-copy.md)
+- [Create Customer Notes](https://developers.zuper.co/reference/create-customer-notes.md)
+- [Get Customer Note](https://developers.zuper.co/reference/get-customer-note.md)
+- [Change Note Privacy](https://developers.zuper.co/reference/get-customer-note-copy.md)
+- [Update Customer Notes](https://developers.zuper.co/reference/get-customer-note-copy-1.md)
+- [Delete Customer Notes](https://developers.zuper.co/reference/get-customer-note-copy-2.md)
+- [Create Organization](https://developers.zuper.co/reference/create-organization.md): Create new Organization
+- [Get Organizations](https://developers.zuper.co/reference/get-all-organizations.md)
+- [Get Organization Details](https://developers.zuper.co/reference/get-organization-details.md)
+- [Update Organization Details](https://developers.zuper.co/reference/create-organization-copy.md): Create new Organization
+- [Activate / Deactivate Organization](https://developers.zuper.co/reference/activate-property-copy.md)
+- [Delete Organization](https://developers.zuper.co/reference/delete-organization-attachment-copy-1.md)
+- [Restore Organization](https://developers.zuper.co/reference/create-organization-attachments-copy-2.md)
+- [Get Organizations By Filter](https://developers.zuper.co/reference/get-organizations-by-filter.md): Rule-engine-based list endpoint — an alternative to the simple `filter.*` query params on the plain list endpoint, for building complex AND/OR filter conditions. This endpoint is served by a separate…
+- [Get Organization Meta](https://developers.zuper.co/reference/get-organization-meta.md): Returns the column/field configuration used to render this module's list view.
+- [Get Organization Meta Filter](https://developers.zuper.co/reference/get-organization-meta-filter.md): Returns the set of fields available to filter this module on, along with each field's supported operators. `fieldDataKey` values are exactly the `key` values accepted by this module's generic-filter…
+- [Add Organization Attachments](https://developers.zuper.co/reference/activatedeactivate-organization-copy.md)
+- [Update Organization Attachment](https://developers.zuper.co/reference/create-organization-attachments-copy.md)
+- [Delete Organization Attachment](https://developers.zuper.co/reference/update-organization-attachment-copy.md)
+- [/organization/{organization_uid}/summary](https://developers.zuper.co/reference/get-organization-summary.md)
+- [Create Property](https://developers.zuper.co/reference/create-properties.md)
+- [Get All Properties](https://developers.zuper.co/reference/get-all-properties.md)
+- [Get Property Details](https://developers.zuper.co/reference/get-property-details.md)
+- [Update Property Details](https://developers.zuper.co/reference/update-property-details.md)
+- [Activate / Deactivate Property](https://developers.zuper.co/reference/activate-property.md)
+- [Delete Property](https://developers.zuper.co/reference/delete-property.md)
+- [Recover Property](https://developers.zuper.co/reference/recover-property.md)
+- [Get Properties By Filter](https://developers.zuper.co/reference/get-properties-by-filter.md): Rule-engine-based list endpoint — an alternative to the simple `filter.*` query params on the plain list endpoint, for building complex AND/OR filter conditions. This endpoint is served by a separate…
+- [Get Property Meta](https://developers.zuper.co/reference/get-property-meta.md): Returns the column/field configuration used to render this module's list view.
+- [Get Property Meta Filter](https://developers.zuper.co/reference/get-property-meta-filter.md): Returns the set of fields available to filter this module on, along with each field's supported operators. `fieldDataKey` values are exactly the `key` values accepted by this module's generic-filter…
+- [/property/{property_uid}/summary](https://developers.zuper.co/reference/get-property-summary.md)
+- [Create Asset](https://developers.zuper.co/reference/create-asset.md): Creates a new asset. `asset_code` and `asset_name` are required and must be non-blank.
+- [Get All Assets](https://developers.zuper.co/reference/get-all-assets.md): Lists assets for the company, with pagination (offset or cursor-based) and an extensive set of filter.* query params.
+- [Get Asset Details](https://developers.zuper.co/reference/get-asset-details.md): Returns full asset details, with related records (customer, asset_category, asset_product, parent_asset, organization, property, asset_inspection_form, secondary_customers) populated.
+- [Update Asset](https://developers.zuper.co/reference/update-asset.md): Replaces an asset's fields. Accepts the same shape as Create Asset. Certain field changes (serial number, parts, product) automatically insert corresponding Asset History rows.
+- [Update Asset Status](https://developers.zuper.co/reference/update-asset-status.md): Updates an asset's status. Automatically inserts a STATUS_UPDATE Asset History row.
+- [Activate Asset](https://developers.zuper.co/reference/activate-asset.md): Activates or deactivates an asset.
+- [Delete Asset](https://developers.zuper.co/reference/delete-asset.md): Soft-deletes an asset (`is_deleted: true`). Use Recover Asset to undo.
+- [Asset Bulk Action](https://developers.zuper.co/reference/asset-bulk-action.md): Performs a bulk operation on assets. You must scope the action with at least one of asset_uid, filter, or filter_rules — if none are provided, the action applies to every asset in your company,…
+- [Recover Asset](https://developers.zuper.co/reference/recover-asset.md): Restores (undeletes) previously soft-deleted assets.
+- [Get Asset Meta](https://developers.zuper.co/reference/get-asset-meta.md): Returns the column/field configuration used to render the Assets list view.
+- [Get Asset Meta Filter](https://developers.zuper.co/reference/get-asset-meta-filter.md): Returns the set of fields available to filter Assets on, along with each field's supported operators.
+- [Get Assets By Generic Filter](https://developers.zuper.co/reference/get-assets-by-generic-filter.md): Rule-engine-based list endpoint — an alternative to the simple `filter.*` query params on Get All Assets, for building complex AND/OR filter conditions.
+- [Create Asset Card](https://developers.zuper.co/reference/create-asset-card.md): Generates a printable asset card as a PDF from a template, either returned directly or emailed.
+- [Get Asset History](https://developers.zuper.co/reference/get-asset-history.md): Returns the audit history of actions performed on an asset (installs, removals, status changes, product/part/serial-number updates, etc).
+- [Create Asset Action](https://developers.zuper.co/reference/create-asset-action.md): Records an action against an asset (e.g. INSTALL, REMOVE, REPLACE, a status change). This is what populates Asset History. `REPLACE` creates two history rows: a REMOVE on this asset and an INSTALL on…
+- [Get Asset Import Template](https://developers.zuper.co/reference/get-asset-template-1.md): Downloads an Excel (.xlsx) import template for bulk-creating assets, with one sheet per Asset Category including that category's custom fields as columns.
+- [Get Sample Import Data](https://developers.zuper.co/reference/get-sample-import-data.md): Downloads a sample Excel (.xlsx) file with example rows in the same format as the Get Asset Import Template file, for reference.
+- [Import Asset Data](https://developers.zuper.co/reference/import-asset-data.md): Bulk-imports assets from an uploaded Excel file (multipart/form-data). `unique_field_name` is required and determines which field is used to detect duplicates.
+- [Asset Summary](https://developers.zuper.co/reference/get-asset-summary.md): Returns a cross-module digest for an asset — the latest and 3 most recent records (plus counts) from Job, Invoice, Estimate, Service Contract, Project, Request, and Activity, scoped by the `modules`…
+- [Create Document](https://developers.zuper.co/reference/create-document.md)
+- [Create service contract](https://developers.zuper.co/reference/create-service-contract.md)
+- [Get Service Contracts](https://developers.zuper.co/reference/get-all-organizations-copy.md)
+- [Get Service Contract Details](https://developers.zuper.co/reference/get-service-contract-details.md)
+- [Update service contract](https://developers.zuper.co/reference/create-service-contract-copy.md)
+- [Delete Service Contract](https://developers.zuper.co/reference/get-organization-details-copy.md)
+- [Recover Contract](https://developers.zuper.co/reference/delete-service-contract-copy.md)
+- [Activate/Deactivate Service Contract](https://developers.zuper.co/reference/delete-organization-copy.md)
+- [Update Approval Status](https://developers.zuper.co/reference/activatedeactivate-service-contract-copy.md)
+- [Renew Service Contract](https://developers.zuper.co/reference/update-approval-status-copy.md)
+- [Send To Customer](https://developers.zuper.co/reference/renew-service-contract-copy.md)
+- [Get Service Contracts By Filter](https://developers.zuper.co/reference/get-service-contracts-by-filter.md): Rule-engine-based list endpoint — an alternative to the simple `filter.*` query params on the plain list endpoint, for building complex AND/OR filter conditions. Supports cursor pagination…
+- [Get Service Contract Meta](https://developers.zuper.co/reference/get-service-contract-meta.md): Returns the column/field configuration used to render this module's list view.
+- [Get Service Contract Meta Filter](https://developers.zuper.co/reference/get-service-contract-meta-filter.md): Returns the set of fields available to filter this module on, along with each field's supported operators. `fieldDataKey` values are exactly the `key` values accepted by this module's generic-filter…
+- [Create Request](https://developers.zuper.co/reference/create-customer-request.md)
+- [Get Requests](https://developers.zuper.co/reference/get-service-tasks-copy-1.md)
+- [Get Request Details](https://developers.zuper.co/reference/get-customer-request-details.md)
+- [Update Request](https://developers.zuper.co/reference/create-customer-request-copy.md)
+- [Update Request status](https://developers.zuper.co/reference/update-customer-request-copy.md)
+- [Delete Request](https://developers.zuper.co/reference/get-customer-request-details-copy.md)
+- [Get Requests By Filter](https://developers.zuper.co/reference/get-requests-by-filter.md): Rule-engine-based list endpoint — an alternative to the simple `filter.*` query params on the plain list endpoint, for building complex AND/OR filter conditions. `sort_by` is not validated against an…
+- [Get Request Meta](https://developers.zuper.co/reference/get-request-meta.md): Returns the column/field configuration used to render this module's list view.
+- [Get Request Meta Filter](https://developers.zuper.co/reference/get-request-meta-filter.md): Returns the set of fields available to filter this module on, along with each field's supported operators. `fieldDataKey` values are exactly the `key` values accepted by this module's generic-filter…
+- [Send Message To Stream Channel](https://developers.zuper.co/reference/send-message-to-stream-channel.md)
+- [Add Users To Stream Channel](https://developers.zuper.co/reference/add-users-to-stream-channel.md)
+- [Get all workflow modules](https://developers.zuper.co/reference/get-all-workflow-modules.md): Returns the modules available as workflow triggers, filtered to only modules enabled for this company. Use this to discover valid trigger_module/event values before calling Get Workflow Conditions or…
+- [Get All Workflow Conditions](https://developers.zuper.co/reference/get-all-workflow-conditions.md): Returns the available condition fields (default + custom) for a given module and trigger event — required query params module_name and event_name (400 "Missing Module / Event Name" if either is…
+- [Get Workflow Actions](https://developers.zuper.co/reference/get-workflow-actions.md): Returns the available actions for a given action_type and action_module (both required; 400 if missing or action_module is unrecognized). The EXECUTE_CUSTOM_FUNCTION action is only included if the…
+- [Create Workflow](https://developers.zuper.co/reference/create-workflow.md): Creates a workflow automation rule (trigger + conditions + actions). Workflow activation uses a different payload shape than other modules' activate endpoints (e.g. Territory) — see Activate Workflow…
+- [Get Workflow](https://developers.zuper.co/reference/get-workflow.md): Lists workflow automation rules.
+- [Get Workflow Activities](https://developers.zuper.co/reference/get-workflow-details.md): Returns the audit log of actions a workflow has actually executed (e.g. a job created/updated as a result of a rule firing) — distinct from the workflow's own configuration.
+- [Get Workflow Details](https://developers.zuper.co/reference/get-workflow-details-1.md): Returns full workflow details. Pass should_populate=true to resolve condition/action reference values (e.g. category, status, team, user) to populated objects instead of raw uids.
+- [Activate Workflow](https://developers.zuper.co/reference/activate-workflow.md): Activates or deactivates a workflow. Unlike Territory/other modules' activate endpoints, this uses type (ACTIVATE or DEACTIVATE) rather than an is_active boolean.
+- [Update Workflow](https://developers.zuper.co/reference/update-workflow.md): Same workflow_access/allowed_teams/allowed_users validation as Create. Switching workflow_access to USERS clears allowed_teams, and vice versa.
+- [Delete Workflow](https://developers.zuper.co/reference/delete-workflow.md): Only succeeds when the workflow is already deactivated (is_active: false) — deleting an active workflow returns 404 "No Workflow found for given UID" (the workflow exists, but the lookup filter…
+- [Create Service Territory](https://developers.zuper.co/reference/create-service-territory.md): Creates a service territory used for scheduling/dispatch and the GET /jobs filter.service_territory filter. Exactly one of territory_radius, territory_coordinates, or territory_zipcodes is expected,…
+- [Get Service Territories](https://developers.zuper.co/reference/get-service-territories.md): Lists service territories. Role-based auto-scoping applies: a Team Leader only sees territories owned/created by users on their teams; a Field Executive only sees their own owned/created territories.
+- [Get Service Territory Details](https://developers.zuper.co/reference/get-service-territory.md): Returns a single territory's full details, including populated teams and owners. There is no "zones" concept on a territory — the closest equivalents are the geofence boundary (territory_coordinates)…
+- [Update Service Territory](https://developers.zuper.co/reference/update-service-territory.md): Same validation as Create. The duplicate-name check excludes this territory itself.
+- [Activate / Deactivate Service Territory](https://developers.zuper.co/reference/activate-service-territory.md): Activates or deactivates a territory. Rejected with 400 "Territory In Use" when deactivating a territory referenced by an active Booking Widget.
+- [Delete Service Territory](https://developers.zuper.co/reference/delete-service-territory.md): Soft delete. Rejected with 400 "Territory In Use" if the territory is referenced by any active Booking Widget's service-territory settings.
+- [/commissions](https://developers.zuper.co/reference/create-commission.md)
+- [/commissions/{commission_uid}](https://developers.zuper.co/reference/update-commission.md)
+- [/commissions](https://developers.zuper.co/reference/get-commissions.md)
+- [/commissions/{commission_uid}](https://developers.zuper.co/reference/get-single-commission.md)
+- [/commissions/{commission_uid}](https://developers.zuper.co/reference/delete-commission.md)
+- [Get Commissions By Filter](https://developers.zuper.co/reference/get-commissions-by-filter.md): Rule-engine-based list endpoint — an alternative to the simple `filter.*` query params on the plain list endpoint, for building complex AND/OR filter conditions. Unlike other modules, invalid…
+- [Get Commissions Meta](https://developers.zuper.co/reference/get-commissions-meta.md): Returns the column/field configuration used to render this module's list view.
+- [Get Commissions Meta Filter](https://developers.zuper.co/reference/get-commissions-meta-filter.md): Returns the set of fields available to filter this module on, along with each field's supported operators. `fieldDataKey` values are exactly the `key` values accepted by this module's generic-filter…
+- [Get Request Statuses](https://developers.zuper.co/reference/get-request-statuses.md): Returns the full list of request statuses configured for the company (a single per-company document holding an array of statuses, not one document per status). Use the returned status_uid values with…
+
+## API Reference: Inventory
+- [Create a Product](https://developers.zuper.co/reference/create-a-product.md)
+- [Get all Products](https://developers.zuper.co/reference/get-all-products.md)
+- [Get a Product Details](https://developers.zuper.co/reference/get-a-product-details.md)
+- [Update a Product](https://developers.zuper.co/reference/update-a-product.md)
+- [Delete a Product](https://developers.zuper.co/reference/delete-a-product.md)
+- [Get Product Meta Filter](https://developers.zuper.co/reference/get-product-meta-filter.md): Returns the set of fields available to filter this module on, along with each field's supported operators and (for LOOKUP/nested fields) the companion API to call for typeahead options.…
+- [Create Products Group](https://developers.zuper.co/reference/create-product-group.md)
+- [Get All Products Group](https://developers.zuper.co/reference/get-all-product-group.md)
+- [Get Products Group Details](https://developers.zuper.co/reference/get-product-group.md)
+- [Update Products Group](https://developers.zuper.co/reference/update-product-group.md)
+- [Delete Products Group](https://developers.zuper.co/reference/delete-product-group.md)
+- [Add Products to Products Group](https://developers.zuper.co/reference/add-products-to-group.md)
+- [Remove Products from Group](https://developers.zuper.co/reference/remove-products-from-group.md)
+- [Activate Products Group](https://developers.zuper.co/reference/activate-products-group.md): Activate or Deactivate Given Product group
+- [Get Product Groups By Filter](https://developers.zuper.co/reference/get-product-groups-by-filter.md): Rule-engine-based list endpoint — an alternative to the simple `filter.*` query params on the plain list endpoint, for building complex AND/OR filter conditions. Get the field key enum for…
+- [Get Product Group Meta Filter](https://developers.zuper.co/reference/get-product-group-meta-filter.md): Returns the set of fields available to filter this module on, along with each field's supported operators and (for LOOKUP/nested fields) the companion API to call for typeahead options.…
+- [Create Product Category](https://developers.zuper.co/reference/create-product-category.md)
+- [Get Product Categories](https://developers.zuper.co/reference/get-product-categories.md)
+- [Update Product Category](https://developers.zuper.co/reference/update-product-category.md)
+- [Delete Product Category](https://developers.zuper.co/reference/delete-product-category.md)
+- [Create Inward Transcation](https://developers.zuper.co/reference/create-inward-transcation.md)
+- [Create Outward Transaction](https://developers.zuper.co/reference/create-transfer-transaction.md)
+- [Create Transfer](https://developers.zuper.co/reference/create-transfer.md)
+- [Get all Products Transaction](https://developers.zuper.co/reference/get-all-products-copy.md)
+- [Get Product transaction details](https://developers.zuper.co/reference/get-product-transaction-details.md)
+- [Create Transfer Order](https://developers.zuper.co/reference/transfer-order-create.md)
+- [Get all Transfer Orders](https://developers.zuper.co/reference/transfer-order-get.md)
+- [Get a Transfer Order](https://developers.zuper.co/reference/transfer-order-details.md)
+- [Update Transfer Order](https://developers.zuper.co/reference/transfer-order-upadate.md)
+- [Update Status of Transfer Order](https://developers.zuper.co/reference/transfer-order-status-update.md)
+- [Delete Transfer Order](https://developers.zuper.co/reference/transfer-order-delete.md)
+- [Transfer Order Card](https://developers.zuper.co/reference/transfer-order-card.md)
+- [Create Transfer Order Attachment](https://developers.zuper.co/reference/transfer-order-attachment-create.md)
+- [Update Transfer Order Attachment](https://developers.zuper.co/reference/transfer-order-attachment-update.md)
+- [Delete Transfer Order Attachment](https://developers.zuper.co/reference/transfer-order-attachment-delete.md)
+- [Create Pricelist](https://developers.zuper.co/reference/create-pricelist.md)
+- [Get all Pricelist](https://developers.zuper.co/reference/get-all-pricelist.md)
+- [Get a Pricelist Details](https://developers.zuper.co/reference/get-a-pricelist-details.md)
+- [Update a Pricelist](https://developers.zuper.co/reference/update-a-pricelist.md)
+- [Activate / Deactivate](https://developers.zuper.co/reference/pricelist-activate.md): Update Activate status for a pricelist
+- [Delete Pricelist](https://developers.zuper.co/reference/delete-pricelist.md)
+- [Create Vendor Catalog](https://developers.zuper.co/reference/create-vendor-catalogs.md): Operates on Vendors. In the Zuper client app this module is labeled "Vendor" for most companies, and "Supplier" for companies in the roofing industry — the API and data shape are identical either…
+- [Get Vendor Catalogs](https://developers.zuper.co/reference/get-vendor-catalogs.md): Operates on Vendors. In the Zuper client app this module is labeled "Vendor" for most companies, and "Supplier" for companies in the roofing industry — the API and data shape are identical either…
+- [Update Vendor Catalog](https://developers.zuper.co/reference/update-vendor-catalog.md): Operates on Vendors. In the Zuper client app this module is labeled "Vendor" for most companies, and "Supplier" for companies in the roofing industry — the API and data shape are identical either…
+- [Delete Vendor Catalog](https://developers.zuper.co/reference/delete-vendor-catalog.md): Operates on Vendors. In the Zuper client app this module is labeled "Vendor" for most companies, and "Supplier" for companies in the roofing industry — the API and data shape are identical either…
+- [Create Vendor](https://developers.zuper.co/reference/create-vendor.md): Operates on Vendors. In the Zuper client app this module is labeled "Vendor" for most companies, and "Supplier" for companies in the roofing industry — the API and data shape are identical either…
+- [Get Vendors](https://developers.zuper.co/reference/get-all-vendors.md): Operates on Vendors. In the Zuper client app this module is labeled "Vendor" for most companies, and "Supplier" for companies in the roofing industry — the API and data shape are identical either…
+- [Get Vendor Details](https://developers.zuper.co/reference/get-vendor-details.md): Operates on Vendors. In the Zuper client app this module is labeled "Vendor" for most companies, and "Supplier" for companies in the roofing industry — the API and data shape are identical either…
+- [Update Vendor](https://developers.zuper.co/reference/update-vendor.md): Operates on Vendors. In the Zuper client app this module is labeled "Vendor" for most companies, and "Supplier" for companies in the roofing industry — the API and data shape are identical either…
+- [Delete Vendor](https://developers.zuper.co/reference/delete-vendor.md): Operates on Vendors. In the Zuper client app this module is labeled "Vendor" for most companies, and "Supplier" for companies in the roofing industry — the API and data shape are identical either…
+- [Create Subcontractor](https://developers.zuper.co/reference/post_vendors-1.md): Operates on Subcontractors, shown in the Zuper client app as "Subcontractor" (in every industry). Subcontractors share the exact same underlying schema and endpoints as Vendors / Suppliers; they're…
+- [Get Subcontractors](https://developers.zuper.co/reference/get_vendors-1.md): Operates on Subcontractors, shown in the Zuper client app as "Subcontractor" (in every industry). Subcontractors share the exact same underlying schema and endpoints as Vendors / Suppliers; they're…
+- [Get Subcontractor Details](https://developers.zuper.co/reference/get_vendorsvendor_uid-1.md): Operates on Subcontractors, shown in the Zuper client app as "Subcontractor" (in every industry). Subcontractors share the exact same underlying schema and endpoints as Vendors / Suppliers; they're…
+- [Update Subcontractor](https://developers.zuper.co/reference/put_vendorsvendor_uid-1.md): Operates on Subcontractors, shown in the Zuper client app as "Subcontractor" (in every industry). Subcontractors share the exact same underlying schema and endpoints as Vendors / Suppliers; they're…
+- [Delete Subcontractor](https://developers.zuper.co/reference/delete_vendorsvendor_uid-1.md): Operates on Subcontractors, shown in the Zuper client app as "Subcontractor" (in every industry). Subcontractors share the exact same underlying schema and endpoints as Vendors / Suppliers; they're…
+- [Create Purchase Order](https://developers.zuper.co/reference/create-purchase-order.md): Operates on Purchase Orders. In the Zuper client app this module is labeled "Purchase Order" for most companies, and "Material Order" for companies in the roofing industry — the API and data shape…
+- [Get Purchase Orders](https://developers.zuper.co/reference/get-purchase-orders.md): Operates on Purchase Orders. In the Zuper client app this module is labeled "Purchase Order" for most companies, and "Material Order" for companies in the roofing industry — the API and data shape…
+- [Get Purchase Order Details](https://developers.zuper.co/reference/get-purchase-order-details.md): Operates on Purchase Orders. In the Zuper client app this module is labeled "Purchase Order" for most companies, and "Material Order" for companies in the roofing industry — the API and data shape…
+- [Update Purchase Order](https://developers.zuper.co/reference/update-purchase-order.md): Operates on Purchase Orders. In the Zuper client app this module is labeled "Purchase Order" for most companies, and "Material Order" for companies in the roofing industry — the API and data shape…
+- [Update Purchase Order Fields](https://developers.zuper.co/reference/put_purchase_orderspurchase_order_uid-2.md): Operates on Purchase Orders. In the Zuper client app this module is labeled "Purchase Order" for most companies, and "Material Order" for companies in the roofing industry — the API and data shape…
+- [Update Purchase Order Status](https://developers.zuper.co/reference/update-purchase-order-status.md): Operates on Purchase Orders. In the Zuper client app this module is labeled "Purchase Order" for most companies, and "Material Order" for companies in the roofing industry — the API and data shape…
+- [Send Purchase Order](https://developers.zuper.co/reference/send-purchase-order.md): Operates on Purchase Orders. In the Zuper client app this module is labeled "Purchase Order" for most companies, and "Material Order" for companies in the roofing industry — the API and data shape…
+- [Delete Purchase Order](https://developers.zuper.co/reference/delete-purchase-order.md): Operates on Purchase Orders. In the Zuper client app this module is labeled "Purchase Order" for most companies, and "Material Order" for companies in the roofing industry — the API and data shape…
+- [Bulk Create Purchase Order](https://developers.zuper.co/reference/bulk-create-purchase-order.md): Operates on Purchase Orders. In the Zuper client app this module is labeled "Purchase Order" for most companies, and "Material Order" for companies in the roofing industry — the API and data shape…
+- [Update Purchase Order Line Items](https://developers.zuper.co/reference/update-purchase-order-line-items.md): Operates on Purchase Orders. In the Zuper client app this module is labeled "Purchase Order" for most companies, and "Material Order" for companies in the roofing industry — the API and data shape…
+- [Purchase Order Bulk Action](https://developers.zuper.co/reference/purchase-order-bulk-action.md): Operates on Purchase Orders. In the Zuper client app this module is labeled "Purchase Order" for most companies, and "Material Order" for companies in the roofing industry — the API and data shape…
+- [Get Purchase Orders Meta Filter](https://developers.zuper.co/reference/get-purchase-orders-meta-filter.md): Operates on Purchase Orders. In the Zuper client app this module is labeled "Purchase Order" for most companies, and "Material Order" for companies in the roofing industry — the API and data shape…
+- [Get Purchase Orders By Filter](https://developers.zuper.co/reference/get-purchase-orders-by-filter.md): Operates on Purchase Orders. In the Zuper client app this module is labeled "Purchase Order" for most companies, and "Material Order" for companies in the roofing industry — the API and data shape…
+- [Recover Purchase Order](https://developers.zuper.co/reference/recover-purchase-order.md): Operates on Purchase Orders. In the Zuper client app this module is labeled "Purchase Order" for most companies, and "Material Order" for companies in the roofing industry — the API and data shape…
+- [Create Work Order](https://developers.zuper.co/reference/post_purchase_orders-1.md): Operates on Service Orders, shown in the Zuper client app as "Work Order" (in every industry). Work Orders share the exact same underlying schema and endpoints as Purchase Orders / Material Orders;…
+- [Get Work Orders](https://developers.zuper.co/reference/get_purchase_orders-1.md): Operates on Service Orders, shown in the Zuper client app as "Work Order" (in every industry). Work Orders share the exact same underlying schema and endpoints as Purchase Orders / Material Orders;…
+- [Get Work Order Details](https://developers.zuper.co/reference/get_purchase_orderspurchase_order_uid-1.md): Operates on Service Orders, shown in the Zuper client app as "Work Order" (in every industry). Work Orders share the exact same underlying schema and endpoints as Purchase Orders / Material Orders;…
+- [Update Work Order](https://developers.zuper.co/reference/put_purchase_orderspurchase_order_uid-1.md): Operates on Service Orders, shown in the Zuper client app as "Work Order" (in every industry). Work Orders share the exact same underlying schema and endpoints as Purchase Orders / Material Orders;…
+- [Update Work Order Status](https://developers.zuper.co/reference/put_purchase_orderspurchase_order_uidstatus-1.md): Operates on Service Orders, shown in the Zuper client app as "Work Order" (in every industry). Work Orders share the exact same underlying schema and endpoints as Purchase Orders / Material Orders;…
+- [Send Work Order](https://developers.zuper.co/reference/post_purchase_orderspurchase_order_uidsend-1.md): Operates on Service Orders, shown in the Zuper client app as "Work Order" (in every industry). Work Orders share the exact same underlying schema and endpoints as Purchase Orders / Material Orders;…
+- [Update Work Order Fields](https://developers.zuper.co/reference/put_purchase_orderspurchase_order_uid-2-1.md): Operates on Service Orders, shown in the Zuper client app as "Work Order" (in every industry). Work Orders share the exact same underlying schema and endpoints as Purchase Orders / Material Orders;…
+- [Delete Work Order](https://developers.zuper.co/reference/delete_purchase_orderspurchase_order_uid-2.md): Operates on Service Orders, shown in the Zuper client app as "Work Order" (in every industry). Work Orders share the exact same underlying schema and endpoints as Purchase Orders / Material Orders;…
+- [Get Work Order Summary](https://developers.zuper.co/reference/get-work-order-summary.md): Operates on Service Orders, shown in the Zuper client app as "Work Order" (in every industry). Work Orders share the exact same underlying schema and endpoints as Purchase Orders / Material Orders;…
+- [Get Work Orders Meta](https://developers.zuper.co/reference/get-work-orders-meta.md): Operates on Service Orders, shown in the Zuper client app as "Work Order" (in every industry). Work Orders share the exact same underlying schema and endpoints as Purchase Orders / Material Orders;…
+
+## API Reference: Accounting
+- [Create a Quote](https://developers.zuper.co/reference/create-a-quote.md)
+- [Get all Quote](https://developers.zuper.co/reference/get-all-quote.md)
+- [Get a Quote](https://developers.zuper.co/reference/get-quote-details.md)
+- [Update a Quote](https://developers.zuper.co/reference/update-quote-details.md)
+- [Update Proposal Status](https://developers.zuper.co/reference/update-quote-status.md)
+- [Send a Quote](https://developers.zuper.co/reference/send-a-quote.md)
+- [Bulk Action Quote](https://developers.zuper.co/reference/bulk-action-quote.md)
+- [Delete a Proposal](https://developers.zuper.co/reference/delete-a-quote.md)
+- [Recover a Quote](https://developers.zuper.co/reference/recover-a-quote.md)
+- [/estimate/{estimate_uid}/unarchive](https://developers.zuper.co/reference/unarchive-a-quote.md)
+- [Get Estimate Meta](https://developers.zuper.co/reference/get-estimate-meta.md): Returns the column/field configuration used to render this module's list view.
+- [Get Estimate Meta Filter](https://developers.zuper.co/reference/get-estimate-meta-filter.md): Returns the set of fields available to filter this module on, along with each field's supported operators and (for LOOKUP/nested fields) the companion API to call for typeahead options.…
+- [Create a Proposal](https://developers.zuper.co/reference/create-a-proposal.md)
+- [Get all Proposal](https://developers.zuper.co/reference/get-all-proposal.md)
+- [Get Proposal Details](https://developers.zuper.co/reference/get-proposal-details.md)
+- [Update a Proposal](https://developers.zuper.co/reference/update-a-proposal.md)
+- [Update Proposal Options](https://developers.zuper.co/reference/update-proposal-options.md)
+- [Delete a Proposal](https://developers.zuper.co/reference/delete-a-proposal.md)
+- [Create a Package](https://developers.zuper.co/reference/create-a-package.md)
+- [Get all Packages](https://developers.zuper.co/reference/get-all-packages.md)
+- [Get a Package](https://developers.zuper.co/reference/get-a-package.md)
+- [Update a Package](https://developers.zuper.co/reference/update-a-package.md)
+- [Activate/Deactivate a Package](https://developers.zuper.co/reference/activate-package.md)
+- [Reorder Packages](https://developers.zuper.co/reference/reorder-package.md)
+- [Delete a Package](https://developers.zuper.co/reference/delete-a-package.md)
+- [Create a Template](https://developers.zuper.co/reference/create-a-proposal-template.md)
+- [Get all Templates](https://developers.zuper.co/reference/get-all-proposal-template.md)
+- [Get a Template](https://developers.zuper.co/reference/get-a-proposal-template.md)
+- [Update a Template](https://developers.zuper.co/reference/update-a-proposal-template.md)
+- [Activate/Deactivate a Template](https://developers.zuper.co/reference/activate-template.md)
+- [Delete a Template](https://developers.zuper.co/reference/delete-a-proposal-template.md)
+- [Create a Invoice](https://developers.zuper.co/reference/create-a-invoice.md)
+- [Get all Invoice](https://developers.zuper.co/reference/get-all-invoices.md)
+- [Get Invoice Details](https://developers.zuper.co/reference/get-invoice-details.md)
+- [Update a Invoice](https://developers.zuper.co/reference/update-a-invoice.md)
+- [Update Invoice Status](https://developers.zuper.co/reference/update-a-invoice-status.md)
+- [Send a Invoice](https://developers.zuper.co/reference/send-a-invoice.md)
+- [Delete a Invoice](https://developers.zuper.co/reference/delete-a-invoice.md)
+- [Restore a Invoice](https://developers.zuper.co/reference/recover-invoice.md)
+- [/invoice/{invoice_uid}/unarchive](https://developers.zuper.co/reference/unarchive-a-invoice.md)
+- [Get Invoices By Filter](https://developers.zuper.co/reference/get-invoices-by-filter.md): Rule-engine-based list endpoint — an alternative to the simple `filter.*` query params on the plain list endpoint, for building complex AND/OR filter conditions. Get the field key enum for…
+- [Create Payment Request](https://developers.zuper.co/reference/create-payment-request.md)
+- [Get All Payment Request](https://developers.zuper.co/reference/get-all-payment-request.md)
+- [Cancel Payment Request](https://developers.zuper.co/reference/cancel-payment-request.md)
+- [Delete Payment Request](https://developers.zuper.co/reference/delete-payment-request.md)
+- [Resend Payment Request Email](https://developers.zuper.co/reference/resend-payment-request-email.md)
+- [Get Payment Request Details](https://developers.zuper.co/reference/get-payment-request-details.md)
+- [Get payments](https://developers.zuper.co/reference/get-payments.md)
+- [Get payment details](https://developers.zuper.co/reference/get-payment-details.md)
+- [Void a payment](https://developers.zuper.co/reference/void-a-payment.md)
+- [Get Payment Transactions By Filter](https://developers.zuper.co/reference/get-payment-transactions-by-filter.md): Rule-engine-based list endpoint — an alternative to the simple `filter.*` query params on the plain list endpoint, for building complex AND/OR filter conditions. `job_uid` is special-cased: it has no…
+- [Get Payment Transactions Meta Filter](https://developers.zuper.co/reference/get-payment-transactions-meta-filter.md): Returns the set of fields available to filter this module on, along with each field's supported operators. `fieldDataKey` values are exactly the `key` values accepted by this module's generic-filter…
+- [Create Credit Note](https://developers.zuper.co/reference/create-credit-note.md): Only admins can create
+- [Get All Credit Notes](https://developers.zuper.co/reference/get-all-credit-notes.md)
+- [Get Credit Note Details](https://developers.zuper.co/reference/get-credit-note-details.md)
+- [Delete Credit Note](https://developers.zuper.co/reference/delete-credit-note.md): Only "UNAPPLIED" Credits can be deleted
+- [Get Customer Credit Histories](https://developers.zuper.co/reference/get-customer-credit-histories.md)
+
+## API Reference: Zuper Connect
+- [Get Calls](https://developers.zuper.co/reference/get-calls.md)
+- [Get Call Details](https://developers.zuper.co/reference/get-call-details.md)
+- [Get Call Analytics](https://developers.zuper.co/reference/get-call-stats.md)
+- [Get Call Activity ](https://developers.zuper.co/reference/post_telephony-calls-analytics-comprehensive-1.md)
+- [Get Conversations](https://developers.zuper.co/reference/get-conversations.md)
+- [Get Conversation Details](https://developers.zuper.co/reference/get-conversation-details.md)
+- [Get Conversation Messages](https://developers.zuper.co/reference/get-conversation-messages.md)
+- [Send a message](https://developers.zuper.co/reference/send-a-message.md)
+
+## API Reference: User Management
+- [Create User](https://developers.zuper.co/reference/create-user.md)
+- [Get All Users](https://developers.zuper.co/reference/get-all-users-1.md)
+- [Get User Details](https://developers.zuper.co/reference/get-user-details.md)
+- [Update User Details](https://developers.zuper.co/reference/update-user-details.md)
+- [Delete User](https://developers.zuper.co/reference/delete-user.md)
+- [Activate / Deactivate User](https://developers.zuper.co/reference/update.md)
+- [Create User Skills](https://developers.zuper.co/reference/create-user-skills.md)
+- [Get User Skills](https://developers.zuper.co/reference/get-user-skills.md)
+- [Update User Skills](https://developers.zuper.co/reference/update-user-skills.md)
+- [Delete User Skills](https://developers.zuper.co/reference/delete-user-skills.md)
+- [Get Users Timelog](https://developers.zuper.co/reference/users-timelog.md)
+- [Get User Timelog Details](https://developers.zuper.co/reference/get-user-timelog-details.md)
+- [Create Team](https://developers.zuper.co/reference/create-team.md)
+- [Get All Teams](https://developers.zuper.co/reference/get-all-teams.md)
+- [Get Team Details](https://developers.zuper.co/reference/get-team-details.md)
+- [Update Team Details](https://developers.zuper.co/reference/update-team-details.md)
+- [Delete Team](https://developers.zuper.co/reference/delete-team.md)
+- [Restore Team](https://developers.zuper.co/reference/recover-team.md)
+- [Assign User To Team](https://developers.zuper.co/reference/assign-employee-to-team.md)
+- [Unassign User From Team](https://developers.zuper.co/reference/unassign-employee-from-team.md)
+- [Get Timesheets](https://developers.zuper.co/reference/get-all-timesheet.md)
+- [Get Timesheet Summary](https://developers.zuper.co/reference/get-timesheet-history-copy.md): Returns summary of timesheets such as total work time of users across from & to date
+- [Create Timesheet](https://developers.zuper.co/reference/create-timesheet.md)
+- [Update Timesheet](https://developers.zuper.co/reference/create-timesheet-copy.md)
+- [Delete Timesheet](https://developers.zuper.co/reference/delete-timesheet.md)
+- [Create Timeoff Request](https://developers.zuper.co/reference/create-timeoff.md)
+- [Get Timeoff Requests](https://developers.zuper.co/reference/get-timeoff.md)
+- [Get Timeoff Request Details](https://developers.zuper.co/reference/get-timeoff-request-details.md)
+- [Edit Timeoff Request](https://developers.zuper.co/reference/create-timeoff-request-copy.md)
+- [Update Approval Status](https://developers.zuper.co/reference/get-timeoff-request.md)
+- [Delete Timeoff Request](https://developers.zuper.co/reference/delete-timeoff-request.md)
+- [Create Timesheet Location](https://developers.zuper.co/reference/create-timesheet-location.md)
+- [Get Timesheet Location](https://developers.zuper.co/reference/get-timesheet-location.md)
+- [Get Location Details](https://developers.zuper.co/reference/get-location-details.md)
+- [Update Timesheet Location](https://developers.zuper.co/reference/create-timesheet-location-copy.md)
+- [Delete Timesheet Location](https://developers.zuper.co/reference/delete-timesheet-location.md)
+- [Create Timeoff Request Type](https://developers.zuper.co/reference/create-timeoff-request-type.md)
+- [Get Timeoff Request Type](https://developers.zuper.co/reference/get-timeoff-request-type.md)
+- [Update Timeoff Request Type](https://developers.zuper.co/reference/create-timeoff-request-type-copy.md)
+- [Delete Timeoff Request Type](https://developers.zuper.co/reference/get-timeoff-request-type-copy.md)
+- [Reorder Timeoff Request Type](https://developers.zuper.co/reference/reorder-timeoff-request-type.md)
+- [Create Timeoff Availability](https://developers.zuper.co/reference/get-timeoff-availability-copy.md)
+- [Get Timeoff Availability](https://developers.zuper.co/reference/get-timeoff-availability.md)
+- [Update Timeoff Availability](https://developers.zuper.co/reference/create-timeoff-availability-copy.md)
+- [Delete Timeoff Availability](https://developers.zuper.co/reference/delete-timeoff-availability.md)
+- [/business_units](https://developers.zuper.co/reference/create-trade-type.md)
+- [/business_units](https://developers.zuper.co/reference/get-trade-types.md)
+- [/business_units/{business_unit_uid}](https://developers.zuper.co/reference/get-trade-type-details.md)
+- [/business_units/{business_unit_uid}](https://developers.zuper.co/reference/update-trade-type.md)
+- [/business_units/{business_unit_uid}/activate](https://developers.zuper.co/reference/activatedeactivate-trade-type.md)
+- [/business_units/reorder](https://developers.zuper.co/reference/reorder-trade-types.md)
+- [/business_units/{business_unit_uid}](https://developers.zuper.co/reference/delete-trade-type.md)
+
+## API Reference: OTHERS
+- [Update Custom Fields](https://developers.zuper.co/reference/update-custom-fields.md)
+- [/notes](https://developers.zuper.co/reference/get-notes.md)
+
+## API Reference: Developer Features
+- [Create a Webhook](https://developers.zuper.co/reference/add-webhook.md)
+- [Get Webhooks](https://developers.zuper.co/reference/webhooks.md)
+- [Get Webhook Details](https://developers.zuper.co/reference/get-webhook-by-uid.md)
+- [Update Webhook](https://developers.zuper.co/reference/update-webhook.md)
+- [Activate/Deactivate Webhook](https://developers.zuper.co/reference/activatedeactivate-webhook.md)
+- [Delete Webhook](https://developers.zuper.co/reference/delete-webhook.md)
+- [Get Webhooks History](https://developers.zuper.co/reference/get-all-webhook-history.md)
+- [Webhook Retry](https://developers.zuper.co/reference/webhook-retry.md)
+
+## API Reference: FORM BUILDER
+- [Create Job Checklist](https://developers.zuper.co/reference/create-job-checklist.md)
+- [Get Checklist Details](https://developers.zuper.co/reference/get-checklist-details.md)
+- [Update Job Checklist](https://developers.zuper.co/reference/update-job-checklist-1.md)
+- [Delete Job Checklist](https://developers.zuper.co/reference/delete-job-checklist.md)
+- [Reorder Job Checklists](https://developers.zuper.co/reference/reorder-job-checklists.md)
+- [Clone Checklist](https://developers.zuper.co/reference/clone-checklist.md)
+- [Get Checklists](https://developers.zuper.co/reference/get-checklists.md)
+- [Create Inspection form](https://developers.zuper.co/reference/create-inspection-form.md)
+- [Get Inspection form Details](https://developers.zuper.co/reference/get-inspection-form-details.md)
+- [Update Asset Inspection Form Field](https://developers.zuper.co/reference/update-asset-inspection-form-1.md)
+- [Delete Asset Inspection Form Field](https://developers.zuper.co/reference/delete-asset-inspection-field.md)
+
+## API Reference: zuper-pro-api
+- [Get Purchase Order Summary](https://developers.zuper.co/reference/post_purchase_orderssummary.md): Operates on Purchase Orders. In the Zuper client app this module is labeled "Purchase Order" for most companies, and "Material Order" for companies in the roofing industry — the API and data shape…
+- [Work Order Bulk Action](https://developers.zuper.co/reference/post_service_ordersbulk_action.md): Operates on Service Orders, shown in the Zuper client app as "Work Order" (in every industry). Work Orders share the exact same underlying schema and endpoints as Purchase Orders / Material Orders;…
+- [Bulk Create Work Order](https://developers.zuper.co/reference/post_service_ordersbulk.md): Operates on Service Orders, shown in the Zuper client app as "Work Order" (in every industry). Work Orders share the exact same underlying schema and endpoints as Purchase Orders / Material Orders;…
+- [Get Purchase Orders Meta](https://developers.zuper.co/reference/get_purchase_ordersmeta.md): Operates on Purchase Orders. In the Zuper client app this module is labeled "Purchase Order" for most companies, and "Material Order" for companies in the roofing industry — the API and data shape…
+- [Get Work Orders By Filter](https://developers.zuper.co/reference/post_service_ordersfilter.md): Operates on Service Orders, shown in the Zuper client app as "Work Order" (in every industry). Work Orders share the exact same underlying schema and endpoints as Purchase Orders / Material Orders;…
+- [Get Work Orders Meta Filter](https://developers.zuper.co/reference/get_service_ordersmetafilter.md): Operates on Service Orders, shown in the Zuper client app as "Work Order" (in every industry). Work Orders share the exact same underlying schema and endpoints as Purchase Orders / Material Orders;…
+- [Recover Work Order](https://developers.zuper.co/reference/post_service_ordersrecover.md): Operates on Service Orders, shown in the Zuper client app as "Work Order" (in every industry). Work Orders share the exact same underlying schema and endpoints as Purchase Orders / Material Orders;…
+- [Subcontractor Bulk Action](https://developers.zuper.co/reference/subcontractor-bulk-action.md): Operates on Subcontractors, shown in the Zuper client app as "Subcontractor" (in every industry). Subcontractors share the exact same underlying schema and endpoints as Vendors / Suppliers; they're…
+- [Get Subcontractors Meta](https://developers.zuper.co/reference/get-subcontractors-meta.md): Operates on Subcontractors, shown in the Zuper client app as "Subcontractor" (in every industry). Subcontractors share the exact same underlying schema and endpoints as Vendors / Suppliers; they're…
+- [Get Subcontractors Meta Filter](https://developers.zuper.co/reference/get-subcontractors-meta-filter.md): Operates on Subcontractors, shown in the Zuper client app as "Subcontractor" (in every industry). Subcontractors share the exact same underlying schema and endpoints as Vendors / Suppliers; they're…
+- [Vendor Bulk Action](https://developers.zuper.co/reference/vendor-bulk-action.md): Operates on Vendors. In the Zuper client app this module is labeled "Vendor" for most companies, and "Supplier" for companies in the roofing industry — the API and data shape are identical either…
+- [Get Vendors Meta Filter](https://developers.zuper.co/reference/get-vendors-meta-filter.md): Operates on Vendors. In the Zuper client app this module is labeled "Vendor" for most companies, and "Supplier" for companies in the roofing industry — the API and data shape are identical either…
+- [Activate/Deactivate Vendor](https://developers.zuper.co/reference/activate-vendor.md): Operates on Vendors. In the Zuper client app this module is labeled "Vendor" for most companies, and "Supplier" for companies in the roofing industry — the API and data shape are identical either…
+- [Create Request Status](https://developers.zuper.co/reference/create-request-status-1.md): Creates a new request status. If the company has no request-status document yet, this creates it with this as the first entry.
+- [Update Request Status](https://developers.zuper.co/reference/update-request-status-entry.md): Partial update — any field omitted keeps its existing value.
+- [Delete Request Status](https://developers.zuper.co/reference/delete-request-status-1.md): Removes the status entry from the company's status array entirely (not a soft-delete flag on the entry).
+- [Get Estimates By Filter](https://developers.zuper.co/reference/get-estimates-by-filter-1.md): Rule-engine-based list endpoint — an alternative to the simple `filter.*` query params on the plain list endpoint, for building complex AND/OR filter conditions. Get the field key enum for…
+- [Get Invoice Meta](https://developers.zuper.co/reference/get-invoice-meta-1.md): Returns the column/field configuration used to render this module's list view.
+- [Get Invoice Meta Filter](https://developers.zuper.co/reference/get-invoice-meta-filter-1.md): Returns the set of fields available to filter this module on, along with each field's supported operators and (for LOOKUP/nested fields) the companion API to call for typeahead options.…
+- [Get Job Meta](https://developers.zuper.co/reference/get-job-meta-1.md): Returns the column/field configuration used to render this module's list view.
+- [Get Job Meta Filter](https://developers.zuper.co/reference/get-job-meta-filter-1.md): Returns the set of fields available to filter this module on, along with each field's supported operators and (for LOOKUP/nested fields) the companion API to call for typeahead options.…
+- [Get Products By Filter](https://developers.zuper.co/reference/get-products-by-filter-1.md): Rule-engine-based list endpoint — an alternative to the simple `filter.*` query params on the plain list endpoint, for building complex AND/OR filter conditions. Get the field key enum for…
+- [Get Product Meta](https://developers.zuper.co/reference/get-product-meta-1.md): Returns the column/field configuration used to render this module's list view.
+- [Reorder Request Statuses](https://developers.zuper.co/reference/reorder-request-statuses-1.md): Replaces the order of the full request-status array. Must include every existing status (same length as the current array, all status_uids resolvable) — this is not a partial reorder.
+- [Get Subcontractors By Filter](https://developers.zuper.co/reference/get-subcontractors-by-filter-1.md): Operates on Subcontractors, shown in the Zuper client app as "Subcontractor" (in every industry). Subcontractors share the exact same underlying schema and endpoints as Vendors / Suppliers; they're…
+- [Activate/Deactivate Subcontractor](https://developers.zuper.co/reference/activatedeactivate-subcontractor.md): Operates on Subcontractors, shown in the Zuper client app as "Subcontractor" (in every industry). Subcontractors share the exact same underlying schema and endpoints as Vendors / Suppliers; they're…
+- [Get Vendors By Filter](https://developers.zuper.co/reference/get-vendors-by-filter.md): Operates on Vendors. In the Zuper client app this module is labeled "Vendor" for most companies, and "Supplier" for companies in the roofing industry — the API and data shape are identical either…
+- [Get Vendors Meta](https://developers.zuper.co/reference/get-vendors-meta.md): Operates on Vendors. In the Zuper client app this module is labeled "Vendor" for most companies, and "Supplier" for companies in the roofing industry — the API and data shape are identical either…
+- [Delete Multiple Vendor Catalogs](https://developers.zuper.co/reference/delete-vendor-catalogs.md): Operates on Vendors. In the Zuper client app this module is labeled "Vendor" for most companies, and "Supplier" for companies in the roofing industry — the API and data shape are identical either…
+- [Get User Meta Filter](https://developers.zuper.co/reference/get-users-meta-filter-fields.md): Returns the set of fields available to filter this module on, along with each field's supported operators. `fieldDataKey` values are exactly the `key` values accepted by this module's generic-filter…
+
+## Changelog
+- [September 2026 Updates](https://developers.zuper.co/changelog/september-2026-updates.md)
+- [August 2026 Updates](https://developers.zuper.co/changelog/august-2026-updates.md)
+- [July 2026 Updates](https://developers.zuper.co/changelog/july-2026-updates.md)
+- [June 2026 Updates](https://developers.zuper.co/changelog/june-2026-updates.md)
+- [May 2026 Updates](https://developers.zuper.co/changelog/may-2026-updates.md)
+- [April 2026 Updates](https://developers.zuper.co/changelog/april-2026-updates.md)
+- [March 2026 Updates](https://developers.zuper.co/changelog/march-2026-updates.md)
+- [February 2026 Updates](https://developers.zuper.co/changelog/february-2026-updates.md)
+- [January 2026 Updates](https://developers.zuper.co/changelog/january-2026-updates.md)
+- [December 2025 Updates](https://developers.zuper.co/changelog/december-2025-updates.md)

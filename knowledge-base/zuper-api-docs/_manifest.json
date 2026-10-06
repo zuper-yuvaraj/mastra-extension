@@ -1,0 +1,2739 @@
+{
+  "source": "https://developers.zuper.co/llms.txt",
+  "generatedAt": "2026-10-06T13:44:35.979Z",
+  "folders": {
+    "guides/documentation": [
+      {
+        "title": "Getting Started with Zuper Pro",
+        "url": "https://developers.zuper.co/docs/getting-started.md",
+        "file": "guides/documentation/getting-started.md"
+      },
+      {
+        "title": "Zuper's Model Context Protocol (MCP) Server",
+        "url": "https://developers.zuper.co/docs/zupers-model-context-protocol-mcp-server.md",
+        "file": "guides/documentation/zupers-model-context-protocol-mcp-server.md"
+      }
+    ],
+    "api-reference/zuper-pro-api/general": [
+      {
+        "title": "Getting Started with Zuper API",
+        "url": "https://developers.zuper.co/reference/getting-started-with-your-api.md",
+        "file": "api-reference/zuper-pro-api/general/getting-started-with-your-api.md"
+      },
+      {
+        "title": "Generating API Key",
+        "url": "https://developers.zuper.co/reference/generate-api-key.md",
+        "file": "api-reference/zuper-pro-api/general/generate-api-key.md"
+      }
+    ],
+    "api-reference/work-order-management/jobs": [
+      {
+        "title": "Create a Job",
+        "url": "https://developers.zuper.co/reference/create-job.md",
+        "file": "api-reference/work-order-management/jobs/create-job.md"
+      },
+      {
+        "title": "Get Jobs",
+        "url": "https://developers.zuper.co/reference/get-all-jobs.md",
+        "file": "api-reference/work-order-management/jobs/get-all-jobs.md"
+      },
+      {
+        "title": "Get Job Details",
+        "url": "https://developers.zuper.co/reference/get-job-details.md",
+        "file": "api-reference/work-order-management/jobs/get-job-details.md"
+      },
+      {
+        "title": "Update Job Assignment",
+        "url": "https://developers.zuper.co/reference/update-job-assignment.md",
+        "file": "api-reference/work-order-management/jobs/update-job-assignment.md"
+      },
+      {
+        "title": "Accept / Decline Job",
+        "url": "https://developers.zuper.co/reference/update-job-accept.md",
+        "file": "api-reference/work-order-management/jobs/update-job-accept.md"
+      },
+      {
+        "title": "Update a Job",
+        "url": "https://developers.zuper.co/reference/update-job.md",
+        "file": "api-reference/work-order-management/jobs/update-job.md"
+      },
+      {
+        "title": "Generate / Share Job Card PDF",
+        "url": "https://developers.zuper.co/reference/update-a-job-assignment-copy.md",
+        "file": "api-reference/work-order-management/jobs/update-a-job-assignment-copy.md"
+      },
+      {
+        "title": "Delete a Job",
+        "url": "https://developers.zuper.co/reference/delete-job.md",
+        "file": "api-reference/work-order-management/jobs/delete-job.md"
+      },
+      {
+        "title": "Restore Job",
+        "url": "https://developers.zuper.co/reference/recover-jobs.md",
+        "file": "api-reference/work-order-management/jobs/recover-jobs.md"
+      },
+      {
+        "title": "Reschedule Job",
+        "url": "https://developers.zuper.co/reference/print-save-as-pdf-share-via-email-job-card-copy.md",
+        "file": "api-reference/work-order-management/jobs/print-save-as-pdf-share-via-email-job-card-copy.md"
+      },
+      {
+        "title": "Get Unscheduled Jobs",
+        "url": "https://developers.zuper.co/reference/get-unassigned-jobs-copy.md",
+        "file": "api-reference/work-order-management/jobs/get-unassigned-jobs-copy.md"
+      },
+      {
+        "title": "Assisted Scheduling",
+        "url": "https://developers.zuper.co/reference/assisted-scheduling.md",
+        "file": "api-reference/work-order-management/jobs/assisted-scheduling.md"
+      },
+      {
+        "title": "Conflicting Jobs & Time off",
+        "url": "https://developers.zuper.co/reference/conflicting-jobs-and-time-off.md",
+        "file": "api-reference/work-order-management/jobs/conflicting-jobs-and-time-off.md"
+      },
+      {
+        "title": "Get Jobs By Filter",
+        "url": "https://developers.zuper.co/reference/get-job-details-v3-1.md",
+        "file": "api-reference/work-order-management/jobs/get-job-details-v3-1.md"
+      },
+      {
+        "title": "Get Job Financial Summary",
+        "url": "https://developers.zuper.co/reference/get-job-financial-summary.md",
+        "file": "api-reference/work-order-management/jobs/get-job-financial-summary.md"
+      }
+    ],
+    "api-reference/work-order-management/job-status": [
+      {
+        "title": "Update Status & Checklist",
+        "url": "https://developers.zuper.co/reference/update-job-status.md",
+        "file": "api-reference/work-order-management/job-status/update-job-status.md"
+      },
+      {
+        "title": "Rollback / Delete a Job Status",
+        "url": "https://developers.zuper.co/reference/rollback-job-status.md",
+        "file": "api-reference/work-order-management/job-status/rollback-job-status.md"
+      },
+      {
+        "title": "Create Job Status",
+        "url": "https://developers.zuper.co/reference/create-job-status.md",
+        "file": "api-reference/work-order-management/job-status/create-job-status.md"
+      },
+      {
+        "title": "Get All Job Status",
+        "url": "https://developers.zuper.co/reference/get-all-job-status.md",
+        "file": "api-reference/work-order-management/job-status/get-all-job-status.md"
+      },
+      {
+        "title": "Update Job Status",
+        "url": "https://developers.zuper.co/reference/update-job-status-1.md",
+        "file": "api-reference/work-order-management/job-status/update-job-status-1.md"
+      },
+      {
+        "title": "Rearrange Job Status",
+        "url": "https://developers.zuper.co/reference/rearrange-job-status.md",
+        "file": "api-reference/work-order-management/job-status/rearrange-job-status.md"
+      },
+      {
+        "title": "Delete Job Status",
+        "url": "https://developers.zuper.co/reference/delete-job-status.md",
+        "file": "api-reference/work-order-management/job-status/delete-job-status.md"
+      }
+    ],
+    "api-reference/work-order-management/checklists": [
+      {
+        "title": "Update Job Checklist",
+        "url": "https://developers.zuper.co/reference/update-job-checklist.md",
+        "file": "api-reference/work-order-management/checklists/update-job-checklist.md"
+      }
+    ],
+    "api-reference/work-order-management/job-timelogs": [
+      {
+        "title": "Create a Job Timelog",
+        "url": "https://developers.zuper.co/reference/create-a-job-timelog-copy-1.md",
+        "file": "api-reference/work-order-management/job-timelogs/create-a-job-timelog-copy-1.md"
+      },
+      {
+        "title": "Update a Job Timelog",
+        "url": "https://developers.zuper.co/reference/create-a-job-timelog-copy.md",
+        "file": "api-reference/work-order-management/job-timelogs/create-a-job-timelog-copy.md"
+      },
+      {
+        "title": "Get Job Timelog",
+        "url": "https://developers.zuper.co/reference/get-job-timelog-summary-copy.md",
+        "file": "api-reference/work-order-management/job-timelogs/get-job-timelog-summary-copy.md"
+      },
+      {
+        "title": "Get Job Timelog Summary",
+        "url": "https://developers.zuper.co/reference/create-a-job-copy.md",
+        "file": "api-reference/work-order-management/job-timelogs/create-a-job-copy.md"
+      },
+      {
+        "title": "Get Job Timelog Summary Details",
+        "url": "https://developers.zuper.co/reference/get-job-timelog-summary-copy-copy.md",
+        "file": "api-reference/work-order-management/job-timelogs/get-job-timelog-summary-copy-copy.md"
+      },
+      {
+        "title": "Delete Job Timelog",
+        "url": "https://developers.zuper.co/reference/delete-job-timelog.md",
+        "file": "api-reference/work-order-management/job-timelogs/delete-job-timelog.md"
+      }
+    ],
+    "api-reference/work-order-management/job-notes": [
+      {
+        "title": "Create Job Note",
+        "url": "https://developers.zuper.co/reference/create-job-note.md",
+        "file": "api-reference/work-order-management/job-notes/create-job-note.md"
+      },
+      {
+        "title": "Get Job Notes",
+        "url": "https://developers.zuper.co/reference/get-job-notes.md",
+        "file": "api-reference/work-order-management/job-notes/get-job-notes.md"
+      },
+      {
+        "title": "Update Job Note",
+        "url": "https://developers.zuper.co/reference/update-job-note.md",
+        "file": "api-reference/work-order-management/job-notes/update-job-note.md"
+      },
+      {
+        "title": "Change Note Privacy",
+        "url": "https://developers.zuper.co/reference/change-job-note-privacy.md",
+        "file": "api-reference/work-order-management/job-notes/change-job-note-privacy.md"
+      },
+      {
+        "title": "Delete Job Note",
+        "url": "https://developers.zuper.co/reference/delete-job-note.md",
+        "file": "api-reference/work-order-management/job-notes/delete-job-note.md"
+      }
+    ],
+    "api-reference/work-order-management/routes": [
+      {
+        "title": "Create Route",
+        "url": "https://developers.zuper.co/reference/create-route.md",
+        "file": "api-reference/work-order-management/routes/create-route.md"
+      },
+      {
+        "title": "Get Routes",
+        "url": "https://developers.zuper.co/reference/get-routes.md",
+        "file": "api-reference/work-order-management/routes/get-routes.md"
+      },
+      {
+        "title": "Get Route Details",
+        "url": "https://developers.zuper.co/reference/get-route-details.md",
+        "file": "api-reference/work-order-management/routes/get-route-details.md"
+      },
+      {
+        "title": "Get Routes Count",
+        "url": "https://developers.zuper.co/reference/get-routes-count-1.md",
+        "file": "api-reference/work-order-management/routes/get-routes-count-1.md"
+      },
+      {
+        "title": "Update Route Details",
+        "url": "https://developers.zuper.co/reference/update-route-details.md",
+        "file": "api-reference/work-order-management/routes/update-route-details.md"
+      },
+      {
+        "title": "Add Job To Route",
+        "url": "https://developers.zuper.co/reference/add-job-to-route.md",
+        "file": "api-reference/work-order-management/routes/add-job-to-route.md"
+      },
+      {
+        "title": "Assign User Team To Route",
+        "url": "https://developers.zuper.co/reference/assign-user-team-to-route.md",
+        "file": "api-reference/work-order-management/routes/assign-user-team-to-route.md"
+      },
+      {
+        "title": "Unassign User Team To Route",
+        "url": "https://developers.zuper.co/reference/assign-user-team-to-route-copy.md",
+        "file": "api-reference/work-order-management/routes/assign-user-team-to-route-copy.md"
+      },
+      {
+        "title": "Reassign Job From Route",
+        "url": "https://developers.zuper.co/reference/reassign-job-from-route.md",
+        "file": "api-reference/work-order-management/routes/reassign-job-from-route.md"
+      },
+      {
+        "title": "Reorder Jobs In Route",
+        "url": "https://developers.zuper.co/reference/reorder-jobs-in-route.md",
+        "file": "api-reference/work-order-management/routes/reorder-jobs-in-route.md"
+      },
+      {
+        "title": "Clone Job Route",
+        "url": "https://developers.zuper.co/reference/clone-job-route.md",
+        "file": "api-reference/work-order-management/routes/clone-job-route.md"
+      },
+      {
+        "title": "Optimize Job Route",
+        "url": "https://developers.zuper.co/reference/optimize-job-route.md",
+        "file": "api-reference/work-order-management/routes/optimize-job-route.md"
+      },
+      {
+        "title": "Lock Job Route",
+        "url": "https://developers.zuper.co/reference/lock-job-route.md",
+        "file": "api-reference/work-order-management/routes/lock-job-route.md"
+      },
+      {
+        "title": "Delete Job Route",
+        "url": "https://developers.zuper.co/reference/delete-job-route.md",
+        "file": "api-reference/work-order-management/routes/delete-job-route.md"
+      },
+      {
+        "title": "Delete Job From Route",
+        "url": "https://developers.zuper.co/reference/delete-job-from-route.md",
+        "file": "api-reference/work-order-management/routes/delete-job-from-route.md"
+      },
+      {
+        "title": "Get Job Routes By Filter",
+        "url": "https://developers.zuper.co/reference/get-job-routes-by-filter.md",
+        "file": "api-reference/work-order-management/routes/get-job-routes-by-filter.md"
+      },
+      {
+        "title": "Get Job Route Meta Filter",
+        "url": "https://developers.zuper.co/reference/get-job-route-meta-filter.md",
+        "file": "api-reference/work-order-management/routes/get-job-route-meta-filter.md"
+      }
+    ],
+    "api-reference/work-order-management/recurring-jobs": [
+      {
+        "title": "Get Recurring Jobs",
+        "url": "https://developers.zuper.co/reference/get-all-recurring-jobs.md",
+        "file": "api-reference/work-order-management/recurring-jobs/get-all-recurring-jobs.md"
+      },
+      {
+        "title": "Update Recurring Job Schedule",
+        "url": "https://developers.zuper.co/reference/update-recurring-jobs.md",
+        "file": "api-reference/work-order-management/recurring-jobs/update-recurring-jobs.md"
+      },
+      {
+        "title": "Delete Reccurring Job",
+        "url": "https://developers.zuper.co/reference/delete-reccurring-job.md",
+        "file": "api-reference/work-order-management/recurring-jobs/delete-reccurring-job.md"
+      }
+    ],
+    "api-reference/work-order-management/job-attachments": [
+      {
+        "title": "Add Job Attachment",
+        "url": "https://developers.zuper.co/reference/create-job-attachment.md",
+        "file": "api-reference/work-order-management/job-attachments/create-job-attachment.md"
+      },
+      {
+        "title": "Update Job Attachment",
+        "url": "https://developers.zuper.co/reference/update-job-attachment.md",
+        "file": "api-reference/work-order-management/job-attachments/update-job-attachment.md"
+      },
+      {
+        "title": "Delete Job Attachment",
+        "url": "https://developers.zuper.co/reference/delete-job-attachment.md",
+        "file": "api-reference/work-order-management/job-attachments/delete-job-attachment.md"
+      }
+    ],
+    "api-reference/work-order-management/expenses": [
+      {
+        "title": "Create Expense",
+        "url": "https://developers.zuper.co/reference/createexpense.md",
+        "file": "api-reference/work-order-management/expenses/createexpense.md"
+      },
+      {
+        "title": "Update Expense",
+        "url": "https://developers.zuper.co/reference/update-expense.md",
+        "file": "api-reference/work-order-management/expenses/update-expense.md"
+      },
+      {
+        "title": "Get All Expenses",
+        "url": "https://developers.zuper.co/reference/get-all-expenses.md",
+        "file": "api-reference/work-order-management/expenses/get-all-expenses.md"
+      },
+      {
+        "title": "Get Expense Details",
+        "url": "https://developers.zuper.co/reference/get-expense-details.md",
+        "file": "api-reference/work-order-management/expenses/get-expense-details.md"
+      },
+      {
+        "title": "Delete Expense",
+        "url": "https://developers.zuper.co/reference/delete-expense.md",
+        "file": "api-reference/work-order-management/expenses/delete-expense.md"
+      }
+    ],
+    "api-reference/work-order-management/job-categories": [
+      {
+        "title": "Create Job Category",
+        "url": "https://developers.zuper.co/reference/create-job-category.md",
+        "file": "api-reference/work-order-management/job-categories/create-job-category.md"
+      },
+      {
+        "title": "Get All Job Category",
+        "url": "https://developers.zuper.co/reference/get-all-job-category.md",
+        "file": "api-reference/work-order-management/job-categories/get-all-job-category.md"
+      },
+      {
+        "title": "Edit Job Category",
+        "url": "https://developers.zuper.co/reference/edit-job-category.md",
+        "file": "api-reference/work-order-management/job-categories/edit-job-category.md"
+      },
+      {
+        "title": "Delete a job category",
+        "url": "https://developers.zuper.co/reference/delete-a-job-category.md",
+        "file": "api-reference/work-order-management/job-categories/delete-a-job-category.md"
+      },
+      {
+        "title": "Reorder Job Category",
+        "url": "https://developers.zuper.co/reference/reorder-job-category.md",
+        "file": "api-reference/work-order-management/job-categories/reorder-job-category.md"
+      }
+    ],
+    "api-reference/work-order-management/attachment-folders": [
+      {
+        "title": "/attachments/folders",
+        "url": "https://developers.zuper.co/reference/create-folder.md",
+        "file": "api-reference/work-order-management/attachment-folders/create-folder.md"
+      },
+      {
+        "title": "/attachments/folders",
+        "url": "https://developers.zuper.co/reference/get-folders.md",
+        "file": "api-reference/work-order-management/attachment-folders/get-folders.md"
+      },
+      {
+        "title": "/attachments/folders/{folder_uid}",
+        "url": "https://developers.zuper.co/reference/update-folder.md",
+        "file": "api-reference/work-order-management/attachment-folders/update-folder.md"
+      },
+      {
+        "title": "/attachments/folders/{folder_uid}",
+        "url": "https://developers.zuper.co/reference/delete-folder.md",
+        "file": "api-reference/work-order-management/attachment-folders/delete-folder.md"
+      },
+      {
+        "title": "/attachments/folders/{folder_uid}/association",
+        "url": "https://developers.zuper.co/reference/add-files-to-folder.md",
+        "file": "api-reference/work-order-management/attachment-folders/add-files-to-folder.md"
+      },
+      {
+        "title": "/attachments/folders/{folder_uid}/association",
+        "url": "https://developers.zuper.co/reference/remove-files-from-folder.md",
+        "file": "api-reference/work-order-management/attachment-folders/remove-files-from-folder.md"
+      },
+      {
+        "title": "/attachments/folders/{folder_uid}/share",
+        "url": "https://developers.zuper.co/reference/share-folder.md",
+        "file": "api-reference/work-order-management/attachment-folders/share-folder.md"
+      },
+      {
+        "title": "/attachments/folders/{folder_uid}/share",
+        "url": "https://developers.zuper.co/reference/get-folder-shares.md",
+        "file": "api-reference/work-order-management/attachment-folders/get-folder-shares.md"
+      },
+      {
+        "title": "/attachments/folders/{folder_uid}/share/{share_uid}",
+        "url": "https://developers.zuper.co/reference/update-folder-share.md",
+        "file": "api-reference/work-order-management/attachment-folders/update-folder-share.md"
+      },
+      {
+        "title": "/attachments/folders/{folder_uid}/share/{share_uid}",
+        "url": "https://developers.zuper.co/reference/delete-folder-share.md",
+        "file": "api-reference/work-order-management/attachment-folders/delete-folder-share.md"
+      }
+    ],
+    "api-reference/work-order-management/comments": [
+      {
+        "title": "Create Comment",
+        "url": "https://developers.zuper.co/reference/create-comment.md",
+        "file": "api-reference/work-order-management/comments/create-comment.md"
+      },
+      {
+        "title": "Get Comments",
+        "url": "https://developers.zuper.co/reference/get-comments.md",
+        "file": "api-reference/work-order-management/comments/get-comments.md"
+      },
+      {
+        "title": "Update Comment",
+        "url": "https://developers.zuper.co/reference/update-comment.md",
+        "file": "api-reference/work-order-management/comments/update-comment.md"
+      },
+      {
+        "title": "Delete Comment",
+        "url": "https://developers.zuper.co/reference/delete-comment.md",
+        "file": "api-reference/work-order-management/comments/delete-comment.md"
+      }
+    ],
+    "api-reference/work-order-management/gallery": [
+      {
+        "title": "Gallery",
+        "url": "https://developers.zuper.co/reference/get-attachments.md",
+        "file": "api-reference/work-order-management/gallery/get-attachments.md"
+      },
+      {
+        "title": "Bulk Delete Attachments",
+        "url": "https://developers.zuper.co/reference/bulk-delete-attachments.md",
+        "file": "api-reference/work-order-management/gallery/bulk-delete-attachments.md"
+      },
+      {
+        "title": "Bulk Recover Attachments",
+        "url": "https://developers.zuper.co/reference/bulk-recover-attachments.md",
+        "file": "api-reference/work-order-management/gallery/bulk-recover-attachments.md"
+      }
+    ],
+    "api-reference/work-order-management/appointments": [
+      {
+        "title": "Create New Appointment",
+        "url": "https://developers.zuper.co/reference/create-new-appointment.md",
+        "file": "api-reference/work-order-management/appointments/create-new-appointment.md"
+      },
+      {
+        "title": "Get Appointments",
+        "url": "https://developers.zuper.co/reference/get-appointments.md",
+        "file": "api-reference/work-order-management/appointments/get-appointments.md"
+      },
+      {
+        "title": "Get Appointment Details",
+        "url": "https://developers.zuper.co/reference/get-appointment-details.md",
+        "file": "api-reference/work-order-management/appointments/get-appointment-details.md"
+      },
+      {
+        "title": "Update Appointment",
+        "url": "https://developers.zuper.co/reference/update-appointment.md",
+        "file": "api-reference/work-order-management/appointments/update-appointment.md"
+      },
+      {
+        "title": "Update Appointment Associations",
+        "url": "https://developers.zuper.co/reference/update-appointment-associations.md",
+        "file": "api-reference/work-order-management/appointments/update-appointment-associations.md"
+      },
+      {
+        "title": "Appointment - Service task reorder",
+        "url": "https://developers.zuper.co/reference/appointment-service-task-reorder.md",
+        "file": "api-reference/work-order-management/appointments/appointment-service-task-reorder.md"
+      },
+      {
+        "title": "Assign Appointment",
+        "url": "https://developers.zuper.co/reference/assign-appointment.md",
+        "file": "api-reference/work-order-management/appointments/assign-appointment.md"
+      },
+      {
+        "title": "Delete Appointment",
+        "url": "https://developers.zuper.co/reference/delete-appointment.md",
+        "file": "api-reference/work-order-management/appointments/delete-appointment.md"
+      }
+    ],
+    "api-reference/work-order-management/service-tasks": [
+      {
+        "title": "Create Service Tasks",
+        "url": "https://developers.zuper.co/reference/create-service-tasks.md",
+        "file": "api-reference/work-order-management/service-tasks/create-service-tasks.md"
+      },
+      {
+        "title": "Get  Service Tasks",
+        "url": "https://developers.zuper.co/reference/get-service-task.md",
+        "file": "api-reference/work-order-management/service-tasks/get-service-task.md"
+      },
+      {
+        "title": "Get Service Task Details",
+        "url": "https://developers.zuper.co/reference/get-service-tasks.md",
+        "file": "api-reference/work-order-management/service-tasks/get-service-tasks.md"
+      },
+      {
+        "title": "Update Service Task Status",
+        "url": "https://developers.zuper.co/reference/update-service-task-status.md",
+        "file": "api-reference/work-order-management/service-tasks/update-service-task-status.md"
+      },
+      {
+        "title": "Update Service Task",
+        "url": "https://developers.zuper.co/reference/update-service-task.md",
+        "file": "api-reference/work-order-management/service-tasks/update-service-task.md"
+      },
+      {
+        "title": "Assign Service Task",
+        "url": "https://developers.zuper.co/reference/assign-service-task.md",
+        "file": "api-reference/work-order-management/service-tasks/assign-service-task.md"
+      },
+      {
+        "title": "Reorder Service Tasks",
+        "url": "https://developers.zuper.co/reference/reorder-service-tasks.md",
+        "file": "api-reference/work-order-management/service-tasks/reorder-service-tasks.md"
+      },
+      {
+        "title": "Bulk Action Service Task",
+        "url": "https://developers.zuper.co/reference/bulk-action-service-task.md",
+        "file": "api-reference/work-order-management/service-tasks/bulk-action-service-task.md"
+      },
+      {
+        "title": "Delete Service Task",
+        "url": "https://developers.zuper.co/reference/delete-service-task.md",
+        "file": "api-reference/work-order-management/service-tasks/delete-service-task.md"
+      }
+    ],
+    "api-reference/work-order-management/projects": [
+      {
+        "title": "Create Project",
+        "url": "https://developers.zuper.co/reference/create-project.md",
+        "file": "api-reference/work-order-management/projects/create-project.md"
+      },
+      {
+        "title": "Get All Projects",
+        "url": "https://developers.zuper.co/reference/get-all-projects.md",
+        "file": "api-reference/work-order-management/projects/get-all-projects.md"
+      },
+      {
+        "title": "Get Project Details",
+        "url": "https://developers.zuper.co/reference/get-project-details.md",
+        "file": "api-reference/work-order-management/projects/get-project-details.md"
+      },
+      {
+        "title": "Update a project",
+        "url": "https://developers.zuper.co/reference/update-a-project.md",
+        "file": "api-reference/work-order-management/projects/update-a-project.md"
+      },
+      {
+        "title": "Update Project Status",
+        "url": "https://developers.zuper.co/reference/update-project-status-1.md",
+        "file": "api-reference/work-order-management/projects/update-project-status-1.md"
+      },
+      {
+        "title": "Update Assignment",
+        "url": "https://developers.zuper.co/reference/update-assignment.md",
+        "file": "api-reference/work-order-management/projects/update-assignment.md"
+      },
+      {
+        "title": "Delete Project",
+        "url": "https://developers.zuper.co/reference/delete-project.md",
+        "file": "api-reference/work-order-management/projects/delete-project.md"
+      },
+      {
+        "title": "Get Projects By Filter",
+        "url": "https://developers.zuper.co/reference/get-projects-by-filter.md",
+        "file": "api-reference/work-order-management/projects/get-projects-by-filter.md"
+      },
+      {
+        "title": "Get Project Meta",
+        "url": "https://developers.zuper.co/reference/get-project-meta.md",
+        "file": "api-reference/work-order-management/projects/get-project-meta.md"
+      },
+      {
+        "title": "Get Project Meta Filter",
+        "url": "https://developers.zuper.co/reference/get-project-meta-filter.md",
+        "file": "api-reference/work-order-management/projects/get-project-meta-filter.md"
+      },
+      {
+        "title": "Link Job to Project",
+        "url": "https://developers.zuper.co/reference/link-job-to-project.md",
+        "file": "api-reference/work-order-management/projects/link-job-to-project.md"
+      },
+      {
+        "title": "Reorder Jobs in Project",
+        "url": "https://developers.zuper.co/reference/reorder-jobs-in-project.md",
+        "file": "api-reference/work-order-management/projects/reorder-jobs-in-project.md"
+      },
+      {
+        "title": "Remove Job from Project",
+        "url": "https://developers.zuper.co/reference/remove-job-from-project.md",
+        "file": "api-reference/work-order-management/projects/remove-job-from-project.md"
+      },
+      {
+        "title": "Create Milestone",
+        "url": "https://developers.zuper.co/reference/create-milestone.md",
+        "file": "api-reference/work-order-management/projects/create-milestone.md"
+      },
+      {
+        "title": "Update Milestone",
+        "url": "https://developers.zuper.co/reference/update-milestone.md",
+        "file": "api-reference/work-order-management/projects/update-milestone.md"
+      },
+      {
+        "title": "Update Milestone Status",
+        "url": "https://developers.zuper.co/reference/update-milestone-status.md",
+        "file": "api-reference/work-order-management/projects/update-milestone-status.md"
+      },
+      {
+        "title": "Delete Milestone",
+        "url": "https://developers.zuper.co/reference/delete-milestone.md",
+        "file": "api-reference/work-order-management/projects/delete-milestone.md"
+      },
+      {
+        "title": "Create Phase",
+        "url": "https://developers.zuper.co/reference/create-phase.md",
+        "file": "api-reference/work-order-management/projects/create-phase.md"
+      },
+      {
+        "title": "Update Phase",
+        "url": "https://developers.zuper.co/reference/update-phase.md",
+        "file": "api-reference/work-order-management/projects/update-phase.md"
+      },
+      {
+        "title": "Update Phase Items",
+        "url": "https://developers.zuper.co/reference/update-phase-items.md",
+        "file": "api-reference/work-order-management/projects/update-phase-items.md"
+      },
+      {
+        "title": "Get All Phases",
+        "url": "https://developers.zuper.co/reference/get-phase.md",
+        "file": "api-reference/work-order-management/projects/get-phase.md"
+      },
+      {
+        "title": "Reorder Phase",
+        "url": "https://developers.zuper.co/reference/reorder-phase.md",
+        "file": "api-reference/work-order-management/projects/reorder-phase.md"
+      },
+      {
+        "title": "Reorder Phase Items",
+        "url": "https://developers.zuper.co/reference/reorder-phase-items.md",
+        "file": "api-reference/work-order-management/projects/reorder-phase-items.md"
+      },
+      {
+        "title": "Delete Phase",
+        "url": "https://developers.zuper.co/reference/delete-phase.md",
+        "file": "api-reference/work-order-management/projects/delete-phase.md"
+      },
+      {
+        "title": "Delete Phase Items",
+        "url": "https://developers.zuper.co/reference/delete-phase-items.md",
+        "file": "api-reference/work-order-management/projects/delete-phase-items.md"
+      },
+      {
+        "title": "Create Dependency",
+        "url": "https://developers.zuper.co/reference/create-dependency.md",
+        "file": "api-reference/work-order-management/projects/create-dependency.md"
+      },
+      {
+        "title": "Update Dependency",
+        "url": "https://developers.zuper.co/reference/update-dependency.md",
+        "file": "api-reference/work-order-management/projects/update-dependency.md"
+      },
+      {
+        "title": "Check Dependency",
+        "url": "https://developers.zuper.co/reference/check-dependency.md",
+        "file": "api-reference/work-order-management/projects/check-dependency.md"
+      },
+      {
+        "title": "Delete Dependency",
+        "url": "https://developers.zuper.co/reference/delete-dependency.md",
+        "file": "api-reference/work-order-management/projects/delete-dependency.md"
+      },
+      {
+        "title": "/projects/{project_uid}/finance/stats",
+        "url": "https://developers.zuper.co/reference/get-project-finance-stats.md",
+        "file": "api-reference/work-order-management/projects/get-project-finance-stats.md"
+      }
+    ],
+    "api-reference/work-order-management/measurements": [
+      {
+        "title": "Create Measurement",
+        "url": "https://developers.zuper.co/reference/create-measurement.md",
+        "file": "api-reference/work-order-management/measurements/create-measurement.md"
+      },
+      {
+        "title": "Get Measurements",
+        "url": "https://developers.zuper.co/reference/get-measurements.md",
+        "file": "api-reference/work-order-management/measurements/get-measurements.md"
+      },
+      {
+        "title": "Get Measurement Details",
+        "url": "https://developers.zuper.co/reference/get-measurement-details.md",
+        "file": "api-reference/work-order-management/measurements/get-measurement-details.md"
+      },
+      {
+        "title": "Update Measurement",
+        "url": "https://developers.zuper.co/reference/update-measurement.md",
+        "file": "api-reference/work-order-management/measurements/update-measurement.md"
+      },
+      {
+        "title": "Delete Measurement",
+        "url": "https://developers.zuper.co/reference/delete-measurement.md",
+        "file": "api-reference/work-order-management/measurements/delete-measurement.md"
+      },
+      {
+        "title": "Create Measurement Token",
+        "url": "https://developers.zuper.co/reference/create-measurement-token.md",
+        "file": "api-reference/work-order-management/measurements/create-measurement-token.md"
+      },
+      {
+        "title": "Update Custom Measurement Token",
+        "url": "https://developers.zuper.co/reference/update-custom-measurement-token.md",
+        "file": "api-reference/work-order-management/measurements/update-custom-measurement-token.md"
+      },
+      {
+        "title": "Delete Custom Measurement Token",
+        "url": "https://developers.zuper.co/reference/delete-custom-measurement-token.md",
+        "file": "api-reference/work-order-management/measurements/delete-custom-measurement-token.md"
+      },
+      {
+        "title": "Upload Measurement",
+        "url": "https://developers.zuper.co/reference/upload-measurement.md",
+        "file": "api-reference/work-order-management/measurements/upload-measurement.md"
+      },
+      {
+        "title": "Sync Measurement",
+        "url": "https://developers.zuper.co/reference/sync-measurement.md",
+        "file": "api-reference/work-order-management/measurements/sync-measurement.md"
+      }
+    ],
+    "api-reference/work-order-management/customers": [
+      {
+        "title": "Create a Customer",
+        "url": "https://developers.zuper.co/reference/get-all-customers-copy-1.md",
+        "file": "api-reference/work-order-management/customers/get-all-customers-copy-1.md"
+      },
+      {
+        "title": "Get all Customers",
+        "url": "https://developers.zuper.co/reference/get-all-customers.md",
+        "file": "api-reference/work-order-management/customers/get-all-customers.md"
+      },
+      {
+        "title": "Get Customer Details",
+        "url": "https://developers.zuper.co/reference/get-all-customers-copy.md",
+        "file": "api-reference/work-order-management/customers/get-all-customers-copy.md"
+      },
+      {
+        "title": "Update Customer",
+        "url": "https://developers.zuper.co/reference/get-all-customers-copy-2.md",
+        "file": "api-reference/work-order-management/customers/get-all-customers-copy-2.md"
+      },
+      {
+        "title": "Merge Customers",
+        "url": "https://developers.zuper.co/reference/merge-customers.md",
+        "file": "api-reference/work-order-management/customers/merge-customers.md"
+      },
+      {
+        "title": "Activate / Deactivate Customer",
+        "url": "https://developers.zuper.co/reference/get-all-customers-copy-3.md",
+        "file": "api-reference/work-order-management/customers/get-all-customers-copy-3.md"
+      },
+      {
+        "title": "Delete Customer",
+        "url": "https://developers.zuper.co/reference/get-all-customers-copy-4.md",
+        "file": "api-reference/work-order-management/customers/get-all-customers-copy-4.md"
+      },
+      {
+        "title": "Restore Customer",
+        "url": "https://developers.zuper.co/reference/customer-recovery.md",
+        "file": "api-reference/work-order-management/customers/customer-recovery.md"
+      },
+      {
+        "title": "/customers/{customer_uid}/summary",
+        "url": "https://developers.zuper.co/reference/get-customer-summary.md",
+        "file": "api-reference/work-order-management/customers/get-customer-summary.md"
+      },
+      {
+        "title": "Get Customers By Filter",
+        "url": "https://developers.zuper.co/reference/get-customers-by-filter.md",
+        "file": "api-reference/work-order-management/customers/get-customers-by-filter.md"
+      },
+      {
+        "title": "Get Customer Meta",
+        "url": "https://developers.zuper.co/reference/get-customer-meta.md",
+        "file": "api-reference/work-order-management/customers/get-customer-meta.md"
+      },
+      {
+        "title": "Get Customer Meta Filter",
+        "url": "https://developers.zuper.co/reference/get-customer-meta-filter.md",
+        "file": "api-reference/work-order-management/customers/get-customer-meta-filter.md"
+      },
+      {
+        "title": "Add Attachments",
+        "url": "https://developers.zuper.co/reference/create-customer-attachments.md",
+        "file": "api-reference/work-order-management/customers/create-customer-attachments.md"
+      },
+      {
+        "title": "Update Attachment",
+        "url": "https://developers.zuper.co/reference/delete-customer-attachments-copy.md",
+        "file": "api-reference/work-order-management/customers/delete-customer-attachments-copy.md"
+      },
+      {
+        "title": "Delete Attachment",
+        "url": "https://developers.zuper.co/reference/create-customer-attachments-copy.md",
+        "file": "api-reference/work-order-management/customers/create-customer-attachments-copy.md"
+      },
+      {
+        "title": "Create Customer Notes",
+        "url": "https://developers.zuper.co/reference/create-customer-notes.md",
+        "file": "api-reference/work-order-management/customers/create-customer-notes.md"
+      },
+      {
+        "title": "Get Customer Note",
+        "url": "https://developers.zuper.co/reference/get-customer-note.md",
+        "file": "api-reference/work-order-management/customers/get-customer-note.md"
+      },
+      {
+        "title": "Change Note Privacy",
+        "url": "https://developers.zuper.co/reference/get-customer-note-copy.md",
+        "file": "api-reference/work-order-management/customers/get-customer-note-copy.md"
+      },
+      {
+        "title": "Update Customer Notes",
+        "url": "https://developers.zuper.co/reference/get-customer-note-copy-1.md",
+        "file": "api-reference/work-order-management/customers/get-customer-note-copy-1.md"
+      },
+      {
+        "title": "Delete Customer Notes",
+        "url": "https://developers.zuper.co/reference/get-customer-note-copy-2.md",
+        "file": "api-reference/work-order-management/customers/get-customer-note-copy-2.md"
+      }
+    ],
+    "api-reference/work-order-management/organizations": [
+      {
+        "title": "Create Organization",
+        "url": "https://developers.zuper.co/reference/create-organization.md",
+        "file": "api-reference/work-order-management/organizations/create-organization.md"
+      },
+      {
+        "title": "Get Organizations",
+        "url": "https://developers.zuper.co/reference/get-all-organizations.md",
+        "file": "api-reference/work-order-management/organizations/get-all-organizations.md"
+      },
+      {
+        "title": "Get Organization Details",
+        "url": "https://developers.zuper.co/reference/get-organization-details.md",
+        "file": "api-reference/work-order-management/organizations/get-organization-details.md"
+      },
+      {
+        "title": "Update Organization Details",
+        "url": "https://developers.zuper.co/reference/create-organization-copy.md",
+        "file": "api-reference/work-order-management/organizations/create-organization-copy.md"
+      },
+      {
+        "title": "Activate / Deactivate Organization",
+        "url": "https://developers.zuper.co/reference/activate-property-copy.md",
+        "file": "api-reference/work-order-management/organizations/activate-property-copy.md"
+      },
+      {
+        "title": "Delete Organization",
+        "url": "https://developers.zuper.co/reference/delete-organization-attachment-copy-1.md",
+        "file": "api-reference/work-order-management/organizations/delete-organization-attachment-copy-1.md"
+      },
+      {
+        "title": "Restore Organization",
+        "url": "https://developers.zuper.co/reference/create-organization-attachments-copy-2.md",
+        "file": "api-reference/work-order-management/organizations/create-organization-attachments-copy-2.md"
+      },
+      {
+        "title": "Get Organizations By Filter",
+        "url": "https://developers.zuper.co/reference/get-organizations-by-filter.md",
+        "file": "api-reference/work-order-management/organizations/get-organizations-by-filter.md"
+      },
+      {
+        "title": "Get Organization Meta",
+        "url": "https://developers.zuper.co/reference/get-organization-meta.md",
+        "file": "api-reference/work-order-management/organizations/get-organization-meta.md"
+      },
+      {
+        "title": "Get Organization Meta Filter",
+        "url": "https://developers.zuper.co/reference/get-organization-meta-filter.md",
+        "file": "api-reference/work-order-management/organizations/get-organization-meta-filter.md"
+      },
+      {
+        "title": "Add Organization Attachments",
+        "url": "https://developers.zuper.co/reference/activatedeactivate-organization-copy.md",
+        "file": "api-reference/work-order-management/organizations/activatedeactivate-organization-copy.md"
+      },
+      {
+        "title": "Update Organization Attachment",
+        "url": "https://developers.zuper.co/reference/create-organization-attachments-copy.md",
+        "file": "api-reference/work-order-management/organizations/create-organization-attachments-copy.md"
+      },
+      {
+        "title": "Delete Organization Attachment",
+        "url": "https://developers.zuper.co/reference/update-organization-attachment-copy.md",
+        "file": "api-reference/work-order-management/organizations/update-organization-attachment-copy.md"
+      },
+      {
+        "title": "/organization/{organization_uid}/summary",
+        "url": "https://developers.zuper.co/reference/get-organization-summary.md",
+        "file": "api-reference/work-order-management/organizations/get-organization-summary.md"
+      }
+    ],
+    "api-reference/work-order-management/properties": [
+      {
+        "title": "Create Property",
+        "url": "https://developers.zuper.co/reference/create-properties.md",
+        "file": "api-reference/work-order-management/properties/create-properties.md"
+      },
+      {
+        "title": "Get All Properties",
+        "url": "https://developers.zuper.co/reference/get-all-properties.md",
+        "file": "api-reference/work-order-management/properties/get-all-properties.md"
+      },
+      {
+        "title": "Get Property Details",
+        "url": "https://developers.zuper.co/reference/get-property-details.md",
+        "file": "api-reference/work-order-management/properties/get-property-details.md"
+      },
+      {
+        "title": "Update Property Details",
+        "url": "https://developers.zuper.co/reference/update-property-details.md",
+        "file": "api-reference/work-order-management/properties/update-property-details.md"
+      },
+      {
+        "title": "Activate / Deactivate Property",
+        "url": "https://developers.zuper.co/reference/activate-property.md",
+        "file": "api-reference/work-order-management/properties/activate-property.md"
+      },
+      {
+        "title": "Delete Property",
+        "url": "https://developers.zuper.co/reference/delete-property.md",
+        "file": "api-reference/work-order-management/properties/delete-property.md"
+      },
+      {
+        "title": "Recover Property",
+        "url": "https://developers.zuper.co/reference/recover-property.md",
+        "file": "api-reference/work-order-management/properties/recover-property.md"
+      },
+      {
+        "title": "Get Properties By Filter",
+        "url": "https://developers.zuper.co/reference/get-properties-by-filter.md",
+        "file": "api-reference/work-order-management/properties/get-properties-by-filter.md"
+      },
+      {
+        "title": "Get Property Meta",
+        "url": "https://developers.zuper.co/reference/get-property-meta.md",
+        "file": "api-reference/work-order-management/properties/get-property-meta.md"
+      },
+      {
+        "title": "Get Property Meta Filter",
+        "url": "https://developers.zuper.co/reference/get-property-meta-filter.md",
+        "file": "api-reference/work-order-management/properties/get-property-meta-filter.md"
+      },
+      {
+        "title": "/property/{property_uid}/summary",
+        "url": "https://developers.zuper.co/reference/get-property-summary.md",
+        "file": "api-reference/work-order-management/properties/get-property-summary.md"
+      }
+    ],
+    "api-reference/work-order-management/assets": [
+      {
+        "title": "Create Asset",
+        "url": "https://developers.zuper.co/reference/create-asset.md",
+        "file": "api-reference/work-order-management/assets/create-asset.md"
+      },
+      {
+        "title": "Get All Assets",
+        "url": "https://developers.zuper.co/reference/get-all-assets.md",
+        "file": "api-reference/work-order-management/assets/get-all-assets.md"
+      },
+      {
+        "title": "Get Asset Details",
+        "url": "https://developers.zuper.co/reference/get-asset-details.md",
+        "file": "api-reference/work-order-management/assets/get-asset-details.md"
+      },
+      {
+        "title": "Update Asset",
+        "url": "https://developers.zuper.co/reference/update-asset.md",
+        "file": "api-reference/work-order-management/assets/update-asset.md"
+      },
+      {
+        "title": "Update Asset Status",
+        "url": "https://developers.zuper.co/reference/update-asset-status.md",
+        "file": "api-reference/work-order-management/assets/update-asset-status.md"
+      },
+      {
+        "title": "Activate Asset",
+        "url": "https://developers.zuper.co/reference/activate-asset.md",
+        "file": "api-reference/work-order-management/assets/activate-asset.md"
+      },
+      {
+        "title": "Delete Asset",
+        "url": "https://developers.zuper.co/reference/delete-asset.md",
+        "file": "api-reference/work-order-management/assets/delete-asset.md"
+      },
+      {
+        "title": "Asset Bulk Action",
+        "url": "https://developers.zuper.co/reference/asset-bulk-action.md",
+        "file": "api-reference/work-order-management/assets/asset-bulk-action.md"
+      },
+      {
+        "title": "Recover Asset",
+        "url": "https://developers.zuper.co/reference/recover-asset.md",
+        "file": "api-reference/work-order-management/assets/recover-asset.md"
+      },
+      {
+        "title": "Get Asset Meta",
+        "url": "https://developers.zuper.co/reference/get-asset-meta.md",
+        "file": "api-reference/work-order-management/assets/get-asset-meta.md"
+      },
+      {
+        "title": "Get Asset Meta Filter",
+        "url": "https://developers.zuper.co/reference/get-asset-meta-filter.md",
+        "file": "api-reference/work-order-management/assets/get-asset-meta-filter.md"
+      },
+      {
+        "title": "Get Assets By Generic Filter",
+        "url": "https://developers.zuper.co/reference/get-assets-by-generic-filter.md",
+        "file": "api-reference/work-order-management/assets/get-assets-by-generic-filter.md"
+      },
+      {
+        "title": "Create Asset Card",
+        "url": "https://developers.zuper.co/reference/create-asset-card.md",
+        "file": "api-reference/work-order-management/assets/create-asset-card.md"
+      },
+      {
+        "title": "Get Asset History",
+        "url": "https://developers.zuper.co/reference/get-asset-history.md",
+        "file": "api-reference/work-order-management/assets/get-asset-history.md"
+      },
+      {
+        "title": "Create Asset Action",
+        "url": "https://developers.zuper.co/reference/create-asset-action.md",
+        "file": "api-reference/work-order-management/assets/create-asset-action.md"
+      },
+      {
+        "title": "Get Asset Import Template",
+        "url": "https://developers.zuper.co/reference/get-asset-template-1.md",
+        "file": "api-reference/work-order-management/assets/get-asset-template-1.md"
+      },
+      {
+        "title": "Get Sample Import Data",
+        "url": "https://developers.zuper.co/reference/get-sample-import-data.md",
+        "file": "api-reference/work-order-management/assets/get-sample-import-data.md"
+      },
+      {
+        "title": "Import Asset Data",
+        "url": "https://developers.zuper.co/reference/import-asset-data.md",
+        "file": "api-reference/work-order-management/assets/import-asset-data.md"
+      },
+      {
+        "title": "Asset Summary",
+        "url": "https://developers.zuper.co/reference/get-asset-summary.md",
+        "file": "api-reference/work-order-management/assets/get-asset-summary.md"
+      }
+    ],
+    "api-reference/work-order-management/contracts": [
+      {
+        "title": "Create Document",
+        "url": "https://developers.zuper.co/reference/create-document.md",
+        "file": "api-reference/work-order-management/contracts/create-document.md"
+      },
+      {
+        "title": "Create service contract",
+        "url": "https://developers.zuper.co/reference/create-service-contract.md",
+        "file": "api-reference/work-order-management/contracts/create-service-contract.md"
+      },
+      {
+        "title": "Get Service Contracts",
+        "url": "https://developers.zuper.co/reference/get-all-organizations-copy.md",
+        "file": "api-reference/work-order-management/contracts/get-all-organizations-copy.md"
+      },
+      {
+        "title": "Get Service Contract Details",
+        "url": "https://developers.zuper.co/reference/get-service-contract-details.md",
+        "file": "api-reference/work-order-management/contracts/get-service-contract-details.md"
+      },
+      {
+        "title": "Update service contract",
+        "url": "https://developers.zuper.co/reference/create-service-contract-copy.md",
+        "file": "api-reference/work-order-management/contracts/create-service-contract-copy.md"
+      },
+      {
+        "title": "Delete Service Contract",
+        "url": "https://developers.zuper.co/reference/get-organization-details-copy.md",
+        "file": "api-reference/work-order-management/contracts/get-organization-details-copy.md"
+      },
+      {
+        "title": "Recover Contract",
+        "url": "https://developers.zuper.co/reference/delete-service-contract-copy.md",
+        "file": "api-reference/work-order-management/contracts/delete-service-contract-copy.md"
+      },
+      {
+        "title": "Activate/Deactivate Service Contract",
+        "url": "https://developers.zuper.co/reference/delete-organization-copy.md",
+        "file": "api-reference/work-order-management/contracts/delete-organization-copy.md"
+      },
+      {
+        "title": "Update Approval Status",
+        "url": "https://developers.zuper.co/reference/activatedeactivate-service-contract-copy.md",
+        "file": "api-reference/work-order-management/contracts/activatedeactivate-service-contract-copy.md"
+      },
+      {
+        "title": "Renew Service Contract",
+        "url": "https://developers.zuper.co/reference/update-approval-status-copy.md",
+        "file": "api-reference/work-order-management/contracts/update-approval-status-copy.md"
+      },
+      {
+        "title": "Send To Customer",
+        "url": "https://developers.zuper.co/reference/renew-service-contract-copy.md",
+        "file": "api-reference/work-order-management/contracts/renew-service-contract-copy.md"
+      },
+      {
+        "title": "Get Service Contracts By Filter",
+        "url": "https://developers.zuper.co/reference/get-service-contracts-by-filter.md",
+        "file": "api-reference/work-order-management/contracts/get-service-contracts-by-filter.md"
+      },
+      {
+        "title": "Get Service Contract Meta",
+        "url": "https://developers.zuper.co/reference/get-service-contract-meta.md",
+        "file": "api-reference/work-order-management/contracts/get-service-contract-meta.md"
+      },
+      {
+        "title": "Get Service Contract Meta Filter",
+        "url": "https://developers.zuper.co/reference/get-service-contract-meta-filter.md",
+        "file": "api-reference/work-order-management/contracts/get-service-contract-meta-filter.md"
+      }
+    ],
+    "api-reference/work-order-management/requests": [
+      {
+        "title": "Create Request",
+        "url": "https://developers.zuper.co/reference/create-customer-request.md",
+        "file": "api-reference/work-order-management/requests/create-customer-request.md"
+      },
+      {
+        "title": "Get Requests",
+        "url": "https://developers.zuper.co/reference/get-service-tasks-copy-1.md",
+        "file": "api-reference/work-order-management/requests/get-service-tasks-copy-1.md"
+      },
+      {
+        "title": "Get Request Details",
+        "url": "https://developers.zuper.co/reference/get-customer-request-details.md",
+        "file": "api-reference/work-order-management/requests/get-customer-request-details.md"
+      },
+      {
+        "title": "Update Request",
+        "url": "https://developers.zuper.co/reference/create-customer-request-copy.md",
+        "file": "api-reference/work-order-management/requests/create-customer-request-copy.md"
+      },
+      {
+        "title": "Update Request status",
+        "url": "https://developers.zuper.co/reference/update-customer-request-copy.md",
+        "file": "api-reference/work-order-management/requests/update-customer-request-copy.md"
+      },
+      {
+        "title": "Delete Request",
+        "url": "https://developers.zuper.co/reference/get-customer-request-details-copy.md",
+        "file": "api-reference/work-order-management/requests/get-customer-request-details-copy.md"
+      },
+      {
+        "title": "Get Requests By Filter",
+        "url": "https://developers.zuper.co/reference/get-requests-by-filter.md",
+        "file": "api-reference/work-order-management/requests/get-requests-by-filter.md"
+      },
+      {
+        "title": "Get Request Meta",
+        "url": "https://developers.zuper.co/reference/get-request-meta.md",
+        "file": "api-reference/work-order-management/requests/get-request-meta.md"
+      },
+      {
+        "title": "Get Request Meta Filter",
+        "url": "https://developers.zuper.co/reference/get-request-meta-filter.md",
+        "file": "api-reference/work-order-management/requests/get-request-meta-filter.md"
+      },
+      {
+        "title": "Get Request Statuses",
+        "url": "https://developers.zuper.co/reference/get-request-statuses.md",
+        "file": "api-reference/work-order-management/requests/get-request-statuses.md"
+      }
+    ],
+    "api-reference/work-order-management/stream-channels": [
+      {
+        "title": "Send Message To Stream Channel",
+        "url": "https://developers.zuper.co/reference/send-message-to-stream-channel.md",
+        "file": "api-reference/work-order-management/stream-channels/send-message-to-stream-channel.md"
+      },
+      {
+        "title": "Add Users To Stream Channel",
+        "url": "https://developers.zuper.co/reference/add-users-to-stream-channel.md",
+        "file": "api-reference/work-order-management/stream-channels/add-users-to-stream-channel.md"
+      }
+    ],
+    "api-reference/work-order-management/workflows": [
+      {
+        "title": "Get all workflow modules",
+        "url": "https://developers.zuper.co/reference/get-all-workflow-modules.md",
+        "file": "api-reference/work-order-management/workflows/get-all-workflow-modules.md"
+      },
+      {
+        "title": "Get All Workflow Conditions",
+        "url": "https://developers.zuper.co/reference/get-all-workflow-conditions.md",
+        "file": "api-reference/work-order-management/workflows/get-all-workflow-conditions.md"
+      },
+      {
+        "title": "Get Workflow Actions",
+        "url": "https://developers.zuper.co/reference/get-workflow-actions.md",
+        "file": "api-reference/work-order-management/workflows/get-workflow-actions.md"
+      },
+      {
+        "title": "Create Workflow",
+        "url": "https://developers.zuper.co/reference/create-workflow.md",
+        "file": "api-reference/work-order-management/workflows/create-workflow.md"
+      },
+      {
+        "title": "Get Workflow",
+        "url": "https://developers.zuper.co/reference/get-workflow.md",
+        "file": "api-reference/work-order-management/workflows/get-workflow.md"
+      },
+      {
+        "title": "Get Workflow Activities",
+        "url": "https://developers.zuper.co/reference/get-workflow-details.md",
+        "file": "api-reference/work-order-management/workflows/get-workflow-details.md"
+      },
+      {
+        "title": "Get Workflow Details",
+        "url": "https://developers.zuper.co/reference/get-workflow-details-1.md",
+        "file": "api-reference/work-order-management/workflows/get-workflow-details-1.md"
+      },
+      {
+        "title": "Activate Workflow",
+        "url": "https://developers.zuper.co/reference/activate-workflow.md",
+        "file": "api-reference/work-order-management/workflows/activate-workflow.md"
+      },
+      {
+        "title": "Update Workflow",
+        "url": "https://developers.zuper.co/reference/update-workflow.md",
+        "file": "api-reference/work-order-management/workflows/update-workflow.md"
+      },
+      {
+        "title": "Delete Workflow",
+        "url": "https://developers.zuper.co/reference/delete-workflow.md",
+        "file": "api-reference/work-order-management/workflows/delete-workflow.md"
+      }
+    ],
+    "api-reference/work-order-management/service-territories": [
+      {
+        "title": "Create Service Territory",
+        "url": "https://developers.zuper.co/reference/create-service-territory.md",
+        "file": "api-reference/work-order-management/service-territories/create-service-territory.md"
+      },
+      {
+        "title": "Get Service Territories",
+        "url": "https://developers.zuper.co/reference/get-service-territories.md",
+        "file": "api-reference/work-order-management/service-territories/get-service-territories.md"
+      },
+      {
+        "title": "Get Service Territory Details",
+        "url": "https://developers.zuper.co/reference/get-service-territory.md",
+        "file": "api-reference/work-order-management/service-territories/get-service-territory.md"
+      },
+      {
+        "title": "Update Service Territory",
+        "url": "https://developers.zuper.co/reference/update-service-territory.md",
+        "file": "api-reference/work-order-management/service-territories/update-service-territory.md"
+      },
+      {
+        "title": "Activate / Deactivate Service Territory",
+        "url": "https://developers.zuper.co/reference/activate-service-territory.md",
+        "file": "api-reference/work-order-management/service-territories/activate-service-territory.md"
+      },
+      {
+        "title": "Delete Service Territory",
+        "url": "https://developers.zuper.co/reference/delete-service-territory.md",
+        "file": "api-reference/work-order-management/service-territories/delete-service-territory.md"
+      }
+    ],
+    "api-reference/work-order-management/commissions": [
+      {
+        "title": "/commissions",
+        "url": "https://developers.zuper.co/reference/create-commission.md",
+        "file": "api-reference/work-order-management/commissions/create-commission.md"
+      },
+      {
+        "title": "/commissions/{commission_uid}",
+        "url": "https://developers.zuper.co/reference/update-commission.md",
+        "file": "api-reference/work-order-management/commissions/update-commission.md"
+      },
+      {
+        "title": "/commissions",
+        "url": "https://developers.zuper.co/reference/get-commissions.md",
+        "file": "api-reference/work-order-management/commissions/get-commissions.md"
+      },
+      {
+        "title": "/commissions/{commission_uid}",
+        "url": "https://developers.zuper.co/reference/get-single-commission.md",
+        "file": "api-reference/work-order-management/commissions/get-single-commission.md"
+      },
+      {
+        "title": "/commissions/{commission_uid}",
+        "url": "https://developers.zuper.co/reference/delete-commission.md",
+        "file": "api-reference/work-order-management/commissions/delete-commission.md"
+      },
+      {
+        "title": "Get Commissions By Filter",
+        "url": "https://developers.zuper.co/reference/get-commissions-by-filter.md",
+        "file": "api-reference/work-order-management/commissions/get-commissions-by-filter.md"
+      },
+      {
+        "title": "Get Commissions Meta",
+        "url": "https://developers.zuper.co/reference/get-commissions-meta.md",
+        "file": "api-reference/work-order-management/commissions/get-commissions-meta.md"
+      },
+      {
+        "title": "Get Commissions Meta Filter",
+        "url": "https://developers.zuper.co/reference/get-commissions-meta-filter.md",
+        "file": "api-reference/work-order-management/commissions/get-commissions-meta-filter.md"
+      }
+    ],
+    "api-reference/inventory/products": [
+      {
+        "title": "Create a Product",
+        "url": "https://developers.zuper.co/reference/create-a-product.md",
+        "file": "api-reference/inventory/products/create-a-product.md"
+      },
+      {
+        "title": "Get all Products",
+        "url": "https://developers.zuper.co/reference/get-all-products.md",
+        "file": "api-reference/inventory/products/get-all-products.md"
+      },
+      {
+        "title": "Get a Product Details",
+        "url": "https://developers.zuper.co/reference/get-a-product-details.md",
+        "file": "api-reference/inventory/products/get-a-product-details.md"
+      },
+      {
+        "title": "Update a Product",
+        "url": "https://developers.zuper.co/reference/update-a-product.md",
+        "file": "api-reference/inventory/products/update-a-product.md"
+      },
+      {
+        "title": "Delete a Product",
+        "url": "https://developers.zuper.co/reference/delete-a-product.md",
+        "file": "api-reference/inventory/products/delete-a-product.md"
+      },
+      {
+        "title": "Get Product Meta Filter",
+        "url": "https://developers.zuper.co/reference/get-product-meta-filter.md",
+        "file": "api-reference/inventory/products/get-product-meta-filter.md"
+      }
+    ],
+    "api-reference/inventory/product-groups": [
+      {
+        "title": "Create Products Group",
+        "url": "https://developers.zuper.co/reference/create-product-group.md",
+        "file": "api-reference/inventory/product-groups/create-product-group.md"
+      },
+      {
+        "title": "Get All Products Group",
+        "url": "https://developers.zuper.co/reference/get-all-product-group.md",
+        "file": "api-reference/inventory/product-groups/get-all-product-group.md"
+      },
+      {
+        "title": "Get Products Group Details",
+        "url": "https://developers.zuper.co/reference/get-product-group.md",
+        "file": "api-reference/inventory/product-groups/get-product-group.md"
+      },
+      {
+        "title": "Update Products Group",
+        "url": "https://developers.zuper.co/reference/update-product-group.md",
+        "file": "api-reference/inventory/product-groups/update-product-group.md"
+      },
+      {
+        "title": "Delete Products Group",
+        "url": "https://developers.zuper.co/reference/delete-product-group.md",
+        "file": "api-reference/inventory/product-groups/delete-product-group.md"
+      },
+      {
+        "title": "Add Products to Products Group",
+        "url": "https://developers.zuper.co/reference/add-products-to-group.md",
+        "file": "api-reference/inventory/product-groups/add-products-to-group.md"
+      },
+      {
+        "title": "Remove Products from Group",
+        "url": "https://developers.zuper.co/reference/remove-products-from-group.md",
+        "file": "api-reference/inventory/product-groups/remove-products-from-group.md"
+      },
+      {
+        "title": "Activate Products Group",
+        "url": "https://developers.zuper.co/reference/activate-products-group.md",
+        "file": "api-reference/inventory/product-groups/activate-products-group.md"
+      },
+      {
+        "title": "Get Product Groups By Filter",
+        "url": "https://developers.zuper.co/reference/get-product-groups-by-filter.md",
+        "file": "api-reference/inventory/product-groups/get-product-groups-by-filter.md"
+      },
+      {
+        "title": "Get Product Group Meta Filter",
+        "url": "https://developers.zuper.co/reference/get-product-group-meta-filter.md",
+        "file": "api-reference/inventory/product-groups/get-product-group-meta-filter.md"
+      }
+    ],
+    "api-reference/inventory/product-categories": [
+      {
+        "title": "Create Product Category",
+        "url": "https://developers.zuper.co/reference/create-product-category.md",
+        "file": "api-reference/inventory/product-categories/create-product-category.md"
+      },
+      {
+        "title": "Get Product Categories",
+        "url": "https://developers.zuper.co/reference/get-product-categories.md",
+        "file": "api-reference/inventory/product-categories/get-product-categories.md"
+      },
+      {
+        "title": "Update Product Category",
+        "url": "https://developers.zuper.co/reference/update-product-category.md",
+        "file": "api-reference/inventory/product-categories/update-product-category.md"
+      },
+      {
+        "title": "Delete Product Category",
+        "url": "https://developers.zuper.co/reference/delete-product-category.md",
+        "file": "api-reference/inventory/product-categories/delete-product-category.md"
+      }
+    ],
+    "api-reference/inventory/product-transactions": [
+      {
+        "title": "Create Inward Transcation",
+        "url": "https://developers.zuper.co/reference/create-inward-transcation.md",
+        "file": "api-reference/inventory/product-transactions/create-inward-transcation.md"
+      },
+      {
+        "title": "Create Outward Transaction",
+        "url": "https://developers.zuper.co/reference/create-transfer-transaction.md",
+        "file": "api-reference/inventory/product-transactions/create-transfer-transaction.md"
+      },
+      {
+        "title": "Create Transfer",
+        "url": "https://developers.zuper.co/reference/create-transfer.md",
+        "file": "api-reference/inventory/product-transactions/create-transfer.md"
+      },
+      {
+        "title": "Get all Products Transaction",
+        "url": "https://developers.zuper.co/reference/get-all-products-copy.md",
+        "file": "api-reference/inventory/product-transactions/get-all-products-copy.md"
+      },
+      {
+        "title": "Get Product transaction details",
+        "url": "https://developers.zuper.co/reference/get-product-transaction-details.md",
+        "file": "api-reference/inventory/product-transactions/get-product-transaction-details.md"
+      }
+    ],
+    "api-reference/inventory/transfer-orders": [
+      {
+        "title": "Create Transfer Order",
+        "url": "https://developers.zuper.co/reference/transfer-order-create.md",
+        "file": "api-reference/inventory/transfer-orders/transfer-order-create.md"
+      },
+      {
+        "title": "Get all Transfer Orders",
+        "url": "https://developers.zuper.co/reference/transfer-order-get.md",
+        "file": "api-reference/inventory/transfer-orders/transfer-order-get.md"
+      },
+      {
+        "title": "Get a Transfer Order",
+        "url": "https://developers.zuper.co/reference/transfer-order-details.md",
+        "file": "api-reference/inventory/transfer-orders/transfer-order-details.md"
+      },
+      {
+        "title": "Update Transfer Order",
+        "url": "https://developers.zuper.co/reference/transfer-order-upadate.md",
+        "file": "api-reference/inventory/transfer-orders/transfer-order-upadate.md"
+      },
+      {
+        "title": "Update Status of Transfer Order",
+        "url": "https://developers.zuper.co/reference/transfer-order-status-update.md",
+        "file": "api-reference/inventory/transfer-orders/transfer-order-status-update.md"
+      },
+      {
+        "title": "Delete Transfer Order",
+        "url": "https://developers.zuper.co/reference/transfer-order-delete.md",
+        "file": "api-reference/inventory/transfer-orders/transfer-order-delete.md"
+      },
+      {
+        "title": "Transfer Order Card",
+        "url": "https://developers.zuper.co/reference/transfer-order-card.md",
+        "file": "api-reference/inventory/transfer-orders/transfer-order-card.md"
+      },
+      {
+        "title": "Create Transfer Order Attachment",
+        "url": "https://developers.zuper.co/reference/transfer-order-attachment-create.md",
+        "file": "api-reference/inventory/transfer-orders/transfer-order-attachment-create.md"
+      },
+      {
+        "title": "Update Transfer Order Attachment",
+        "url": "https://developers.zuper.co/reference/transfer-order-attachment-update.md",
+        "file": "api-reference/inventory/transfer-orders/transfer-order-attachment-update.md"
+      },
+      {
+        "title": "Delete Transfer Order Attachment",
+        "url": "https://developers.zuper.co/reference/transfer-order-attachment-delete.md",
+        "file": "api-reference/inventory/transfer-orders/transfer-order-attachment-delete.md"
+      }
+    ],
+    "api-reference/inventory/pricelists": [
+      {
+        "title": "Create Pricelist",
+        "url": "https://developers.zuper.co/reference/create-pricelist.md",
+        "file": "api-reference/inventory/pricelists/create-pricelist.md"
+      },
+      {
+        "title": "Get all Pricelist",
+        "url": "https://developers.zuper.co/reference/get-all-pricelist.md",
+        "file": "api-reference/inventory/pricelists/get-all-pricelist.md"
+      },
+      {
+        "title": "Get a Pricelist Details",
+        "url": "https://developers.zuper.co/reference/get-a-pricelist-details.md",
+        "file": "api-reference/inventory/pricelists/get-a-pricelist-details.md"
+      },
+      {
+        "title": "Update a Pricelist",
+        "url": "https://developers.zuper.co/reference/update-a-pricelist.md",
+        "file": "api-reference/inventory/pricelists/update-a-pricelist.md"
+      },
+      {
+        "title": "Activate / Deactivate",
+        "url": "https://developers.zuper.co/reference/pricelist-activate.md",
+        "file": "api-reference/inventory/pricelists/pricelist-activate.md"
+      },
+      {
+        "title": "Delete Pricelist",
+        "url": "https://developers.zuper.co/reference/delete-pricelist.md",
+        "file": "api-reference/inventory/pricelists/delete-pricelist.md"
+      }
+    ],
+    "api-reference/inventory/vendor-catalogs": [
+      {
+        "title": "Create Vendor Catalog",
+        "url": "https://developers.zuper.co/reference/create-vendor-catalogs.md",
+        "file": "api-reference/inventory/vendor-catalogs/create-vendor-catalogs.md"
+      },
+      {
+        "title": "Get Vendor Catalogs",
+        "url": "https://developers.zuper.co/reference/get-vendor-catalogs.md",
+        "file": "api-reference/inventory/vendor-catalogs/get-vendor-catalogs.md"
+      },
+      {
+        "title": "Update Vendor Catalog",
+        "url": "https://developers.zuper.co/reference/update-vendor-catalog.md",
+        "file": "api-reference/inventory/vendor-catalogs/update-vendor-catalog.md"
+      },
+      {
+        "title": "Delete Vendor Catalog",
+        "url": "https://developers.zuper.co/reference/delete-vendor-catalog.md",
+        "file": "api-reference/inventory/vendor-catalogs/delete-vendor-catalog.md"
+      }
+    ],
+    "api-reference/inventory/vendors": [
+      {
+        "title": "Create Vendor",
+        "url": "https://developers.zuper.co/reference/create-vendor.md",
+        "file": "api-reference/inventory/vendors/create-vendor.md"
+      },
+      {
+        "title": "Get Vendors",
+        "url": "https://developers.zuper.co/reference/get-all-vendors.md",
+        "file": "api-reference/inventory/vendors/get-all-vendors.md"
+      },
+      {
+        "title": "Get Vendor Details",
+        "url": "https://developers.zuper.co/reference/get-vendor-details.md",
+        "file": "api-reference/inventory/vendors/get-vendor-details.md"
+      },
+      {
+        "title": "Update Vendor",
+        "url": "https://developers.zuper.co/reference/update-vendor.md",
+        "file": "api-reference/inventory/vendors/update-vendor.md"
+      },
+      {
+        "title": "Delete Vendor",
+        "url": "https://developers.zuper.co/reference/delete-vendor.md",
+        "file": "api-reference/inventory/vendors/delete-vendor.md"
+      }
+    ],
+    "api-reference/inventory/contracts": [
+      {
+        "title": "Create Subcontractor",
+        "url": "https://developers.zuper.co/reference/post_vendors-1.md",
+        "file": "api-reference/inventory/contracts/post_vendors-1.md"
+      },
+      {
+        "title": "Get Subcontractors",
+        "url": "https://developers.zuper.co/reference/get_vendors-1.md",
+        "file": "api-reference/inventory/contracts/get_vendors-1.md"
+      },
+      {
+        "title": "Get Subcontractor Details",
+        "url": "https://developers.zuper.co/reference/get_vendorsvendor_uid-1.md",
+        "file": "api-reference/inventory/contracts/get_vendorsvendor_uid-1.md"
+      },
+      {
+        "title": "Update Subcontractor",
+        "url": "https://developers.zuper.co/reference/put_vendorsvendor_uid-1.md",
+        "file": "api-reference/inventory/contracts/put_vendorsvendor_uid-1.md"
+      },
+      {
+        "title": "Delete Subcontractor",
+        "url": "https://developers.zuper.co/reference/delete_vendorsvendor_uid-1.md",
+        "file": "api-reference/inventory/contracts/delete_vendorsvendor_uid-1.md"
+      }
+    ],
+    "api-reference/inventory/purchase-orders": [
+      {
+        "title": "Create Purchase Order",
+        "url": "https://developers.zuper.co/reference/create-purchase-order.md",
+        "file": "api-reference/inventory/purchase-orders/create-purchase-order.md"
+      },
+      {
+        "title": "Get Purchase Orders",
+        "url": "https://developers.zuper.co/reference/get-purchase-orders.md",
+        "file": "api-reference/inventory/purchase-orders/get-purchase-orders.md"
+      },
+      {
+        "title": "Get Purchase Order Details",
+        "url": "https://developers.zuper.co/reference/get-purchase-order-details.md",
+        "file": "api-reference/inventory/purchase-orders/get-purchase-order-details.md"
+      },
+      {
+        "title": "Update Purchase Order",
+        "url": "https://developers.zuper.co/reference/update-purchase-order.md",
+        "file": "api-reference/inventory/purchase-orders/update-purchase-order.md"
+      },
+      {
+        "title": "Update Purchase Order Fields",
+        "url": "https://developers.zuper.co/reference/put_purchase_orderspurchase_order_uid-2.md",
+        "file": "api-reference/inventory/purchase-orders/put_purchase_orderspurchase_order_uid-2.md"
+      },
+      {
+        "title": "Update Purchase Order Status",
+        "url": "https://developers.zuper.co/reference/update-purchase-order-status.md",
+        "file": "api-reference/inventory/purchase-orders/update-purchase-order-status.md"
+      },
+      {
+        "title": "Send Purchase Order",
+        "url": "https://developers.zuper.co/reference/send-purchase-order.md",
+        "file": "api-reference/inventory/purchase-orders/send-purchase-order.md"
+      },
+      {
+        "title": "Delete Purchase Order",
+        "url": "https://developers.zuper.co/reference/delete-purchase-order.md",
+        "file": "api-reference/inventory/purchase-orders/delete-purchase-order.md"
+      },
+      {
+        "title": "Bulk Create Purchase Order",
+        "url": "https://developers.zuper.co/reference/bulk-create-purchase-order.md",
+        "file": "api-reference/inventory/purchase-orders/bulk-create-purchase-order.md"
+      },
+      {
+        "title": "Update Purchase Order Line Items",
+        "url": "https://developers.zuper.co/reference/update-purchase-order-line-items.md",
+        "file": "api-reference/inventory/purchase-orders/update-purchase-order-line-items.md"
+      },
+      {
+        "title": "Purchase Order Bulk Action",
+        "url": "https://developers.zuper.co/reference/purchase-order-bulk-action.md",
+        "file": "api-reference/inventory/purchase-orders/purchase-order-bulk-action.md"
+      },
+      {
+        "title": "Get Purchase Orders Meta Filter",
+        "url": "https://developers.zuper.co/reference/get-purchase-orders-meta-filter.md",
+        "file": "api-reference/inventory/purchase-orders/get-purchase-orders-meta-filter.md"
+      },
+      {
+        "title": "Get Purchase Orders By Filter",
+        "url": "https://developers.zuper.co/reference/get-purchase-orders-by-filter.md",
+        "file": "api-reference/inventory/purchase-orders/get-purchase-orders-by-filter.md"
+      },
+      {
+        "title": "Recover Purchase Order",
+        "url": "https://developers.zuper.co/reference/recover-purchase-order.md",
+        "file": "api-reference/inventory/purchase-orders/recover-purchase-order.md"
+      }
+    ],
+    "api-reference/inventory/work-orders": [
+      {
+        "title": "Create Work Order",
+        "url": "https://developers.zuper.co/reference/post_purchase_orders-1.md",
+        "file": "api-reference/inventory/work-orders/post_purchase_orders-1.md"
+      },
+      {
+        "title": "Get Work Orders",
+        "url": "https://developers.zuper.co/reference/get_purchase_orders-1.md",
+        "file": "api-reference/inventory/work-orders/get_purchase_orders-1.md"
+      },
+      {
+        "title": "Get Work Order Details",
+        "url": "https://developers.zuper.co/reference/get_purchase_orderspurchase_order_uid-1.md",
+        "file": "api-reference/inventory/work-orders/get_purchase_orderspurchase_order_uid-1.md"
+      },
+      {
+        "title": "Update Work Order",
+        "url": "https://developers.zuper.co/reference/put_purchase_orderspurchase_order_uid-1.md",
+        "file": "api-reference/inventory/work-orders/put_purchase_orderspurchase_order_uid-1.md"
+      },
+      {
+        "title": "Update Work Order Status",
+        "url": "https://developers.zuper.co/reference/put_purchase_orderspurchase_order_uidstatus-1.md",
+        "file": "api-reference/inventory/work-orders/put_purchase_orderspurchase_order_uidstatus-1.md"
+      },
+      {
+        "title": "Send Work Order",
+        "url": "https://developers.zuper.co/reference/post_purchase_orderspurchase_order_uidsend-1.md",
+        "file": "api-reference/inventory/work-orders/post_purchase_orderspurchase_order_uidsend-1.md"
+      },
+      {
+        "title": "Update Work Order Fields",
+        "url": "https://developers.zuper.co/reference/put_purchase_orderspurchase_order_uid-2-1.md",
+        "file": "api-reference/inventory/work-orders/put_purchase_orderspurchase_order_uid-2-1.md"
+      },
+      {
+        "title": "Delete Work Order",
+        "url": "https://developers.zuper.co/reference/delete_purchase_orderspurchase_order_uid-2.md",
+        "file": "api-reference/inventory/work-orders/delete_purchase_orderspurchase_order_uid-2.md"
+      },
+      {
+        "title": "Get Work Order Summary",
+        "url": "https://developers.zuper.co/reference/get-work-order-summary.md",
+        "file": "api-reference/inventory/work-orders/get-work-order-summary.md"
+      },
+      {
+        "title": "Get Work Orders Meta",
+        "url": "https://developers.zuper.co/reference/get-work-orders-meta.md",
+        "file": "api-reference/inventory/work-orders/get-work-orders-meta.md"
+      }
+    ],
+    "api-reference/accounting/quotes-proposals": [
+      {
+        "title": "Create a Quote",
+        "url": "https://developers.zuper.co/reference/create-a-quote.md",
+        "file": "api-reference/accounting/quotes-proposals/create-a-quote.md"
+      },
+      {
+        "title": "Get all Quote",
+        "url": "https://developers.zuper.co/reference/get-all-quote.md",
+        "file": "api-reference/accounting/quotes-proposals/get-all-quote.md"
+      },
+      {
+        "title": "Get a Quote",
+        "url": "https://developers.zuper.co/reference/get-quote-details.md",
+        "file": "api-reference/accounting/quotes-proposals/get-quote-details.md"
+      },
+      {
+        "title": "Update a Quote",
+        "url": "https://developers.zuper.co/reference/update-quote-details.md",
+        "file": "api-reference/accounting/quotes-proposals/update-quote-details.md"
+      },
+      {
+        "title": "Update Proposal Status",
+        "url": "https://developers.zuper.co/reference/update-quote-status.md",
+        "file": "api-reference/accounting/quotes-proposals/update-quote-status.md"
+      },
+      {
+        "title": "Send a Quote",
+        "url": "https://developers.zuper.co/reference/send-a-quote.md",
+        "file": "api-reference/accounting/quotes-proposals/send-a-quote.md"
+      },
+      {
+        "title": "Bulk Action Quote",
+        "url": "https://developers.zuper.co/reference/bulk-action-quote.md",
+        "file": "api-reference/accounting/quotes-proposals/bulk-action-quote.md"
+      },
+      {
+        "title": "Delete a Proposal",
+        "url": "https://developers.zuper.co/reference/delete-a-quote.md",
+        "file": "api-reference/accounting/quotes-proposals/delete-a-quote.md"
+      },
+      {
+        "title": "Recover a Quote",
+        "url": "https://developers.zuper.co/reference/recover-a-quote.md",
+        "file": "api-reference/accounting/quotes-proposals/recover-a-quote.md"
+      },
+      {
+        "title": "/estimate/{estimate_uid}/unarchive",
+        "url": "https://developers.zuper.co/reference/unarchive-a-quote.md",
+        "file": "api-reference/accounting/quotes-proposals/unarchive-a-quote.md"
+      },
+      {
+        "title": "Get Estimate Meta",
+        "url": "https://developers.zuper.co/reference/get-estimate-meta.md",
+        "file": "api-reference/accounting/quotes-proposals/get-estimate-meta.md"
+      },
+      {
+        "title": "Get Estimate Meta Filter",
+        "url": "https://developers.zuper.co/reference/get-estimate-meta-filter.md",
+        "file": "api-reference/accounting/quotes-proposals/get-estimate-meta-filter.md"
+      },
+      {
+        "title": "Create a Proposal",
+        "url": "https://developers.zuper.co/reference/create-a-proposal.md",
+        "file": "api-reference/accounting/quotes-proposals/create-a-proposal.md"
+      },
+      {
+        "title": "Get all Proposal",
+        "url": "https://developers.zuper.co/reference/get-all-proposal.md",
+        "file": "api-reference/accounting/quotes-proposals/get-all-proposal.md"
+      },
+      {
+        "title": "Get Proposal Details",
+        "url": "https://developers.zuper.co/reference/get-proposal-details.md",
+        "file": "api-reference/accounting/quotes-proposals/get-proposal-details.md"
+      },
+      {
+        "title": "Update a Proposal",
+        "url": "https://developers.zuper.co/reference/update-a-proposal.md",
+        "file": "api-reference/accounting/quotes-proposals/update-a-proposal.md"
+      },
+      {
+        "title": "Update Proposal Options",
+        "url": "https://developers.zuper.co/reference/update-proposal-options.md",
+        "file": "api-reference/accounting/quotes-proposals/update-proposal-options.md"
+      },
+      {
+        "title": "Delete a Proposal",
+        "url": "https://developers.zuper.co/reference/delete-a-proposal.md",
+        "file": "api-reference/accounting/quotes-proposals/delete-a-proposal.md"
+      }
+    ],
+    "api-reference/accounting/packages": [
+      {
+        "title": "Create a Package",
+        "url": "https://developers.zuper.co/reference/create-a-package.md",
+        "file": "api-reference/accounting/packages/create-a-package.md"
+      },
+      {
+        "title": "Get all Packages",
+        "url": "https://developers.zuper.co/reference/get-all-packages.md",
+        "file": "api-reference/accounting/packages/get-all-packages.md"
+      },
+      {
+        "title": "Get a Package",
+        "url": "https://developers.zuper.co/reference/get-a-package.md",
+        "file": "api-reference/accounting/packages/get-a-package.md"
+      },
+      {
+        "title": "Update a Package",
+        "url": "https://developers.zuper.co/reference/update-a-package.md",
+        "file": "api-reference/accounting/packages/update-a-package.md"
+      },
+      {
+        "title": "Activate/Deactivate a Package",
+        "url": "https://developers.zuper.co/reference/activate-package.md",
+        "file": "api-reference/accounting/packages/activate-package.md"
+      },
+      {
+        "title": "Reorder Packages",
+        "url": "https://developers.zuper.co/reference/reorder-package.md",
+        "file": "api-reference/accounting/packages/reorder-package.md"
+      },
+      {
+        "title": "Delete a Package",
+        "url": "https://developers.zuper.co/reference/delete-a-package.md",
+        "file": "api-reference/accounting/packages/delete-a-package.md"
+      }
+    ],
+    "api-reference/accounting/proposal-templates": [
+      {
+        "title": "Create a Template",
+        "url": "https://developers.zuper.co/reference/create-a-proposal-template.md",
+        "file": "api-reference/accounting/proposal-templates/create-a-proposal-template.md"
+      },
+      {
+        "title": "Get all Templates",
+        "url": "https://developers.zuper.co/reference/get-all-proposal-template.md",
+        "file": "api-reference/accounting/proposal-templates/get-all-proposal-template.md"
+      },
+      {
+        "title": "Get a Template",
+        "url": "https://developers.zuper.co/reference/get-a-proposal-template.md",
+        "file": "api-reference/accounting/proposal-templates/get-a-proposal-template.md"
+      },
+      {
+        "title": "Update a Template",
+        "url": "https://developers.zuper.co/reference/update-a-proposal-template.md",
+        "file": "api-reference/accounting/proposal-templates/update-a-proposal-template.md"
+      },
+      {
+        "title": "Activate/Deactivate a Template",
+        "url": "https://developers.zuper.co/reference/activate-template.md",
+        "file": "api-reference/accounting/proposal-templates/activate-template.md"
+      },
+      {
+        "title": "Delete a Template",
+        "url": "https://developers.zuper.co/reference/delete-a-proposal-template.md",
+        "file": "api-reference/accounting/proposal-templates/delete-a-proposal-template.md"
+      }
+    ],
+    "api-reference/accounting/invoices": [
+      {
+        "title": "Create a Invoice",
+        "url": "https://developers.zuper.co/reference/create-a-invoice.md",
+        "file": "api-reference/accounting/invoices/create-a-invoice.md"
+      },
+      {
+        "title": "Get all Invoice",
+        "url": "https://developers.zuper.co/reference/get-all-invoices.md",
+        "file": "api-reference/accounting/invoices/get-all-invoices.md"
+      },
+      {
+        "title": "Get Invoice Details",
+        "url": "https://developers.zuper.co/reference/get-invoice-details.md",
+        "file": "api-reference/accounting/invoices/get-invoice-details.md"
+      },
+      {
+        "title": "Update a Invoice",
+        "url": "https://developers.zuper.co/reference/update-a-invoice.md",
+        "file": "api-reference/accounting/invoices/update-a-invoice.md"
+      },
+      {
+        "title": "Update Invoice Status",
+        "url": "https://developers.zuper.co/reference/update-a-invoice-status.md",
+        "file": "api-reference/accounting/invoices/update-a-invoice-status.md"
+      },
+      {
+        "title": "Send a Invoice",
+        "url": "https://developers.zuper.co/reference/send-a-invoice.md",
+        "file": "api-reference/accounting/invoices/send-a-invoice.md"
+      },
+      {
+        "title": "Delete a Invoice",
+        "url": "https://developers.zuper.co/reference/delete-a-invoice.md",
+        "file": "api-reference/accounting/invoices/delete-a-invoice.md"
+      },
+      {
+        "title": "Restore a Invoice",
+        "url": "https://developers.zuper.co/reference/recover-invoice.md",
+        "file": "api-reference/accounting/invoices/recover-invoice.md"
+      },
+      {
+        "title": "/invoice/{invoice_uid}/unarchive",
+        "url": "https://developers.zuper.co/reference/unarchive-a-invoice.md",
+        "file": "api-reference/accounting/invoices/unarchive-a-invoice.md"
+      },
+      {
+        "title": "Get Invoices By Filter",
+        "url": "https://developers.zuper.co/reference/get-invoices-by-filter.md",
+        "file": "api-reference/accounting/invoices/get-invoices-by-filter.md"
+      }
+    ],
+    "api-reference/accounting/payment-requests": [
+      {
+        "title": "Create Payment Request",
+        "url": "https://developers.zuper.co/reference/create-payment-request.md",
+        "file": "api-reference/accounting/payment-requests/create-payment-request.md"
+      },
+      {
+        "title": "Get All Payment Request",
+        "url": "https://developers.zuper.co/reference/get-all-payment-request.md",
+        "file": "api-reference/accounting/payment-requests/get-all-payment-request.md"
+      },
+      {
+        "title": "Cancel Payment Request",
+        "url": "https://developers.zuper.co/reference/cancel-payment-request.md",
+        "file": "api-reference/accounting/payment-requests/cancel-payment-request.md"
+      },
+      {
+        "title": "Delete Payment Request",
+        "url": "https://developers.zuper.co/reference/delete-payment-request.md",
+        "file": "api-reference/accounting/payment-requests/delete-payment-request.md"
+      },
+      {
+        "title": "Resend Payment Request Email",
+        "url": "https://developers.zuper.co/reference/resend-payment-request-email.md",
+        "file": "api-reference/accounting/payment-requests/resend-payment-request-email.md"
+      },
+      {
+        "title": "Get Payment Request Details",
+        "url": "https://developers.zuper.co/reference/get-payment-request-details.md",
+        "file": "api-reference/accounting/payment-requests/get-payment-request-details.md"
+      }
+    ],
+    "api-reference/accounting/payments": [
+      {
+        "title": "Get payments",
+        "url": "https://developers.zuper.co/reference/get-payments.md",
+        "file": "api-reference/accounting/payments/get-payments.md"
+      },
+      {
+        "title": "Get payment details",
+        "url": "https://developers.zuper.co/reference/get-payment-details.md",
+        "file": "api-reference/accounting/payments/get-payment-details.md"
+      },
+      {
+        "title": "Void a payment",
+        "url": "https://developers.zuper.co/reference/void-a-payment.md",
+        "file": "api-reference/accounting/payments/void-a-payment.md"
+      },
+      {
+        "title": "Get Payment Transactions By Filter",
+        "url": "https://developers.zuper.co/reference/get-payment-transactions-by-filter.md",
+        "file": "api-reference/accounting/payments/get-payment-transactions-by-filter.md"
+      },
+      {
+        "title": "Get Payment Transactions Meta Filter",
+        "url": "https://developers.zuper.co/reference/get-payment-transactions-meta-filter.md",
+        "file": "api-reference/accounting/payments/get-payment-transactions-meta-filter.md"
+      }
+    ],
+    "api-reference/accounting/credit-notes": [
+      {
+        "title": "Create Credit Note",
+        "url": "https://developers.zuper.co/reference/create-credit-note.md",
+        "file": "api-reference/accounting/credit-notes/create-credit-note.md"
+      },
+      {
+        "title": "Get All Credit Notes",
+        "url": "https://developers.zuper.co/reference/get-all-credit-notes.md",
+        "file": "api-reference/accounting/credit-notes/get-all-credit-notes.md"
+      },
+      {
+        "title": "Get Credit Note Details",
+        "url": "https://developers.zuper.co/reference/get-credit-note-details.md",
+        "file": "api-reference/accounting/credit-notes/get-credit-note-details.md"
+      },
+      {
+        "title": "Delete Credit Note",
+        "url": "https://developers.zuper.co/reference/delete-credit-note.md",
+        "file": "api-reference/accounting/credit-notes/delete-credit-note.md"
+      },
+      {
+        "title": "Get Customer Credit Histories",
+        "url": "https://developers.zuper.co/reference/get-customer-credit-histories.md",
+        "file": "api-reference/accounting/credit-notes/get-customer-credit-histories.md"
+      }
+    ],
+    "api-reference/zuper-connect/calls": [
+      {
+        "title": "Get Calls",
+        "url": "https://developers.zuper.co/reference/get-calls.md",
+        "file": "api-reference/zuper-connect/calls/get-calls.md"
+      },
+      {
+        "title": "Get Call Details",
+        "url": "https://developers.zuper.co/reference/get-call-details.md",
+        "file": "api-reference/zuper-connect/calls/get-call-details.md"
+      },
+      {
+        "title": "Get Call Analytics",
+        "url": "https://developers.zuper.co/reference/get-call-stats.md",
+        "file": "api-reference/zuper-connect/calls/get-call-stats.md"
+      },
+      {
+        "title": "Get Call Activity",
+        "url": "https://developers.zuper.co/reference/post_telephony-calls-analytics-comprehensive-1.md",
+        "file": "api-reference/zuper-connect/calls/post_telephony-calls-analytics-comprehensive-1.md"
+      }
+    ],
+    "api-reference/zuper-connect/conversations": [
+      {
+        "title": "Get Conversations",
+        "url": "https://developers.zuper.co/reference/get-conversations.md",
+        "file": "api-reference/zuper-connect/conversations/get-conversations.md"
+      },
+      {
+        "title": "Get Conversation Details",
+        "url": "https://developers.zuper.co/reference/get-conversation-details.md",
+        "file": "api-reference/zuper-connect/conversations/get-conversation-details.md"
+      },
+      {
+        "title": "Get Conversation Messages",
+        "url": "https://developers.zuper.co/reference/get-conversation-messages.md",
+        "file": "api-reference/zuper-connect/conversations/get-conversation-messages.md"
+      },
+      {
+        "title": "Send a message",
+        "url": "https://developers.zuper.co/reference/send-a-message.md",
+        "file": "api-reference/zuper-connect/conversations/send-a-message.md"
+      }
+    ],
+    "api-reference/user-management/users": [
+      {
+        "title": "Create User",
+        "url": "https://developers.zuper.co/reference/create-user.md",
+        "file": "api-reference/user-management/users/create-user.md"
+      },
+      {
+        "title": "Get All Users",
+        "url": "https://developers.zuper.co/reference/get-all-users-1.md",
+        "file": "api-reference/user-management/users/get-all-users-1.md"
+      },
+      {
+        "title": "Get User Details",
+        "url": "https://developers.zuper.co/reference/get-user-details.md",
+        "file": "api-reference/user-management/users/get-user-details.md"
+      },
+      {
+        "title": "Update User Details",
+        "url": "https://developers.zuper.co/reference/update-user-details.md",
+        "file": "api-reference/user-management/users/update-user-details.md"
+      },
+      {
+        "title": "Delete User",
+        "url": "https://developers.zuper.co/reference/delete-user.md",
+        "file": "api-reference/user-management/users/delete-user.md"
+      },
+      {
+        "title": "Activate / Deactivate User",
+        "url": "https://developers.zuper.co/reference/update.md",
+        "file": "api-reference/user-management/users/update.md"
+      }
+    ],
+    "api-reference/user-management/user-skills": [
+      {
+        "title": "Create User Skills",
+        "url": "https://developers.zuper.co/reference/create-user-skills.md",
+        "file": "api-reference/user-management/user-skills/create-user-skills.md"
+      },
+      {
+        "title": "Get User Skills",
+        "url": "https://developers.zuper.co/reference/get-user-skills.md",
+        "file": "api-reference/user-management/user-skills/get-user-skills.md"
+      },
+      {
+        "title": "Update User Skills",
+        "url": "https://developers.zuper.co/reference/update-user-skills.md",
+        "file": "api-reference/user-management/user-skills/update-user-skills.md"
+      },
+      {
+        "title": "Delete User Skills",
+        "url": "https://developers.zuper.co/reference/delete-user-skills.md",
+        "file": "api-reference/user-management/user-skills/delete-user-skills.md"
+      }
+    ],
+    "api-reference/user-management/user-timelogs": [
+      {
+        "title": "Get Users Timelog",
+        "url": "https://developers.zuper.co/reference/users-timelog.md",
+        "file": "api-reference/user-management/user-timelogs/users-timelog.md"
+      },
+      {
+        "title": "Get User Timelog Details",
+        "url": "https://developers.zuper.co/reference/get-user-timelog-details.md",
+        "file": "api-reference/user-management/user-timelogs/get-user-timelog-details.md"
+      }
+    ],
+    "api-reference/user-management/teams": [
+      {
+        "title": "Create Team",
+        "url": "https://developers.zuper.co/reference/create-team.md",
+        "file": "api-reference/user-management/teams/create-team.md"
+      },
+      {
+        "title": "Get All Teams",
+        "url": "https://developers.zuper.co/reference/get-all-teams.md",
+        "file": "api-reference/user-management/teams/get-all-teams.md"
+      },
+      {
+        "title": "Get Team Details",
+        "url": "https://developers.zuper.co/reference/get-team-details.md",
+        "file": "api-reference/user-management/teams/get-team-details.md"
+      },
+      {
+        "title": "Update Team Details",
+        "url": "https://developers.zuper.co/reference/update-team-details.md",
+        "file": "api-reference/user-management/teams/update-team-details.md"
+      },
+      {
+        "title": "Delete Team",
+        "url": "https://developers.zuper.co/reference/delete-team.md",
+        "file": "api-reference/user-management/teams/delete-team.md"
+      },
+      {
+        "title": "Restore Team",
+        "url": "https://developers.zuper.co/reference/recover-team.md",
+        "file": "api-reference/user-management/teams/recover-team.md"
+      },
+      {
+        "title": "Assign User To Team",
+        "url": "https://developers.zuper.co/reference/assign-employee-to-team.md",
+        "file": "api-reference/user-management/teams/assign-employee-to-team.md"
+      },
+      {
+        "title": "Unassign User From Team",
+        "url": "https://developers.zuper.co/reference/unassign-employee-from-team.md",
+        "file": "api-reference/user-management/teams/unassign-employee-from-team.md"
+      }
+    ],
+    "api-reference/user-management/timesheets": [
+      {
+        "title": "Get Timesheets",
+        "url": "https://developers.zuper.co/reference/get-all-timesheet.md",
+        "file": "api-reference/user-management/timesheets/get-all-timesheet.md"
+      },
+      {
+        "title": "Get Timesheet Summary",
+        "url": "https://developers.zuper.co/reference/get-timesheet-history-copy.md",
+        "file": "api-reference/user-management/timesheets/get-timesheet-history-copy.md"
+      },
+      {
+        "title": "Create Timesheet",
+        "url": "https://developers.zuper.co/reference/create-timesheet.md",
+        "file": "api-reference/user-management/timesheets/create-timesheet.md"
+      },
+      {
+        "title": "Update Timesheet",
+        "url": "https://developers.zuper.co/reference/create-timesheet-copy.md",
+        "file": "api-reference/user-management/timesheets/create-timesheet-copy.md"
+      },
+      {
+        "title": "Delete Timesheet",
+        "url": "https://developers.zuper.co/reference/delete-timesheet.md",
+        "file": "api-reference/user-management/timesheets/delete-timesheet.md"
+      }
+    ],
+    "api-reference/user-management/timeoff-requests": [
+      {
+        "title": "Create Timeoff Request",
+        "url": "https://developers.zuper.co/reference/create-timeoff.md",
+        "file": "api-reference/user-management/timeoff-requests/create-timeoff.md"
+      },
+      {
+        "title": "Get Timeoff Requests",
+        "url": "https://developers.zuper.co/reference/get-timeoff.md",
+        "file": "api-reference/user-management/timeoff-requests/get-timeoff.md"
+      },
+      {
+        "title": "Get Timeoff Request Details",
+        "url": "https://developers.zuper.co/reference/get-timeoff-request-details.md",
+        "file": "api-reference/user-management/timeoff-requests/get-timeoff-request-details.md"
+      },
+      {
+        "title": "Edit Timeoff Request",
+        "url": "https://developers.zuper.co/reference/create-timeoff-request-copy.md",
+        "file": "api-reference/user-management/timeoff-requests/create-timeoff-request-copy.md"
+      },
+      {
+        "title": "Update Approval Status",
+        "url": "https://developers.zuper.co/reference/get-timeoff-request.md",
+        "file": "api-reference/user-management/timeoff-requests/get-timeoff-request.md"
+      },
+      {
+        "title": "Delete Timeoff Request",
+        "url": "https://developers.zuper.co/reference/delete-timeoff-request.md",
+        "file": "api-reference/user-management/timeoff-requests/delete-timeoff-request.md"
+      }
+    ],
+    "api-reference/user-management/timesheet-locations": [
+      {
+        "title": "Create Timesheet Location",
+        "url": "https://developers.zuper.co/reference/create-timesheet-location.md",
+        "file": "api-reference/user-management/timesheet-locations/create-timesheet-location.md"
+      },
+      {
+        "title": "Get Timesheet Location",
+        "url": "https://developers.zuper.co/reference/get-timesheet-location.md",
+        "file": "api-reference/user-management/timesheet-locations/get-timesheet-location.md"
+      },
+      {
+        "title": "Get Location Details",
+        "url": "https://developers.zuper.co/reference/get-location-details.md",
+        "file": "api-reference/user-management/timesheet-locations/get-location-details.md"
+      },
+      {
+        "title": "Update Timesheet Location",
+        "url": "https://developers.zuper.co/reference/create-timesheet-location-copy.md",
+        "file": "api-reference/user-management/timesheet-locations/create-timesheet-location-copy.md"
+      },
+      {
+        "title": "Delete Timesheet Location",
+        "url": "https://developers.zuper.co/reference/delete-timesheet-location.md",
+        "file": "api-reference/user-management/timesheet-locations/delete-timesheet-location.md"
+      }
+    ],
+    "api-reference/user-management/timeoff-types": [
+      {
+        "title": "Create Timeoff Request Type",
+        "url": "https://developers.zuper.co/reference/create-timeoff-request-type.md",
+        "file": "api-reference/user-management/timeoff-types/create-timeoff-request-type.md"
+      },
+      {
+        "title": "Get Timeoff Request Type",
+        "url": "https://developers.zuper.co/reference/get-timeoff-request-type.md",
+        "file": "api-reference/user-management/timeoff-types/get-timeoff-request-type.md"
+      },
+      {
+        "title": "Update Timeoff Request Type",
+        "url": "https://developers.zuper.co/reference/create-timeoff-request-type-copy.md",
+        "file": "api-reference/user-management/timeoff-types/create-timeoff-request-type-copy.md"
+      },
+      {
+        "title": "Delete Timeoff Request Type",
+        "url": "https://developers.zuper.co/reference/get-timeoff-request-type-copy.md",
+        "file": "api-reference/user-management/timeoff-types/get-timeoff-request-type-copy.md"
+      },
+      {
+        "title": "Reorder Timeoff Request Type",
+        "url": "https://developers.zuper.co/reference/reorder-timeoff-request-type.md",
+        "file": "api-reference/user-management/timeoff-types/reorder-timeoff-request-type.md"
+      }
+    ],
+    "api-reference/user-management/timeoff-availability": [
+      {
+        "title": "Create Timeoff Availability",
+        "url": "https://developers.zuper.co/reference/get-timeoff-availability-copy.md",
+        "file": "api-reference/user-management/timeoff-availability/get-timeoff-availability-copy.md"
+      },
+      {
+        "title": "Get Timeoff Availability",
+        "url": "https://developers.zuper.co/reference/get-timeoff-availability.md",
+        "file": "api-reference/user-management/timeoff-availability/get-timeoff-availability.md"
+      },
+      {
+        "title": "Update Timeoff Availability",
+        "url": "https://developers.zuper.co/reference/create-timeoff-availability-copy.md",
+        "file": "api-reference/user-management/timeoff-availability/create-timeoff-availability-copy.md"
+      },
+      {
+        "title": "Delete Timeoff Availability",
+        "url": "https://developers.zuper.co/reference/delete-timeoff-availability.md",
+        "file": "api-reference/user-management/timeoff-availability/delete-timeoff-availability.md"
+      }
+    ],
+    "api-reference/user-management/trade-types": [
+      {
+        "title": "/business_units",
+        "url": "https://developers.zuper.co/reference/create-trade-type.md",
+        "file": "api-reference/user-management/trade-types/create-trade-type.md"
+      },
+      {
+        "title": "/business_units",
+        "url": "https://developers.zuper.co/reference/get-trade-types.md",
+        "file": "api-reference/user-management/trade-types/get-trade-types.md"
+      },
+      {
+        "title": "/business_units/{business_unit_uid}",
+        "url": "https://developers.zuper.co/reference/get-trade-type-details.md",
+        "file": "api-reference/user-management/trade-types/get-trade-type-details.md"
+      },
+      {
+        "title": "/business_units/{business_unit_uid}",
+        "url": "https://developers.zuper.co/reference/update-trade-type.md",
+        "file": "api-reference/user-management/trade-types/update-trade-type.md"
+      },
+      {
+        "title": "/business_units/{business_unit_uid}/activate",
+        "url": "https://developers.zuper.co/reference/activatedeactivate-trade-type.md",
+        "file": "api-reference/user-management/trade-types/activatedeactivate-trade-type.md"
+      },
+      {
+        "title": "/business_units/reorder",
+        "url": "https://developers.zuper.co/reference/reorder-trade-types.md",
+        "file": "api-reference/user-management/trade-types/reorder-trade-types.md"
+      },
+      {
+        "title": "/business_units/{business_unit_uid}",
+        "url": "https://developers.zuper.co/reference/delete-trade-type.md",
+        "file": "api-reference/user-management/trade-types/delete-trade-type.md"
+      }
+    ],
+    "api-reference/others/custom-fields": [
+      {
+        "title": "Update Custom Fields",
+        "url": "https://developers.zuper.co/reference/update-custom-fields.md",
+        "file": "api-reference/others/custom-fields/update-custom-fields.md"
+      }
+    ],
+    "api-reference/others/notes": [
+      {
+        "title": "/notes",
+        "url": "https://developers.zuper.co/reference/get-notes.md",
+        "file": "api-reference/others/notes/get-notes.md"
+      }
+    ],
+    "api-reference/developer-features/webhooks": [
+      {
+        "title": "Create a Webhook",
+        "url": "https://developers.zuper.co/reference/add-webhook.md",
+        "file": "api-reference/developer-features/webhooks/add-webhook.md"
+      },
+      {
+        "title": "Get Webhooks",
+        "url": "https://developers.zuper.co/reference/webhooks.md",
+        "file": "api-reference/developer-features/webhooks/webhooks.md"
+      },
+      {
+        "title": "Get Webhook Details",
+        "url": "https://developers.zuper.co/reference/get-webhook-by-uid.md",
+        "file": "api-reference/developer-features/webhooks/get-webhook-by-uid.md"
+      },
+      {
+        "title": "Update Webhook",
+        "url": "https://developers.zuper.co/reference/update-webhook.md",
+        "file": "api-reference/developer-features/webhooks/update-webhook.md"
+      },
+      {
+        "title": "Activate/Deactivate Webhook",
+        "url": "https://developers.zuper.co/reference/activatedeactivate-webhook.md",
+        "file": "api-reference/developer-features/webhooks/activatedeactivate-webhook.md"
+      },
+      {
+        "title": "Delete Webhook",
+        "url": "https://developers.zuper.co/reference/delete-webhook.md",
+        "file": "api-reference/developer-features/webhooks/delete-webhook.md"
+      },
+      {
+        "title": "Get Webhooks History",
+        "url": "https://developers.zuper.co/reference/get-all-webhook-history.md",
+        "file": "api-reference/developer-features/webhooks/get-all-webhook-history.md"
+      },
+      {
+        "title": "Webhook Retry",
+        "url": "https://developers.zuper.co/reference/webhook-retry.md",
+        "file": "api-reference/developer-features/webhooks/webhook-retry.md"
+      }
+    ],
+    "api-reference/form-builder/checklists": [
+      {
+        "title": "Create Job Checklist",
+        "url": "https://developers.zuper.co/reference/create-job-checklist.md",
+        "file": "api-reference/form-builder/checklists/create-job-checklist.md"
+      },
+      {
+        "title": "Get Checklist Details",
+        "url": "https://developers.zuper.co/reference/get-checklist-details.md",
+        "file": "api-reference/form-builder/checklists/get-checklist-details.md"
+      },
+      {
+        "title": "Update Job Checklist",
+        "url": "https://developers.zuper.co/reference/update-job-checklist-1.md",
+        "file": "api-reference/form-builder/checklists/update-job-checklist-1.md"
+      },
+      {
+        "title": "Delete Job Checklist",
+        "url": "https://developers.zuper.co/reference/delete-job-checklist.md",
+        "file": "api-reference/form-builder/checklists/delete-job-checklist.md"
+      },
+      {
+        "title": "Reorder Job Checklists",
+        "url": "https://developers.zuper.co/reference/reorder-job-checklists.md",
+        "file": "api-reference/form-builder/checklists/reorder-job-checklists.md"
+      },
+      {
+        "title": "Clone Checklist",
+        "url": "https://developers.zuper.co/reference/clone-checklist.md",
+        "file": "api-reference/form-builder/checklists/clone-checklist.md"
+      },
+      {
+        "title": "Get Checklists",
+        "url": "https://developers.zuper.co/reference/get-checklists.md",
+        "file": "api-reference/form-builder/checklists/get-checklists.md"
+      }
+    ],
+    "api-reference/form-builder/inspection-forms": [
+      {
+        "title": "Create Inspection form",
+        "url": "https://developers.zuper.co/reference/create-inspection-form.md",
+        "file": "api-reference/form-builder/inspection-forms/create-inspection-form.md"
+      },
+      {
+        "title": "Get Inspection form Details",
+        "url": "https://developers.zuper.co/reference/get-inspection-form-details.md",
+        "file": "api-reference/form-builder/inspection-forms/get-inspection-form-details.md"
+      },
+      {
+        "title": "Update Asset Inspection Form Field",
+        "url": "https://developers.zuper.co/reference/update-asset-inspection-form-1.md",
+        "file": "api-reference/form-builder/inspection-forms/update-asset-inspection-form-1.md"
+      },
+      {
+        "title": "Delete Asset Inspection Form Field",
+        "url": "https://developers.zuper.co/reference/delete-asset-inspection-field.md",
+        "file": "api-reference/form-builder/inspection-forms/delete-asset-inspection-field.md"
+      }
+    ],
+    "api-reference/zuper-pro-api/purchase-orders": [
+      {
+        "title": "Get Purchase Order Summary",
+        "url": "https://developers.zuper.co/reference/post_purchase_orderssummary.md",
+        "file": "api-reference/zuper-pro-api/purchase-orders/post_purchase_orderssummary.md"
+      },
+      {
+        "title": "Get Purchase Orders Meta",
+        "url": "https://developers.zuper.co/reference/get_purchase_ordersmeta.md",
+        "file": "api-reference/zuper-pro-api/purchase-orders/get_purchase_ordersmeta.md"
+      }
+    ],
+    "api-reference/zuper-pro-api/work-orders": [
+      {
+        "title": "Work Order Bulk Action",
+        "url": "https://developers.zuper.co/reference/post_service_ordersbulk_action.md",
+        "file": "api-reference/zuper-pro-api/work-orders/post_service_ordersbulk_action.md"
+      },
+      {
+        "title": "Bulk Create Work Order",
+        "url": "https://developers.zuper.co/reference/post_service_ordersbulk.md",
+        "file": "api-reference/zuper-pro-api/work-orders/post_service_ordersbulk.md"
+      },
+      {
+        "title": "Get Work Orders By Filter",
+        "url": "https://developers.zuper.co/reference/post_service_ordersfilter.md",
+        "file": "api-reference/zuper-pro-api/work-orders/post_service_ordersfilter.md"
+      },
+      {
+        "title": "Get Work Orders Meta Filter",
+        "url": "https://developers.zuper.co/reference/get_service_ordersmetafilter.md",
+        "file": "api-reference/zuper-pro-api/work-orders/get_service_ordersmetafilter.md"
+      },
+      {
+        "title": "Recover Work Order",
+        "url": "https://developers.zuper.co/reference/post_service_ordersrecover.md",
+        "file": "api-reference/zuper-pro-api/work-orders/post_service_ordersrecover.md"
+      }
+    ],
+    "api-reference/zuper-pro-api/contracts": [
+      {
+        "title": "Subcontractor Bulk Action",
+        "url": "https://developers.zuper.co/reference/subcontractor-bulk-action.md",
+        "file": "api-reference/zuper-pro-api/contracts/subcontractor-bulk-action.md"
+      },
+      {
+        "title": "Get Subcontractors Meta",
+        "url": "https://developers.zuper.co/reference/get-subcontractors-meta.md",
+        "file": "api-reference/zuper-pro-api/contracts/get-subcontractors-meta.md"
+      },
+      {
+        "title": "Get Subcontractors Meta Filter",
+        "url": "https://developers.zuper.co/reference/get-subcontractors-meta-filter.md",
+        "file": "api-reference/zuper-pro-api/contracts/get-subcontractors-meta-filter.md"
+      },
+      {
+        "title": "Get Subcontractors By Filter",
+        "url": "https://developers.zuper.co/reference/get-subcontractors-by-filter-1.md",
+        "file": "api-reference/zuper-pro-api/contracts/get-subcontractors-by-filter-1.md"
+      },
+      {
+        "title": "Activate/Deactivate Subcontractor",
+        "url": "https://developers.zuper.co/reference/activatedeactivate-subcontractor.md",
+        "file": "api-reference/zuper-pro-api/contracts/activatedeactivate-subcontractor.md"
+      }
+    ],
+    "api-reference/zuper-pro-api/vendors": [
+      {
+        "title": "Vendor Bulk Action",
+        "url": "https://developers.zuper.co/reference/vendor-bulk-action.md",
+        "file": "api-reference/zuper-pro-api/vendors/vendor-bulk-action.md"
+      },
+      {
+        "title": "Get Vendors Meta Filter",
+        "url": "https://developers.zuper.co/reference/get-vendors-meta-filter.md",
+        "file": "api-reference/zuper-pro-api/vendors/get-vendors-meta-filter.md"
+      },
+      {
+        "title": "Activate/Deactivate Vendor",
+        "url": "https://developers.zuper.co/reference/activate-vendor.md",
+        "file": "api-reference/zuper-pro-api/vendors/activate-vendor.md"
+      },
+      {
+        "title": "Get Vendors By Filter",
+        "url": "https://developers.zuper.co/reference/get-vendors-by-filter.md",
+        "file": "api-reference/zuper-pro-api/vendors/get-vendors-by-filter.md"
+      },
+      {
+        "title": "Get Vendors Meta",
+        "url": "https://developers.zuper.co/reference/get-vendors-meta.md",
+        "file": "api-reference/zuper-pro-api/vendors/get-vendors-meta.md"
+      }
+    ],
+    "api-reference/zuper-pro-api/requests": [
+      {
+        "title": "Create Request Status",
+        "url": "https://developers.zuper.co/reference/create-request-status-1.md",
+        "file": "api-reference/zuper-pro-api/requests/create-request-status-1.md"
+      },
+      {
+        "title": "Update Request Status",
+        "url": "https://developers.zuper.co/reference/update-request-status-entry.md",
+        "file": "api-reference/zuper-pro-api/requests/update-request-status-entry.md"
+      },
+      {
+        "title": "Delete Request Status",
+        "url": "https://developers.zuper.co/reference/delete-request-status-1.md",
+        "file": "api-reference/zuper-pro-api/requests/delete-request-status-1.md"
+      },
+      {
+        "title": "Reorder Request Statuses",
+        "url": "https://developers.zuper.co/reference/reorder-request-statuses-1.md",
+        "file": "api-reference/zuper-pro-api/requests/reorder-request-statuses-1.md"
+      }
+    ],
+    "api-reference/zuper-pro-api/quotes-proposals": [
+      {
+        "title": "Get Estimates By Filter",
+        "url": "https://developers.zuper.co/reference/get-estimates-by-filter-1.md",
+        "file": "api-reference/zuper-pro-api/quotes-proposals/get-estimates-by-filter-1.md"
+      }
+    ],
+    "api-reference/zuper-pro-api/invoices": [
+      {
+        "title": "Get Invoice Meta",
+        "url": "https://developers.zuper.co/reference/get-invoice-meta-1.md",
+        "file": "api-reference/zuper-pro-api/invoices/get-invoice-meta-1.md"
+      },
+      {
+        "title": "Get Invoice Meta Filter",
+        "url": "https://developers.zuper.co/reference/get-invoice-meta-filter-1.md",
+        "file": "api-reference/zuper-pro-api/invoices/get-invoice-meta-filter-1.md"
+      }
+    ],
+    "api-reference/zuper-pro-api/jobs": [
+      {
+        "title": "Get Job Meta",
+        "url": "https://developers.zuper.co/reference/get-job-meta-1.md",
+        "file": "api-reference/zuper-pro-api/jobs/get-job-meta-1.md"
+      },
+      {
+        "title": "Get Job Meta Filter",
+        "url": "https://developers.zuper.co/reference/get-job-meta-filter-1.md",
+        "file": "api-reference/zuper-pro-api/jobs/get-job-meta-filter-1.md"
+      }
+    ],
+    "api-reference/zuper-pro-api/products": [
+      {
+        "title": "Get Products By Filter",
+        "url": "https://developers.zuper.co/reference/get-products-by-filter-1.md",
+        "file": "api-reference/zuper-pro-api/products/get-products-by-filter-1.md"
+      },
+      {
+        "title": "Get Product Meta",
+        "url": "https://developers.zuper.co/reference/get-product-meta-1.md",
+        "file": "api-reference/zuper-pro-api/products/get-product-meta-1.md"
+      }
+    ],
+    "api-reference/zuper-pro-api/vendor-catalogs": [
+      {
+        "title": "Delete Multiple Vendor Catalogs",
+        "url": "https://developers.zuper.co/reference/delete-vendor-catalogs.md",
+        "file": "api-reference/zuper-pro-api/vendor-catalogs/delete-vendor-catalogs.md"
+      }
+    ],
+    "api-reference/zuper-pro-api/users": [
+      {
+        "title": "Get User Meta Filter",
+        "url": "https://developers.zuper.co/reference/get-users-meta-filter-fields.md",
+        "file": "api-reference/zuper-pro-api/users/get-users-meta-filter-fields.md"
+      }
+    ],
+    "changelog": [
+      {
+        "title": "September 2026 Updates",
+        "url": "https://developers.zuper.co/changelog/september-2026-updates.md",
+        "file": "changelog/september-2026-updates.md"
+      },
+      {
+        "title": "August 2026 Updates",
+        "url": "https://developers.zuper.co/changelog/august-2026-updates.md",
+        "file": "changelog/august-2026-updates.md"
+      },
+      {
+        "title": "July 2026 Updates",
+        "url": "https://developers.zuper.co/changelog/july-2026-updates.md",
+        "file": "changelog/july-2026-updates.md"
+      },
+      {
+        "title": "June 2026 Updates",
+        "url": "https://developers.zuper.co/changelog/june-2026-updates.md",
+        "file": "changelog/june-2026-updates.md"
+      },
+      {
+        "title": "May 2026 Updates",
+        "url": "https://developers.zuper.co/changelog/may-2026-updates.md",
+        "file": "changelog/may-2026-updates.md"
+      },
+      {
+        "title": "April 2026 Updates",
+        "url": "https://developers.zuper.co/changelog/april-2026-updates.md",
+        "file": "changelog/april-2026-updates.md"
+      },
+      {
+        "title": "March 2026 Updates",
+        "url": "https://developers.zuper.co/changelog/march-2026-updates.md",
+        "file": "changelog/march-2026-updates.md"
+      },
+      {
+        "title": "February 2026 Updates",
+        "url": "https://developers.zuper.co/changelog/february-2026-updates.md",
+        "file": "changelog/february-2026-updates.md"
+      },
+      {
+        "title": "January 2026 Updates",
+        "url": "https://developers.zuper.co/changelog/january-2026-updates.md",
+        "file": "changelog/january-2026-updates.md"
+      },
+      {
+        "title": "December 2025 Updates",
+        "url": "https://developers.zuper.co/changelog/december-2025-updates.md",
+        "file": "changelog/december-2025-updates.md"
+      }
+    ]
+  },
+  "failures": []
+}

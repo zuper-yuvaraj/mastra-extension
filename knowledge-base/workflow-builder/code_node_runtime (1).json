@@ -1,0 +1,91 @@
+{
+  "generated_at": "2026-06-09T07:01:31.117Z",
+  "isolation": "firejail child process (NOT vm2 — vm2 is deprecated). Linux timeout enforces wall-clock limit.",
+  "timeout_seconds_default": 30,
+  "source": "workflow-automation-worker/lib/sandbox_v2.js + workflow-automation-worker-config.yml (ALLOWED_MODULES)",
+  "allowed_modules": [
+    "axios",
+    "underscore",
+    "geolib",
+    "zuper-sdk",
+    "lodash",
+    "async",
+    "moment-range",
+    "moment-timezone",
+    "crypto-js",
+    "form-data",
+    "xlsx",
+    "googleapis",
+    "mysql",
+    "dayjs",
+    "moment",
+    "xmldom",
+    "xml-js",
+    "parse5",
+    "jsrsasign",
+    "number-to-words",
+    "jsonwebtoken"
+  ],
+  "require_rule": "require() ONLY the modules above. require(\"fs\"|\"child_process\"|\"http\"...) is blocked.",
+  "versions": {
+    "v1": {
+      "globals": [
+        "$ (NodePrototype helpers)",
+        "$item (most recent node output)",
+        "variable / VARIABLE",
+        "$input (also present)"
+      ],
+      "helper_methods": [
+        "$.getNodeData(name)",
+        "$.getLatestNodeData(name)",
+        "$.getRecentNodeData(i)",
+        "$.getCurrentLoopIndex()",
+        "$.getTotalLoopIterations()",
+        "$.getArrayData()",
+        "$.isNodeInsideLoop()",
+        "$.getNodeDetails(uid)",
+        "$.getVariable(name)",
+        "$.getCurrentExecutionUid()"
+      ],
+      "memory": "HIGH — loads all upstream node data into the child process",
+      "use_when": "Need full workflow context / historical node data / loop helpers"
+    },
+    "v2": {
+      "globals": [
+        "$input (ONLY accessor for declared inputs)",
+        "variable / VARIABLE"
+      ],
+      "constraint": "Accessing $ or $item THROWS (intentionally not exposed). Inputs must be declared via the node input-mapping; resolved values arrive as $input.<key>.",
+      "memory": "MINIMAL — only declared inputs passed in",
+      "use_when": "Simple transforms / perf-critical / only need specific inputs (preferred default for new nodes)"
+    },
+    "selector": "is_code_node_v2 flag on the node decides v1 vs v2."
+  },
+  "return": "Return a plain object; it becomes this node's execution_data for downstream nodes. Returning undefined/null is treated as \"Return data is missing.\" error.",
+  "forbidden": [
+    "fs",
+    "child_process",
+    "network servers",
+    "dynamic require of non-whitelisted modules"
+  ],
+  "example_v1": "const axios=require('axios');\nconst job_uid=$item.data.body.job_uid; // $item is the {node,data} wrapper -> .data.body for a webhook/event trigger\ntry{\n  const r=await axios.get(`https://us1.zuperpro.com/api/jobs/${job_uid}`,{headers:{'x-api-key':variable.zuper_api_key}});\n  return { ok:true, status:r.data.data.job_status };\n}catch(e){ return { ok:false, error:e.message }; }",
+  "example_v2": "// inputs declared in node: job_uid <- {{ $item.data.body.job_uid }}\nconst axios=require('axios');\ntry{\n  const r=await axios.get(`https://us1.zuperpro.com/api/jobs/${$input.job_uid}`,{headers:{'x-api-key':variable.zuper_api_key}});\n  return { ok:true, status:r.data.data.job_status };\n}catch(e){ return { ok:false, error:e.message }; }",
+  "zuper_api_recipe": {
+    "note": "Calling a Zuper API from a code/http node: the worker does NOT auto-inject Zuper auth. Auth header = 'x-api-key': variable.zuper_api_key (NOT Bearer). Base = the company DC (e.g. https://<dc>.zuperpro.com/api). The workflow MUST have a `zuper_api_key` variable — create it (create_variable, is_sensitive:true) or return a clarification; never invent variable.zuper_dc_base/zuper_bearer.",
+    "http_vs_code_url": "CODE node: `variable.zuper_dc_base` inside the JS is fine (plain string at runtime). http_request_v2 node: the `url` field is validated with new URL() at SAVE → it MUST be a LITERAL absolute URL (e.g. http://localhost:4500/api/jobs/filter or https://<dc>.zuperpro.com/api/...). NEVER put `{{ variable }}` in the http `url` — `{{ variable.zuper_dc_base }}/jobs/filter` => 'Invalid URL'. Only field VALUES like the x-api-key header may be a {{ variable }} expression.",
+    "get_by_uid": "GET {dc}/api/jobs/{job_uid}  (single record) — prefer the native zuper_get_record node over a code/http call.",
+    "list_filter": "FILTERED LIST endpoint = **POST {dc}/api/{module}/filter** (jobs → POST {dc}/api/jobs/filter). NOT `/jobs/list_v2` (that 404s 'Cannot POST' on this backend) and NOT `/jobs/meta/filter` (schema only). Body: { page:1, count:10, filter_rules:[ RULE, … ], filter_rule_operator:'AND' }. **ALWAYS use count:10** (never 50/100/1000) — the record total is unknown, so paginate via the loop pattern (see `pagination_pattern`) instead of a big page size. A RULE = { key, operator, value, type:'default_field', module:'JOB' } — for a *_uid lookup use type:'nested_field',field_type:'LOOKUP'; for a custom field use key:'cf_<uuid>',type:'custom_field',field_type:'<TYPE>'. Real keys come from describe_trigger_filters('JOB') / zuper_dc_get('/jobs/meta/filter') — NEVER invent a key (no `date`, no `scheduled_date_range`). DATES use operator:'BETWEEN' with value:[fromISO,toISO] (compute the range yourself — there is NO `rangeKey`).",
+    "pagination_pattern": "FETCH-ALL of UNKNOWN COUNT → paginate with count:10 + a loop. Topology: trigger → http(fetch PAGE 1, count:10, filters) → code('compute pages' from page-1 total) → loop(input_data = the page array) → [BODY: http(fetch CURRENT page, count:10, same filters)] → code('aggregate' page-1 + every loop page, build body) → action. WIRING: the loop BODY is ONLY the per-page fetch (loop --two-b--> fetch; fetch --loopEdge--> loop). The 'aggregate' code node + everything after run AFTER the loop, on its EXIT handle (loop --two-a--> aggregate --one-a--> action) — NEVER inside the body (aggregate must NOT have a loopEdge back to the loop; it runs once, post-loop, and reads all pages via $.getNodeData). The page-1 response carries the total — `body.total_records` (or `total`/`total_count`) and sometimes `total_pages`/`current_page`. Use count:10 everywhere; NEVER hardcode a big count. See compute_pages / loop_input_data / paginate_child_fetch / paginate_aggregate.",
+    "paginate_compute_pages": "// 'compute pages' code node — runs AFTER the page-1 http fetch, BEFORE the loop. Returns the remaining page\n// numbers (2..N) as objects so the loop can iterate them.\nconst r1 = $.getLatestNodeData('fetch page 1').data; // the http node's output ({status, data:{...}} or the raw body)\nconst body = (r1 && (r1.data || r1.body || r1)) || {};\nconst total = Number(body.total_records != null ? body.total_records : (body.total != null ? body.total : (body.total_count || 0)));\nconst per = 10;\nconst totalPages = body.total_pages != null ? Number(body.total_pages) : Math.max(1, Math.ceil(total / per));\nconst pages = [];\nfor (let p = 2; p <= totalPages; p++) pages.push({ page: p });\nreturn { total_records: total, total_pages: totalPages, pages };",
+    "loop_input_data": "The loop node's REQUIRED `input_data` field (EXPRESSION) = the array to iterate, i.e. the page array from the compute node: `{{ $.getLatestNodeData('compute pages').data.pages }}`. A loop SHIPS BLANK and never iterates unless you set input_data. Inside the body, the current element is `$item` → its page number is `{{ $item.data.page }}`.",
+    "paginate_child_fetch": "// loop-CHILD http fetch (one iteration = one page). SAME url/filters/count as page 1, but `page` comes from the\n// current loop item. json_body (EXPRESSION) value, e.g.:\n{\"page\": \"{{ $item.data.page }}\", \"count\": 10, \"filter_rules\": [ /* same filters as page 1 */ ], \"filter_rule_operator\": \"AND\"}\n// x-api-key header stays {{ variable.zuper_api_key }}. Do NOT compute the page with getCurrentLoopIndex arithmetic in the http field — use $item.data.page.",
+    "paginate_aggregate": "// 'aggregate' code node — runs AFTER the loop. Combines page-1 records with EVERY loop-page's records.\nconst first = (($.getLatestNodeData('fetch page 1').data||{}).data) || [];\n// a loop-child node's outputs accumulate as an ARRAY across iterations:\nconst rest = ($.getNodeData('fetch current page')||[]).flatMap(e => ((e && e.data && (e.data.data||e.data.body&&e.data.body.data)) || []));\nconst all = [...first, ...rest];\nconst completed = all.filter(j => (j.current_job_status||{}).status_type === 'COMPLETED');\nconst uncompleted = all.filter(j => (j.current_job_status||{}).status_type !== 'COMPLETED');\nconst li = a => a.map(j => `<li>${j.work_order_number||j.job_uid}</li>`).join('');\nconst html = `<h3>Completed (${completed.length})</h3><ul>${li(completed)}</ul><h3>Uncompleted (${uncompleted.length})</h3><ul>${li(uncompleted)}</ul>`;\nreturn { total: all.length, completed_count: completed.length, uncompleted_count: uncompleted.length, html };",
+    "status_type_enum": "Valid `current_job_status.status_type` values: NEW, SCHEDULED, ON_MY_WAY, STARTED, ON_HOLD, COMPLETED, CANNOT_COMPLETE, CANCELED, FAILED, PAID, CLOSED, FOLLOW_UP, FOLLOW_UP_SAME_JOB, OTHER. (IN_PROGRESS→STARTED; INCOMPLETE→CANNOT_COMPLETE; CANCELLED→CANCELED — there is NO 'INCOMPLETE'.) For 'completed AND un-completed', do NOT filter by status — fetch ALL (date filter only) and split by status_type==='COMPLETED' in the code/branch node.",
+    "timezone_dates": "CRITICAL: 'today'/'this week' is the COMPANY's local day, NOT UTC. A raw `new Date()` computes a UTC day → it MISSES jobs scheduled in the local evening (the #1 '0 results' bug). ALWAYS compute date windows in the company timezone with `require('moment-timezone')` + `variable.company_timezone` (an IANA string like 'Asia/Calcutta', auto-provisioned by the builder; default 'UTC' if absent): `const m=require('moment-timezone'); const tz=variable.company_timezone||'UTC'; const start_iso=m.tz(tz).startOf('day').toISOString(); const end_iso=m.tz(tz).endOf('day').toISOString();`. The filter `value:[start_iso,end_iso]` is then correct for the company's day.",
+    "compute_date_range": "// dedicated 'compute date range' code node (runs BEFORE the http fetch node)\nconst m=require('moment-timezone');\nconst tz=variable.company_timezone||'UTC';\nconst start_iso=m.tz(tz).startOf('day').toISOString();\nconst end_iso=m.tz(tz).endOf('day').toISOString();\nreturn { start_iso, end_iso, tz };",
+    "http_body_referencing_dates": "When an http_request_v2 fetch node uses dates computed by an upstream 'compute date range' code node, the http `json_body` (an EXPRESSION field) references that node's output — DO NOT compute dates in the http field (no Nunjucks `.date()`/`new Date()`; those FAIL). Example json_body value (replace 'Compute date range' with the real node name): `{\"page\":1,\"count\":100,\"filter_rules\":[{\"key\":\"scheduled_start_time\",\"operator\":\"BETWEEN\",\"value\":[\"{{ $.getLatestNodeData('Compute date range').data.start_iso }}\",\"{{ $.getLatestNodeData('Compute date range').data.end_iso }}\"],\"type\":\"default_field\",\"module\":\"JOB\"}],\"filter_rule_operator\":\"AND\"}`. The x-api-key header stays `{{ variable.zuper_api_key }}`.",
+    "split_and_build_body": "// 'split + build email body' code node (runs AFTER the http fetch node). Reads the fetch result, partitions\n// by status_type, builds HTML. Replace 'Fetch jobs' with the real fetch node name.\nconst res=$.getLatestNodeData('Fetch jobs').data;\nconst jobs=(res && (res.data || res.body && res.body.data || res.result)) || [];\nconst completed=jobs.filter(j=>(j.current_job_status||{}).status_type==='COMPLETED');\nconst uncompleted=jobs.filter(j=>(j.current_job_status||{}).status_type!=='COMPLETED');\nconst li=a=>a.map(j=>`<li>${j.work_order_number||j.job_uid} — ${(j.current_job_status||{}).status_type}</li>`).join('');\nconst html=`<h3>Completed (${completed.length})</h3><ul>${li(completed)}</ul><h3>Uncompleted (${uncompleted.length})</h3><ul>${li(uncompleted)}</ul>`;\nreturn { total:jobs.length, completed_count:completed.length, uncompleted_count:uncompleted.length, html };",
+    "example_jobs_filter": "// SINGLE-code-node fallback that PAGINATES internally (count:10, loop pages until exhausted) — company-tz dates\nconst axios=require('axios'); const m=require('moment-timezone');\nconst tz=variable.company_timezone||'UTC';\nconst start_iso=m.tz(tz).startOf('day').toISOString();\nconst end_iso=m.tz(tz).endOf('day').toISOString();\nconst rules=[ { key:'scheduled_start_time', operator:'BETWEEN', value:[start_iso,end_iso], type:'default_field', module:'JOB' } ];\nconst per=10; let page=1, jobs=[], totalPages=1;\ndo {\n  const r=await axios.post(`http://localhost:4500/api/jobs/filter`, { page, count:per, filter_rules:rules, filter_rule_operator:'AND' }, { headers:{ 'x-api-key': variable.zuper_api_key } });\n  const b=(r.data)||{}; jobs=jobs.concat(b.data||[]);\n  totalPages = b.total_pages != null ? Number(b.total_pages) : Math.ceil(Number(b.total_records||b.total||0)/per);\n  page++;\n} while (page <= totalPages);\nconst completed=jobs.filter(j=>(j.current_job_status||{}).status_type==='COMPLETED');\nconst uncompleted=jobs.filter(j=>(j.current_job_status||{}).status_type!=='COMPLETED');\nreturn { ok:true, total:jobs.length, completed, uncompleted };\n// NOTE: don't wrap axios in try/catch that returns {ok:false} — let a real failure THROW so the build-test loop catches it.",
+    "resolve_status_by_category": "// CROSS-CATEGORY status resolver — a per-JOB `code` node INSIDE a loop body that updates the status of MANY jobs\n// that MAY span job categories. A `status_uid` is PER-CATEGORY, so you canNOT bake ONE uid for a multi-category set —\n// resolve each job's own category's matching status_uid at RUNTIME, keyed by the CATEGORY-AGNOSTIC `status_type`\n// (name as a tiebreaker/fallback). Wire it: loop --two-b--> THIS resolver --one-a--> zuper_update(UPDATE_STATUS) --loopEdge--> loop.\n// GROUNDED live (GET /jobs/status/{category_uid} → { type:'success', data:{ job_statuses:[ {status_uid,status_name,status_type,...} ] } }).\nconst axios=require('axios');\nconst TARGET_TYPE='COMPLETED';   // the status_type the requirement asked for — RUNTIME enum (see status_type_enum: STARTED/CANCELED, NOT the filter enum's IN_PROGRESS/CANCELLED)\nconst TARGET_NAME='Completed';   // the human status name — used as a case-insensitive tiebreaker/fallback so enum drift never mis-targets\nconst catUid=(($item.data.job_category)||{}).category_uid;   // the CURRENT job's own category (loop iterates fetched jobs → $item.data is a job record)\nif(!catUid) throw new Error('current job has no job_category.category_uid');\nconst r=await axios.get(`https://<dc>.zuperpro.com/api/jobs/status/${catUid}`,{headers:{'x-api-key':variable.zuper_api_key}}); // literal DC base; NEVER {{ variable }} in a URL\nconst statuses=(((r.data||{}).data)||{}).job_statuses||[];\nlet hit=statuses.find(s=>s.status_type===TARGET_TYPE);\nif(!hit) hit=statuses.find(s=>String(s.status_name||'').toLowerCase()===String(TARGET_NAME).toLowerCase());\nif(!hit) throw new Error(`No '${TARGET_TYPE}'/'${TARGET_NAME}' status configured in category ${catUid}`); // THROW (don't return {ok:false}) so the build-test loop catches it\nreturn { status_uid: hit.status_uid, status_name: hit.status_name, status_type: hit.status_type, category_uid: catUid };\n// The UPDATE_STATUS node then sets job_status by EXPRESSION off THIS node's output: {{ $.getLatestNodeData('<this resolver node name>').data.status_uid }}\n// (operator_type=UPDATE_STATUS, source_node:'CUSTOM', module_uid: {{ $item.data.job_uid }}, job_fields:[], custom_fields:[]). NEVER a baked FIXED status_uid for a multi-category set.\n// SINGLE-category / single-job status updates do NOT use this — keep the one baked status_uid there."
+  }
+}

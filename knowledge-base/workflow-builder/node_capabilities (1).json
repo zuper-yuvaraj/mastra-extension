@@ -1,0 +1,26 @@
+{
+  "generated_at": "2026-06-18",
+  "purpose": "LOCAL-reality node capability map. select_node_type consults this FIRST. The staging captures (zuper_action_schema.json / nodes_all.json) OVER-report capabilities — they show separate zuper_update/zuper_create masters and estimate/quote update that do NOT build+validate on THIS backend (only the unified `zuper` master + the active node set exist). `http_request_v2` IS buildable locally now — its master_node_uid is remapped from the live master_nodes catalogue (uid 7d35bb68… , is_active=1). This map lists ONLY the genuine local gaps.",
+
+  "code_only_modules": {
+    "_note": "Modules with NO buildable native action node locally. The action is still a real Zuper API call → it goes through an `http_request_v2` node (PUT/POST to the module's API, header x-api-key: {{ variable.zuper_api_key }}, LITERAL DC base in url), NOT a code node. Use a PRECEDING `code` node ONLY to construct a complex payload, then the http node performs the create/update. NEVER a single code node that does the axios call itself. e.g. decline a quote = loop estimates → http_request_v2 PUT /estimate/:uid/status {estimate_status:'DECLINED'}; create estimate = code(build payload) → http_request_v2 POST /estimate.",
+    "modules": ["ESTIMATE", "ESTIMATES", "QUOTE", "QUOTES"],
+    "reason": "No native estimate/quote action node builds locally (the unified `zuper` master rejects an estimate save). The Zuper estimate API is called via http_request_v2 (PUT/POST), with code used only for payload construction — not a code node doing the HTTP itself."
+  },
+
+  "code_only_operations": {
+    "_note": "EMPTY — LIST / fetch-multiple / query now build via `http_request_v2` (POST {DC}/<module>/filter — NOT `list_v2`, which 404s on this backend), which is locally buildable (uid remapped from master_nodes). select_node_type returns Tier-2 http_request_v2 for these (no native list node exists). NOTE: an HTTP call to Zuper is NOT auto-authenticated — the http_request_v2 node still needs the `x-api-key: {{ variable.zuper_api_key }}` header + a LITERAL DC base in the url. `code` remains the fallback ONLY when no HTTP API path exists.",
+    "operations": [],
+    "reason": "http_request_v2 builds locally → lists use Tier-2 HTTP, not code."
+  },
+
+  "native_modules": {
+    "_note": "Confirmed to build + validate locally via the unified `zuper` master (+ first-class email/notification nodes). Reference for humans; select_node_type only USES the code_only_* overrides above (conservative — it won't downgrade a working native).",
+    "JOB": ["get", "create", "update", "update_status", "assign", "schedule", "add_note", "associations", "copy_custom_field"],
+    "CUSTOMER": ["get", "create", "update"],
+    "ORGANIZATION": ["get", "create", "update"],
+    "INVOICE": ["create"],
+    "EMAIL": ["send"],
+    "NOTIFICATION": ["send"]
+  }
+}

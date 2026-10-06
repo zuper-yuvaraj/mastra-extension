@@ -1,0 +1,1572 @@
+{
+  "generated_at": "2026-06-09T07:01:31.089Z",
+  "source": "live /api/nodes (is_active=true) + live workflow instances + worker code",
+  "active_node_count": 15,
+  "zuper_action_count": 5,
+  "nodes": [
+    {
+      "action_key": "http_request_v2",
+      "node_name": "http_request_v2",
+      "action_name": "HTTP Request",
+      "category": "HELPERS",
+      "type": "ACTION",
+      "description": "Make HTTP call and handle error response",
+      "when_to_use": "Call any external/Zuper REST API not covered by a native Zuper action node (the Tier-2 fallback). Use Zuper API + x-api-key for unsupported modules/operations.",
+      "handles": {
+        "input": [
+          "a"
+        ],
+        "output": [
+          "two-a (success)",
+          "two-b (failure, when error_action routes)"
+        ]
+      },
+      "connection_rules": {
+        "maxIn": 1,
+        "maxOut": 2,
+        "edge_types": [
+          "buttonEdge"
+        ]
+      },
+      "form_fields": [
+        {
+          "key": "timeout",
+          "type": "NUMBER",
+          "required": false,
+          "expr": true
+        },
+        {
+          "key": "method",
+          "type": "SELECT",
+          "required": true,
+          "expr": true,
+          "options": [
+            "GET",
+            "PUT",
+            "POST"
+          ]
+        },
+        {
+          "key": "url",
+          "type": "TEXT",
+          "required": true,
+          "expr": true
+        },
+        {
+          "key": "authentication",
+          "type": "SELECT",
+          "required": true,
+          "expr": true,
+          "options": [
+            "NONE",
+            "BASIC",
+            "HEADER_AUTH"
+          ]
+        },
+        {
+          "key": "username",
+          "type": "TEXT",
+          "required": true,
+          "expr": true,
+          "show_when": "authentication=BASIC"
+        },
+        {
+          "key": "password",
+          "type": "TEXT",
+          "required": true,
+          "expr": true,
+          "show_when": "authentication=BASIC"
+        },
+        {
+          "key": "send_query_param",
+          "type": "CHECKBOX",
+          "required": false,
+          "expr": true
+        },
+        {
+          "key": "query_parameters",
+          "type": "GROUP",
+          "required": false,
+          "expr": false,
+          "options": [
+            "query_key",
+            "query_value"
+          ],
+          "show_when": "send_query_param=true"
+        },
+        {
+          "key": "send_headers",
+          "type": "CHECKBOX",
+          "required": false,
+          "expr": true
+        },
+        {
+          "key": "header_parameters",
+          "type": "GROUP",
+          "required": false,
+          "expr": false,
+          "options": [
+            "header_key",
+            "header_value"
+          ],
+          "show_when": "send_headers=true"
+        },
+        {
+          "key": "send_body",
+          "type": "CHECKBOX",
+          "required": false,
+          "expr": true
+        },
+        {
+          "key": "body_data_type",
+          "type": "SELECT",
+          "required": true,
+          "expr": true,
+          "options": [
+            "JSON",
+            "RAW",
+            "FORM_DATA"
+          ],
+          "show_when": "send_body=true"
+        },
+        {
+          "key": "content_type",
+          "type": "TEXT",
+          "required": true,
+          "expr": true,
+          "show_when": "send_body=true; body_data_type=RAW"
+        },
+        {
+          "key": "json_body",
+          "type": "TEXTAREA",
+          "required": true,
+          "expr": true,
+          "show_when": "send_body=true; body_data_type=JSON"
+        },
+        {
+          "key": "raw_body_data",
+          "type": "TEXTAREA",
+          "required": true,
+          "expr": true,
+          "show_when": "send_body=true; body_data_type=RAW"
+        },
+        {
+          "key": "form_data_parameters",
+          "type": "GROUP",
+          "required": false,
+          "expr": false,
+          "options": [
+            "form_data_key",
+            "form_data_value"
+          ],
+          "show_when": "send_body=true; body_data_type=FORM_DATA"
+        },
+        {
+          "key": "ignore_ssl",
+          "type": "CHECKBOX",
+          "required": false,
+          "expr": true
+        },
+        {
+          "key": "error_action",
+          "type": "SELECT",
+          "required": true,
+          "expr": true,
+          "options": [
+            "STOP",
+            "CONTINUE"
+          ]
+        }
+      ],
+      "constraints": [
+        "error_action STOP|CONTINUE controls failure branch",
+        "Use for INVOICE/ESTIMATE create, notes, line-items, and any op the native nodes lack"
+      ]
+    },
+    {
+      "action_key": "(zuper event key e.g. job.new — see triggers_catalog.json)",
+      "node_name": "zuper",
+      "action_name": "Zuper Event",
+      "category": "APP_ACTIONS",
+      "type": "TRIGGER+ACTION",
+      "description": "Trigger on an action inside Zuper",
+      "when_to_use": "Trigger a workflow when an event happens inside Zuper (job/customer/invoice/etc.). The most common trigger. Pick a specific event via action_key (e.g. job.new, job.status_update).",
+      "handles": {
+        "input": [],
+        "output": [
+          "trigger-a"
+        ]
+      },
+      "connection_rules": {
+        "maxIn": 0,
+        "maxOut": 1,
+        "edge_types": [
+          "buttonEdge"
+        ]
+      },
+      "form_fields": [],
+      "constraints": [
+        "First node only",
+        "action_key = the Zuper event key",
+        "Provides the event entity data as trigger output"
+      ]
+    },
+    {
+      "action_key": "schedule",
+      "node_name": "schedule",
+      "action_name": "Schedule",
+      "category": "APP_ACTIONS",
+      "type": "TRIGGER",
+      "description": "Trigger on a defined schedule",
+      "when_to_use": "Run the workflow on a recurring time schedule with no external event (daily/weekly/monthly reports, periodic syncs).",
+      "handles": {
+        "input": [],
+        "output": [
+          "trigger-a"
+        ]
+      },
+      "connection_rules": {
+        "maxIn": 0,
+        "maxOut": 1,
+        "edge_types": [
+          "buttonEdge"
+        ]
+      },
+      "form_fields": [
+        {
+          "key": "timezone",
+          "type": "SELECT",
+          "required": true,
+          "expr": true
+        },
+        {
+          "key": "trigger_interval",
+          "type": "SELECT",
+          "required": true,
+          "expr": true,
+          "options": [
+            "minutes",
+            "hours",
+            "days",
+            "weeks",
+            "months",
+            "custom"
+          ]
+        },
+        {
+          "key": "hours_between_triggers",
+          "type": "NUMBER",
+          "required": true,
+          "expr": true,
+          "show_when": "trigger_interval=hours"
+        },
+        {
+          "key": "days_between_triggers",
+          "type": "NUMBER",
+          "required": true,
+          "expr": true,
+          "show_when": "trigger_interval=days"
+        },
+        {
+          "key": "trigger_at_hour",
+          "type": "SELECT",
+          "required": true,
+          "expr": true,
+          "options": [
+            "00",
+            "01",
+            "02",
+            "03",
+            "04",
+            "05",
+            "06",
+            "07",
+            "08",
+            "09",
+            "10",
+            "11",
+            "12",
+            "13",
+            "14",
+            "15",
+            "16",
+            "17",
+            "18",
+            "19",
+            "20",
+            "21",
+            "22",
+            "23"
+          ],
+          "show_when": "trigger_interval=days"
+        },
+        {
+          "key": "weeks_between_triggers",
+          "type": "NUMBER",
+          "required": true,
+          "expr": true,
+          "show_when": "trigger_interval=weeks"
+        },
+        {
+          "key": "trigger_on_weekdays",
+          "type": "MULTI_SELECT",
+          "required": true,
+          "expr": true,
+          "options": [
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday",
+            "sunday"
+          ],
+          "show_when": "trigger_interval=weeks"
+        },
+        {
+          "key": "trigger_at_hour",
+          "type": "SELECT",
+          "required": true,
+          "expr": true,
+          "options": [
+            "00",
+            "01",
+            "02",
+            "03",
+            "04",
+            "05",
+            "06",
+            "07",
+            "08",
+            "09",
+            "10",
+            "11",
+            "12",
+            "13",
+            "14",
+            "15",
+            "16",
+            "17",
+            "18",
+            "19",
+            "20",
+            "21",
+            "22",
+            "23"
+          ],
+          "show_when": "trigger_interval=weeks"
+        },
+        {
+          "key": "months_between_triggers",
+          "type": "NUMBER",
+          "required": true,
+          "expr": true,
+          "show_when": "trigger_interval=months"
+        },
+        {
+          "key": "trigger_at_day_month",
+          "type": "NUMBER",
+          "required": true,
+          "expr": true,
+          "show_when": "trigger_interval=months"
+        },
+        {
+          "key": "trigger_at_hour",
+          "type": "SELECT",
+          "required": true,
+          "expr": true,
+          "options": [
+            "00",
+            "01",
+            "02",
+            "03",
+            "04",
+            "05",
+            "06",
+            "07",
+            "08",
+            "09",
+            "10",
+            "11",
+            "12",
+            "13",
+            "14",
+            "15",
+            "16",
+            "17",
+            "18",
+            "19",
+            "20",
+            "21",
+            "22",
+            "23"
+          ],
+          "show_when": "trigger_interval=months"
+        },
+        {
+          "key": "custom_cron",
+          "type": "TEXT",
+          "required": true,
+          "expr": true,
+          "show_when": "trigger_interval=custom"
+        },
+        {
+          "key": "trigger_rules_minutes",
+          "type": "GROUP",
+          "required": false,
+          "expr": false,
+          "options": [
+            "minutes_between_triggers"
+          ],
+          "show_when": "trigger_interval=minutes"
+        },
+        {
+          "key": "trigger_rules_minutes_text",
+          "type": "GROUP",
+          "required": false,
+          "expr": false,
+          "options": [
+            "trigger_at_minute"
+          ],
+          "show_when": "trigger_interval=days/hours/weeks/months"
+        }
+      ],
+      "constraints": [
+        "First node only",
+        "One schedule trigger per workflow",
+        "Timezone-aware"
+      ]
+    },
+    {
+      "action_key": "external_webhook",
+      "node_name": "external_webhook",
+      "action_name": "External Webhook",
+      "category": "APP_ACTIONS",
+      "type": "TRIGGER",
+      "description": "Trigger by invoking an endpoint",
+      "when_to_use": "Let an EXTERNAL system start the workflow by calling a generated URL (integrations, third-party push).",
+      "handles": {
+        "input": [],
+        "output": [
+          "trigger-a"
+        ]
+      },
+      "connection_rules": {
+        "maxIn": 0,
+        "maxOut": 1,
+        "edge_types": [
+          "buttonEdge"
+        ]
+      },
+      "form_fields": [
+        {
+          "key": "webhook_method",
+          "type": "SELECT",
+          "required": true,
+          "expr": true,
+          "options": [
+            "GET",
+            "PUT",
+            "POST"
+          ]
+        },
+        {
+          "key": "live_url",
+          "type": "TEXTAREA",
+          "required": false,
+          "expr": true
+        },
+        {
+          "key": "test_url",
+          "type": "TEXTAREA",
+          "required": false,
+          "expr": true
+        },
+        {
+          "key": "respond_after",
+          "type": "CHECKBOX",
+          "required": false,
+          "expr": true
+        },
+        {
+          "key": "method",
+          "type": "SELECT",
+          "required": true,
+          "expr": true,
+          "options": [
+            "GET",
+            "PUT",
+            "POST"
+          ],
+          "show_when": "respond_after=true"
+        },
+        {
+          "key": "url",
+          "type": "TEXT",
+          "required": true,
+          "expr": true,
+          "show_when": "respond_after=true"
+        },
+        {
+          "key": "send_headers",
+          "type": "CHECKBOX",
+          "required": false,
+          "expr": true,
+          "show_when": "respond_after=true"
+        },
+        {
+          "key": "header_parameters",
+          "type": "GROUP",
+          "required": false,
+          "expr": false,
+          "options": [
+            "header_key",
+            "header_value"
+          ],
+          "show_when": "send_headers=true"
+        },
+        {
+          "key": "respond",
+          "type": "SELECT",
+          "required": false,
+          "expr": true,
+          "options": [
+            "IMMEDIATELY",
+            "WHEN_LAST_NODE_FINISHES",
+            "USING_RESPOND_TO_WEBHOOK_NODE"
+          ]
+        }
+      ],
+      "constraints": [
+        "First node only",
+        "live_url/test_url auto-generated after save",
+        "Optional respond_after to reply to caller"
+      ]
+    },
+    {
+      "action_key": "if_else",
+      "node_name": "if_else",
+      "action_name": "If/Else",
+      "category": "FLOW",
+      "type": "ACTION",
+      "description": "Route items to different branch",
+      "when_to_use": "Branch the flow on a condition. TRUE goes out two-a, FALSE goes out two-b.",
+      "handles": {
+        "input": [
+          "a"
+        ],
+        "output": [
+          "two-a (TRUE branch)",
+          "two-b (FALSE branch)"
+        ]
+      },
+      "connection_rules": {
+        "maxIn": 1,
+        "maxOut": 2,
+        "edge_types": [
+          "buttonEdge"
+        ]
+      },
+      "form_fields": [
+        {
+          "key": "combine",
+          "type": "SELECT",
+          "required": false,
+          "expr": false,
+          "options": [
+            "AND",
+            "OR"
+          ],
+          "desc": "AND=match all conditions, OR=match any"
+        },
+        {
+          "key": "conditions",
+          "type": "GROUP(max 10)",
+          "required": false,
+          "expr": true,
+          "desc": "Each: {field_key(type), value1, operation, value2}. type ∈ STRING/NUMBER/BOOLEAN/DATETIME/DATE/TIME/ARRAY/OBJECT"
+        },
+        {
+          "key": "conditions[].value1",
+          "type": "per-type",
+          "required": true,
+          "expr": true,
+          "desc": "left operand (expression to the data being checked)"
+        },
+        {
+          "key": "conditions[].operation",
+          "type": "SELECT",
+          "required": true,
+          "expr": false,
+          "desc": "STRING: EQUAL_TO/NOT_EQUAL_TO/STARTS_WITH/NOT_STARTS_WITH/ENDS_WITH/NOT_ENDS_WITH/REGEX/NOT_REGEX/CONTAINS/NOT_CONTAINS/EMPTY/NOT_EMPTY · NUMBER & DATETIME/DATE/TIME: EQUAL_TO/NOT_EQUAL_TO/LESS_THAN/LESS_THAN_EQUAL_TO/GREATER_THAN/GREATER_THAN_EQUAL_TO/EMPTY/NOT_EMPTY · BOOLEAN: EQUAL_TO/NOT_EQUAL_TO/EMPTY/NOT_EMPTY · ARRAY: EXISTS/NOT_EXISTS/EMPTY/NOT_EMPTY/CONTAINS/NOT_CONTAINS/LENGTH_EQUAL_TO/LENGTH_NOT_EQUAL_TO/LENGTH_GREATER_THAN/LENGTH_GREATER_THAN_EQUAL_TO/LENGTH_LESS_THAN/LENGTH_LESS_THAN_EQUAL_TO · OBJECT: EXISTS/NOT_EXISTS/EMPTY/NOT_EMPTY"
+        },
+        {
+          "key": "conditions[].value2",
+          "type": "per-type",
+          "required": false,
+          "expr": true,
+          "desc": "right operand; NOT required when operation ∈ EMPTY/NOT_EMPTY/EXISTS/NOT_EXISTS"
+        }
+      ],
+      "constraints": [
+        "Wire BOTH two-a and two-b",
+        "Up to 10 conditions combined with AND/OR"
+      ]
+    },
+    {
+      "action_key": "code",
+      "node_name": "code",
+      "action_name": "Code",
+      "category": "FLOW",
+      "type": "ACTION",
+      "description": "Run custom javascript code",
+      "when_to_use": "Last-resort custom JavaScript when no node/HTTP combo fits (data transforms, complex logic). Agent writes the JS. ALSO the path for Zuper modules with no native action node (estimates/quotes): call the Zuper API directly (header x-api-key: variable.zuper_api_key) — e.g. decline a quote via PUT /estimate/:uid/status {estimate_status:'DECLINED'}. NEVER a 3rd-party API (HubSpot etc.) unless the user named it.",
+      "handles": {
+        "input": [
+          "a"
+        ],
+        "output": [
+          "one-a"
+        ]
+      },
+      "connection_rules": {
+        "maxIn": 1,
+        "maxOut": 1,
+        "edge_types": [
+          "buttonEdge",
+          "loopEdge"
+        ],
+        "note": "May sit inside a loop body."
+      },
+      "form_fields": [
+        {
+          "key": "code",
+          "type": "CODE",
+          "required": false,
+          "expr": false
+        }
+      ],
+      "constraints": [
+        "firejail-sandboxed child process, 30s timeout",
+        "require() ONLY whitelisted modules (see code_node_runtime.json)",
+        "Return a plain object",
+        "No fs/child_process/network-server"
+      ]
+    },
+    {
+      "action_key": "stop_error",
+      "node_name": "stop_error",
+      "action_name": "Stop and error",
+      "category": "FLOW",
+      "type": "ACTION",
+      "description": "Throw an error in the workflow",
+      "when_to_use": "Abort the workflow with an error (validation failed, unrecoverable state).",
+      "handles": {
+        "input": [
+          "a"
+        ],
+        "output": []
+      },
+      "connection_rules": {
+        "maxIn": 1,
+        "maxOut": 0,
+        "edge_types": [],
+        "note": "Terminal — ends execution with error."
+      },
+      "form_fields": [],
+      "constraints": [
+        "Terminal node"
+      ]
+    },
+    {
+      "action_key": "merge",
+      "node_name": "merge",
+      "action_name": "Merge",
+      "category": "FLOW",
+      "type": "ACTION",
+      "description": "Merges data of multiple streams once data from both is available",
+      "when_to_use": "Re-join parallel branches created by split; continues once all inputs arrive.",
+      "handles": {
+        "input": [
+          "a"
+        ],
+        "output": [
+          "one-a"
+        ]
+      },
+      "connection_rules": {
+        "maxIn": 2,
+        "maxOut": 1,
+        "edge_types": [
+          "buttonEdge"
+        ],
+        "note": "Waits for all incoming branches."
+      },
+      "form_fields": [],
+      "constraints": [
+        "Pairs with split"
+      ]
+    },
+    {
+      "action_key": "wait",
+      "node_name": "wait",
+      "action_name": "Wait",
+      "category": "FLOW",
+      "type": "ACTION",
+      "description": "Wait before continue with execution",
+      "when_to_use": "Pause the flow before continuing. 3 modes via wait_type: FIXED (relative duration), BASED_ON_ZUPER_FIELD (wait until a date field +/- offset), CALENDAR_DATE (absolute date/time/timezone).",
+      "handles": {
+        "input": [
+          "a"
+        ],
+        "output": [
+          "one-a"
+        ]
+      },
+      "connection_rules": {
+        "maxIn": 1,
+        "maxOut": 1,
+        "edge_types": [
+          "buttonEdge"
+        ]
+      },
+      "form_fields": [
+        {
+          "key": "wait_type",
+          "type": "SELECT",
+          "required": true,
+          "expr": false,
+          "options": [
+            "FIXED",
+            "BASED_ON_ZUPER_FIELD",
+            "CALENDAR_DATE"
+          ],
+          "desc": "Wait mode"
+        },
+        {
+          "key": "days",
+          "type": "NUMBER",
+          "required": false,
+          "expr": true,
+          "show_when": "wait_type=FIXED|BASED_ON_ZUPER_FIELD",
+          "desc": "(FIXED/field) duration part — at least one of days/hours/minutes/seconds > 0"
+        },
+        {
+          "key": "hours",
+          "type": "NUMBER",
+          "required": false,
+          "expr": true,
+          "show_when": "wait_type=FIXED|BASED_ON_ZUPER_FIELD"
+        },
+        {
+          "key": "minutes",
+          "type": "NUMBER",
+          "required": false,
+          "expr": true,
+          "show_when": "wait_type=FIXED|BASED_ON_ZUPER_FIELD"
+        },
+        {
+          "key": "seconds",
+          "type": "NUMBER",
+          "required": false,
+          "expr": true,
+          "show_when": "wait_type=FIXED|BASED_ON_ZUPER_FIELD"
+        },
+        {
+          "key": "source_node",
+          "type": "TEXT",
+          "required": false,
+          "expr": false,
+          "show_when": "wait_type=BASED_ON_ZUPER_FIELD",
+          "desc": "Upstream Zuper node (trigger/get/create/update) supplying the date field"
+        },
+        {
+          "key": "source_field",
+          "type": "TEXT",
+          "required": false,
+          "expr": true,
+          "show_when": "wait_type=BASED_ON_ZUPER_FIELD",
+          "desc": "Path to a DATE/DATETIME field to wait relative to"
+        },
+        {
+          "key": "source_module",
+          "type": "TEXT",
+          "required": false,
+          "expr": false,
+          "show_when": "wait_type=BASED_ON_ZUPER_FIELD"
+        },
+        {
+          "key": "offset_type",
+          "type": "SELECT",
+          "required": false,
+          "expr": false,
+          "options": [
+            "BEFORE",
+            "AFTER"
+          ],
+          "show_when": "wait_type=BASED_ON_ZUPER_FIELD",
+          "desc": "Wait BEFORE or AFTER the field datetime by the duration"
+        },
+        {
+          "key": "date",
+          "type": "TEXT",
+          "required": false,
+          "expr": true,
+          "show_when": "wait_type=CALENDAR_DATE",
+          "desc": "YYYY-MM-DD"
+        },
+        {
+          "key": "time",
+          "type": "TEXT",
+          "required": false,
+          "expr": true,
+          "show_when": "wait_type=CALENDAR_DATE",
+          "desc": "HH:mm:ss"
+        },
+        {
+          "key": "timezone",
+          "type": "SELECT",
+          "required": false,
+          "expr": false,
+          "show_when": "wait_type=CALENDAR_DATE",
+          "desc": "IANA timezone; default UTC"
+        }
+      ],
+      "constraints": [
+        "wait_type = FIXED | BASED_ON_ZUPER_FIELD | CALENDAR_DATE",
+        "FIXED needs ≥1 of days/hours/minutes/seconds > 0",
+        "BASED_ON_ZUPER_FIELD needs source_node + source_field (a DATE/DATETIME) + offset_type + duration",
+        "CALENDAR_DATE needs date + time (+ timezone)"
+      ]
+    },
+    {
+      "action_key": "zuper_email",
+      "node_name": "zuper_email",
+      "action_name": "Send Email",
+      "category": "HELPERS",
+      "type": "ACTION",
+      "description": "Sends an email to specified recipients",
+      "when_to_use": "Send a custom email (SMTP) to any address with subject/body/cc/bcc.",
+      "handles": {
+        "input": [
+          "a"
+        ],
+        "output": [
+          "one-a"
+        ]
+      },
+      "connection_rules": {
+        "maxIn": 1,
+        "maxOut": 1,
+        "edge_types": [
+          "buttonEdge"
+        ],
+        "note": "Usually terminal."
+      },
+      "form_fields": [
+        {
+          "key": "send_to",
+          "type": "TEXT",
+          "required": true,
+          "expr": true
+        },
+        {
+          "key": "email_subject",
+          "type": "TEXT",
+          "required": true,
+          "expr": true
+        },
+        {
+          "key": "email_body",
+          "type": "TEXTAREA",
+          "required": true,
+          "expr": true
+        },
+        {
+          "key": "cc_emails",
+          "type": "GROUP",
+          "required": false,
+          "expr": false,
+          "options": [
+            "cc_email_value"
+          ]
+        },
+        {
+          "key": "bcc_emails",
+          "type": "GROUP",
+          "required": false,
+          "expr": false,
+          "options": [
+            "bcc_email_value"
+          ]
+        }
+      ],
+      "constraints": [
+        "Usually terminal",
+        "Fields support expressions"
+      ]
+    },
+    {
+      "action_key": "no_op",
+      "node_name": "no_op",
+      "action_name": "No OP",
+      "category": "FLOW",
+      "type": "ACTION",
+      "description": "No operation, Sit back and relax",
+      "when_to_use": "Do nothing / structural placeholder / join point.",
+      "handles": {
+        "input": [
+          "a"
+        ],
+        "output": [
+          "one-a"
+        ]
+      },
+      "connection_rules": {
+        "maxIn": 5,
+        "maxOut": 1,
+        "edge_types": [
+          "buttonEdge"
+        ],
+        "note": "Common join / placeholder."
+      },
+      "form_fields": [],
+      "constraints": []
+    },
+    {
+      "action_key": "loop",
+      "node_name": "loop",
+      "action_name": "Loop",
+      "category": "FLOW",
+      "type": "ACTION",
+      "description": "Iterates logic based on iterators",
+      "when_to_use": "Iterate over an array; the body nodes run once per item.",
+      "handles": {
+        "input": [
+          "a (loop entry)",
+          "b (body return)"
+        ],
+        "output": [
+          "two-b (into loop body)",
+          "a (exit after loop)"
+        ]
+      },
+      "connection_rules": {
+        "maxIn": 2,
+        "maxOut": 2,
+        "edge_types": [
+          "buttonEdge",
+          "loopEdge"
+        ],
+        "note": "Body cycle edge uses type \"loopEdge\". Last body node connects back to the loop node targetHandle \"b\"."
+      },
+      "form_fields": [
+        {
+          "key": "input_data",
+          "type": "EXPRESSION",
+          "required": true,
+          "expr": true,
+          "desc": "The array to iterate over (every accessor returns the {node,data} wrapper → go through .data), e.g. {{ $item.data.jobs }} or {{ $.getLatestNodeData('Code').data.items }} or an HTTP body {{ $.getLatestNodeData('HTTP Request').data.data }}. Body runs once per item; max items per company policy (default 100)."
+        }
+      ],
+      "constraints": [
+        "ANY node type may sit in the loop body",
+        "Body return edge type = loopEdge",
+        "Body nodes use $.getCurrentLoopIndex()/$.getArrayData()"
+      ]
+    },
+    {
+      "action_key": "split",
+      "node_name": "split",
+      "action_name": "Split",
+      "category": "FLOW",
+      "type": "ACTION",
+      "description": "Split item into multiple branches",
+      "when_to_use": "Fan out to multiple parallel branches that each receive the same data.",
+      "handles": {
+        "input": [
+          "a"
+        ],
+        "output": [
+          "one-a"
+        ]
+      },
+      "connection_rules": {
+        "maxIn": 1,
+        "maxOut": 4,
+        "edge_types": [
+          "buttonEdge"
+        ],
+        "note": "Fan-out: multiple edges from one-a to parallel branches."
+      },
+      "form_fields": [],
+      "constraints": [
+        "Up to 4 branches",
+        "Pair with merge to rejoin"
+      ]
+    },
+    {
+      "action_key": "internal_notification",
+      "node_name": "internal_notification",
+      "action_name": "Internal Notification",
+      "category": "HELPERS",
+      "type": "ACTION",
+      "description": "Send notification via email, SMS or Push",
+      "when_to_use": "Notify internal users/teams via Email, SMS, or Push.",
+      "handles": {
+        "input": [
+          "a"
+        ],
+        "output": [
+          "one-a"
+        ]
+      },
+      "connection_rules": {
+        "maxIn": 1,
+        "maxOut": 1,
+        "edge_types": [
+          "buttonEdge"
+        ]
+      },
+      "form_fields": [
+        {
+          "key": "notification_type",
+          "type": "SELECT",
+          "required": true,
+          "expr": true,
+          "options": [
+            "SMS",
+            "EMAIL",
+            "PUSH"
+          ]
+        },
+        {
+          "key": "users",
+          "type": "SELECT_DYNAMIC_USER",
+          "required": false,
+          "expr": true
+        },
+        {
+          "key": "teams",
+          "type": "SELECT_DYNAMIC_TEAM",
+          "required": false,
+          "expr": true
+        },
+        {
+          "key": "notify_to",
+          "type": "SELECT",
+          "required": false,
+          "expr": true,
+          "options": [
+            "ALL_ASSIGNED",
+            "ONLY_ASSIGNED_TL",
+            "ONLY_ASSIGNED_EMPLOYEES",
+            "ONLY_TEAM_LEADERS",
+            "CREATED_BY"
+          ]
+        },
+        {
+          "key": "node_lookup",
+          "type": "NODE_SELECT",
+          "required": false,
+          "expr": true,
+          "show_when": "notification_type=/SMS/EMAIL"
+        },
+        {
+          "key": "node_lookup",
+          "type": "NODE_SELECT",
+          "required": true,
+          "expr": true,
+          "show_when": "notification_type=PUSH"
+        },
+        {
+          "key": "node_lookup",
+          "type": "NODE_SELECT",
+          "required": true,
+          "expr": true,
+          "show_when": "notify_to=ALL/ONLY_ASSIGNED_TL/ONLY_ASSIGNED_EMPLOYEES/ONLY_TEAM_LEADERS"
+        },
+        {
+          "key": "email_subject",
+          "type": "TEXT",
+          "required": true,
+          "expr": true,
+          "show_when": "notification_type=EMAIL"
+        },
+        {
+          "key": "sms_body",
+          "type": "TEXTAREA",
+          "required": true,
+          "expr": true,
+          "show_when": "notification_type=SMS"
+        },
+        {
+          "key": "push_notification_title",
+          "type": "TEXT",
+          "required": true,
+          "expr": true,
+          "show_when": "notification_type=PUSH"
+        },
+        {
+          "key": "push_notification_body",
+          "type": "TEXTAREA",
+          "required": true,
+          "expr": true,
+          "show_when": "notification_type=PUSH"
+        },
+        {
+          "key": "email_body",
+          "type": "TEXTAREA",
+          "required": true,
+          "expr": true,
+          "show_when": "notification_type=EMAIL"
+        },
+        {
+          "key": "cc_emails",
+          "type": "GROUP",
+          "required": false,
+          "expr": false,
+          "options": [
+            "cc_email_value"
+          ],
+          "show_when": "notification_type=EMAIL"
+        },
+        {
+          "key": "bcc_emails",
+          "type": "GROUP",
+          "required": false,
+          "expr": false,
+          "options": [
+            "bcc_email_value"
+          ],
+          "show_when": "notification_type=EMAIL"
+        }
+      ],
+      "constraints": [
+        "notification_type SMS|EMAIL|PUSH",
+        "Recipients via users/teams or notify_to roles"
+      ]
+    },
+    {
+      "action_key": "zuper_customer_notifications",
+      "node_name": "zuper_customer_notifications",
+      "action_name": "Notify Customer",
+      "category": "HELPERS",
+      "type": "ACTION",
+      "description": "Send notification via email, SMS to Customer",
+      "when_to_use": "Notify the customer via Email or SMS (no Push).",
+      "handles": {
+        "input": [
+          "a"
+        ],
+        "output": [
+          "one-a"
+        ]
+      },
+      "connection_rules": {
+        "maxIn": 1,
+        "maxOut": 1,
+        "edge_types": [
+          "buttonEdge"
+        ]
+      },
+      "form_fields": [
+        {
+          "key": "notification_type",
+          "type": "SELECT",
+          "required": true,
+          "expr": true,
+          "options": [
+            "SMS",
+            "EMAIL"
+          ]
+        },
+        {
+          "key": "node_lookup",
+          "type": "NODE_SELECT",
+          "required": true,
+          "expr": true
+        },
+        {
+          "key": "email_subject",
+          "type": "TEXT",
+          "required": true,
+          "expr": true,
+          "show_when": "notification_type=EMAIL"
+        },
+        {
+          "key": "sms_body",
+          "type": "TEXTAREA",
+          "required": true,
+          "expr": true,
+          "show_when": "notification_type=SMS"
+        },
+        {
+          "key": "email_body",
+          "type": "TEXTAREA",
+          "required": true,
+          "expr": true,
+          "show_when": "notification_type=EMAIL"
+        },
+        {
+          "key": "cc_emails",
+          "type": "GROUP",
+          "required": false,
+          "expr": false,
+          "options": [
+            "cc_email_value"
+          ],
+          "show_when": "notification_type=EMAIL"
+        },
+        {
+          "key": "bcc_emails",
+          "type": "GROUP",
+          "required": false,
+          "expr": false,
+          "options": [
+            "bcc_email_value"
+          ],
+          "show_when": "notification_type=EMAIL"
+        }
+      ],
+      "constraints": [
+        "Requires customer data from an upstream node (node_lookup)"
+      ]
+    },
+    {
+      "action_key": "zuper_get_record",
+      "node_name": "zuper_get_record",
+      "action_name": "Get Record",
+      "category": "APP_ACTIONS",
+      "type": "ACTION",
+      "description": "Fetch a full Zuper record by module + uid to use its fields downstream.",
+      "when_to_use": "Fetch a full Zuper record by module + uid to use its fields downstream.",
+      "handles": {
+        "input": [
+          "a"
+        ],
+        "output": [
+          "one-a"
+        ]
+      },
+      "connection_rules": {
+        "maxIn": 1,
+        "maxOut": 1,
+        "edge_types": [
+          "buttonEdge",
+          "loopEdge"
+        ]
+      },
+      "form_fields": [
+        {
+          "key": "module",
+          "type": "FIXED|EXPRESSION",
+          "required": true,
+          "desc": "Target module: JOB/CUSTOMER/INVOICE/ESTIMATE/PROJECT/PROPERTY/ASSET/ORGANIZATION/REQUEST/SERVICE_CONTRACT/TEAM/USER/PRODUCT"
+        },
+        {
+          "key": "module_uid",
+          "type": "FIXED|EXPRESSION",
+          "required": true,
+          "desc": "UID of the record to fetch (literal, or expression from trigger/upstream)"
+        },
+        {
+          "key": "source_node",
+          "type": "FIXED",
+          "required": false,
+          "desc": "\"CUSTOM\" = use module_uid above; else the upstream node name to read the uid from"
+        }
+      ],
+      "constraints": [
+        "Handler reads ONLY module, module_uid, source_node",
+        "status_uid/category_uid may appear in saved JSON but are IGNORED by the backend (UI vestigial)"
+      ],
+      "note": "Special-cased Zuper action (not a standalone master_node row); configured via module + fields. See module_action_matrix.json for supported modules."
+    },
+    {
+      "action_key": "zuper_create",
+      "node_name": "zuper_create",
+      "action_name": "Create Record",
+      "category": "APP_ACTIONS",
+      "type": "ACTION",
+      "description": "Create a Zuper record (Tier-1). Use for JOB/CUSTOMER/PROJECT/REQUEST etc.",
+      "when_to_use": "Create a Zuper record (Tier-1). Use for JOB/CUSTOMER/PROJECT/REQUEST etc.",
+      "handles": {
+        "input": [
+          "a"
+        ],
+        "output": [
+          "one-a"
+        ]
+      },
+      "connection_rules": {
+        "maxIn": 1,
+        "maxOut": 1,
+        "edge_types": [
+          "buttonEdge"
+        ]
+      },
+      "form_fields": [
+        {
+          "key": "module",
+          "type": "FIXED|EXPRESSION",
+          "required": true,
+          "desc": "Module to create in (JOB/CUSTOMER/PROJECT/REQUEST/… — see module_action_matrix)"
+        },
+        {
+          "key": "job_fields",
+          "type": "ARRAY",
+          "required": true,
+          "desc": "Array of {field_key,[field_key]:{type,value}}; module-specific (JOB: job_title, job_customer→customer_uid, job_category→category_uid, job_assigned_users→[{user_uid,team_uid}], job_due_date, job_service_address{...})"
+        },
+        {
+          "key": "custom_fields",
+          "type": "ARRAY",
+          "required": false,
+          "desc": "Custom field values for the module"
+        }
+      ],
+      "constraints": [
+        "module + job_fields[] (+ custom_fields[])",
+        "For INVOICE/ESTIMATE create, use http_request_v2 instead"
+      ],
+      "note": "Special-cased Zuper action (not a standalone master_node row); configured via module + fields. See module_action_matrix.json for supported modules."
+    },
+    {
+      "action_key": "zuper_update",
+      "node_name": "zuper_update",
+      "action_name": "Edit Record",
+      "category": "APP_ACTIONS",
+      "type": "ACTION",
+      "description": "Update a Zuper record. operator_type selects the update mode.",
+      "when_to_use": "Update a Zuper record. operator_type selects the update mode.",
+      "handles": {
+        "input": [
+          "a"
+        ],
+        "output": [
+          "one-a"
+        ]
+      },
+      "connection_rules": {
+        "maxIn": 1,
+        "maxOut": 1,
+        "edge_types": [
+          "buttonEdge"
+        ]
+      },
+      "form_fields": [
+        {
+          "key": "module",
+          "type": "FIXED|EXPRESSION",
+          "required": true,
+          "desc": "Module to update"
+        },
+        {
+          "key": "module_uid",
+          "type": "FIXED|EXPRESSION",
+          "required": true,
+          "desc": "UID of the record to update (or use source_node)"
+        },
+        {
+          "key": "source_node",
+          "type": "FIXED",
+          "required": false,
+          "desc": "\"CUSTOM\" or upstream node name supplying the uid"
+        },
+        {
+          "key": "operator_type",
+          "type": "FIXED",
+          "required": true,
+          "desc": "FIELD | UPDATE_STATUS | ASSIGN | SCHEDULE | SERVICE_TASK — selects which fields below apply"
+        },
+        {
+          "key": "job_fields",
+          "type": "ARRAY",
+          "required": false,
+          "desc": "(FIELD*) standard field updates"
+        },
+        {
+          "key": "custom_fields",
+          "type": "ARRAY",
+          "required": false,
+          "desc": "(FIELD) custom field updates"
+        },
+        {
+          "key": "job_status / job_status_name / status_category",
+          "type": "FIXED",
+          "required": false,
+          "desc": "(UPDATE_STATUS) target status"
+        },
+        {
+          "key": "users / team",
+          "type": "FIXED",
+          "required": false,
+          "desc": "(ASSIGN) assignees"
+        },
+        {
+          "key": "sub_operator_type",
+          "type": "FIXED",
+          "required": false,
+          "desc": "(ASSIGN) ASSIGN_FROM_TEAM_USER/UNASSIGN_FROM_TEAM_USER/ASSIGN_ALL/UNASSIGN_ALL/ASSIGN_TEAM_TL/UNASSIGN_TEAM_TL/ASSIGN_TEAM_FE/UNASSIGN_TEAM_FE/ASSIGN_TEAM/UNASSIGN_TEAM"
+        },
+        {
+          "key": "schedule_type / date / time / offset_type / duration_type / schedule_value",
+          "type": "FIXED",
+          "required": false,
+          "desc": "(SCHEDULE) schedule_type=SCHEDULE_DATE|DUE_DATE|BOTH + timing"
+        },
+        {
+          "key": "service_task",
+          "type": "ARRAY",
+          "required": false,
+          "desc": "(SERVICE_TASK) service task payload"
+        }
+      ],
+      "constraints": [
+        "operator_type: FIELD | UPDATE_STATUS | ASSIGN(+sub_operator_type) | SCHEDULE(+schedule_type) | SERVICE_TASK",
+        "Needs module + module_uid (or source_node)"
+      ],
+      "note": "Special-cased Zuper action (not a standalone master_node row); configured via module + fields. See module_action_matrix.json for supported modules."
+    },
+    {
+      "action_key": "zuper_custom_field",
+      "node_name": "zuper_custom_field",
+      "action_name": "Copy Custom Field",
+      "category": "APP_ACTIONS",
+      "type": "ACTION",
+      "description": "Copy custom field values from one record to another (same or cross-module).",
+      "when_to_use": "Copy custom field values from one record to another (same or cross-module).",
+      "handles": {
+        "input": [
+          "a"
+        ],
+        "output": [
+          "one-a"
+        ]
+      },
+      "connection_rules": {
+        "maxIn": 1,
+        "maxOut": 1,
+        "edge_types": [
+          "buttonEdge"
+        ]
+      },
+      "form_fields": [
+        {
+          "key": "from_module",
+          "type": "FIXED",
+          "required": true,
+          "desc": "Source module"
+        },
+        {
+          "key": "from_module_uid",
+          "type": "FIXED|EXPRESSION",
+          "required": false,
+          "desc": "Source record uid (if from_source_node=CUSTOM)"
+        },
+        {
+          "key": "from_source_node",
+          "type": "FIXED",
+          "required": false,
+          "desc": "\"CUSTOM\" or upstream node name"
+        },
+        {
+          "key": "to_module",
+          "type": "FIXED",
+          "required": true,
+          "desc": "Target module"
+        },
+        {
+          "key": "to_module_uid",
+          "type": "FIXED|EXPRESSION",
+          "required": false,
+          "desc": "Target record uid (if to_source_node=CUSTOM)"
+        },
+        {
+          "key": "to_source_node",
+          "type": "FIXED",
+          "required": false,
+          "desc": "\"CUSTOM\" or upstream node name"
+        },
+        {
+          "key": "copy_type",
+          "type": "FIXED",
+          "required": true,
+          "desc": "ALL = copy all matching custom fields; SELECTED = use associations[]"
+        },
+        {
+          "key": "associations",
+          "type": "ARRAY",
+          "required": false,
+          "desc": "(SELECTED) [{associate_from,associate_to}] dotted paths e.g. custom_fields.default.<Field>"
+        }
+      ],
+      "constraints": [
+        "copy_type ALL|SELECTED",
+        "associations[] map source->target when SELECTED"
+      ],
+      "note": "Special-cased Zuper action (not a standalone master_node row); configured via module + fields. See module_action_matrix.json for supported modules."
+    },
+    {
+      "action_key": "zuper_associations",
+      "node_name": "zuper_associations",
+      "action_name": "Associations",
+      "category": "APP_ACTIONS",
+      "type": "ACTION",
+      "description": "Link a record in one module to a record in another module.",
+      "when_to_use": "Link a record in one module to a record in another module.",
+      "handles": {
+        "input": [
+          "a"
+        ],
+        "output": [
+          "one-a"
+        ]
+      },
+      "connection_rules": {
+        "maxIn": 1,
+        "maxOut": 1,
+        "edge_types": [
+          "buttonEdge"
+        ]
+      },
+      "form_fields": [
+        {
+          "key": "from_module",
+          "type": "FIXED",
+          "required": true,
+          "desc": "Module of the source record"
+        },
+        {
+          "key": "from_module_uid",
+          "type": "FIXED|EXPRESSION",
+          "required": true,
+          "desc": "Source record uid"
+        },
+        {
+          "key": "to_module",
+          "type": "FIXED",
+          "required": true,
+          "desc": "Module of the record to link to"
+        },
+        {
+          "key": "to_module_uid",
+          "type": "FIXED|EXPRESSION",
+          "required": true,
+          "desc": "Target record uid"
+        },
+        {
+          "key": "associations",
+          "type": "ARRAY",
+          "required": false,
+          "desc": "Optional explicit association mappings"
+        }
+      ],
+      "constraints": [
+        "from_module/to_module + their uids"
+      ],
+      "note": "Special-cased Zuper action (not a standalone master_node row); configured via module + fields. See module_action_matrix.json for supported modules."
+    }
+  ]
+}
