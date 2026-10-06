@@ -56,3 +56,4 @@ To learn more about Mastra, visit our [documentation](https://mastra.ai/docs/). 
 ## Deploy to the Mastra platform
 
 The [Mastra platform](https://projects.mastra.ai) provides two products for deploying and managing AI applications built with the Mastra framework. Learn more in the [Mastra platform documentation](https://mastra.ai/docs/mastra-platform/overview).
+# mastra-extension
