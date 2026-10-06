@@ -1,5 +1,6 @@
 import { createTool } from '@mastra/core/tools';
 import { z } from 'zod';
+import { getApiChangelog, getApiEndpoint, listApiEndpoints, listApiModules } from '../knowledge/api/lookup';
 import { searchKnowledge } from '../knowledge/search';
 import {
   getCodeRuntime,
@@ -21,18 +22,32 @@ const NODE_KEY = z.string().describe('Node action_key, e.g. "if_else", "loop", "
 export const searchKnowledgeTool = createTool({
   id: 'search_knowledge',
   description:
-    'Semantic search over the Zuper knowledge base when you do not know which exact lookup to call. ' +
+    'Semantic search over the Zuper knowledge base: workflow-builder facts, Zuper product documentation ' +
+    '(what a module or feature is, how it works, how modules relate) and the Zuper REST API (endpoints, ' +
+    'modules, changelog). Pass `kind` when you know which one you want. Use it when you do not know which exact lookup to call. ' +
     'Returns the closest topics with a `lookup` hint naming the exact tool call that returns the ' +
     'authoritative detail — prefer calling that lookup for exact facts. Returns an empty list when ' +
     'nothing relevant exists; do not guess in that case.',
   inputSchema: z.object({
     query: z.string().describe('A natural-language question or keywords.'),
-    kind: z.enum(['workflow_builder']).optional().describe('Restrict to one knowledge base.'),
-    topic: z.enum(['node', 'node_gotcha', 'expression', 'code', 'trigger', 'capability']).optional(),
+    kind: z
+      .enum(['workflow_builder', 'business', 'api'])
+      .optional()
+      .describe('Restrict to one knowledge base: workflow_builder (nodes, expressions, code runtime), business (Zuper product help docs) or api (Zuper REST API endpoints, modules, changelog).'),
+    topic: z
+      .enum(['node', 'node_gotcha', 'expression', 'code', 'trigger', 'capability', 'doc', 'endpoint', 'module', 'guide', 'changelog'])
+      .optional(),
+    area: z
+      .string()
+      .optional()
+      .describe(
+        'Product area. Business docs: Accounting, Work_Order_Management, Projects, Purchasing, Inventory_Management, Settings. API: accounting, work-order-management, inventory, user-management.',
+      ),
+    module: z.string().optional().describe('API module folder, e.g. jobs, invoices, quotes-proposals, customers, projects.'),
     top_k: z.number().int().min(1).max(10).optional(),
   }),
-  execute: async ({ query, kind, topic, top_k }) => {
-    const hits = await searchKnowledge(query, { kind, topic, topK: top_k ?? 5 });
+  execute: async ({ query, kind, topic, area, module, top_k }) => {
+    const hits = await searchKnowledge(query, { kind, topic, area, module, topK: top_k ?? 5 });
     return hits.length > 0 ? { hits } : { hits: [], message: 'No relevant knowledge found. Do not guess.' };
   },
 });
@@ -115,6 +130,52 @@ export const getNativeCapabilitiesTool = createTool({
   execute: async ({ module }) => getNativeCapabilities(module),
 });
 
+export const listApiModulesTool = createTool({
+  id: 'list_api_modules',
+  description:
+    'List every Zuper REST API module (as area/module, e.g. work-order-management/jobs, accounting/invoices) ' +
+    'with its endpoint count.',
+  inputSchema: z.object({}),
+  execute: async () => listApiModules(),
+});
+
+export const listApiEndpointsTool = createTool({
+  id: 'list_api_endpoints',
+  description: 'List the endpoints of one Zuper API module: id, title, HTTP method and path.',
+  inputSchema: z.object({
+    module: z.string().describe('"area/module" (e.g. accounting/invoices) or just the module folder (e.g. jobs).'),
+  }),
+  execute: async ({ module }) => listApiEndpoints(module),
+});
+
+export const getApiEndpointTool = createTool({
+  id: 'get_api_endpoint',
+  description:
+    'Exact record for one Zuper API endpoint: HTTP method and path, parameters, request body fields, ' +
+    'response field paths with a trimmed real example response, and which other Zuper modules the ' +
+    'response links to (e.g. a job links to customer, invoice, products). Identify it by `id` (from ' +
+    'list_api_endpoints or search_knowledge), or by `method`+`path`, or by `title` (+ optional `module`). ' +
+    'Docs can lag the live API: runtime data from a real execution wins over this.',
+  inputSchema: z.object({
+    id: z.string().optional().describe('e.g. work-order-management/jobs/get-job-details'),
+    method: z.string().optional().describe('GET | POST | PUT | PATCH | DELETE'),
+    path: z.string().optional().describe('e.g. /jobs/{job_uid}'),
+    title: z.string().optional().describe('e.g. "Get Job Details"'),
+    module: z.string().optional().describe('Narrows a title search, e.g. jobs.'),
+  }),
+  execute: async (query) => getApiEndpoint(query),
+});
+
+export const getApiChangelogTool = createTool({
+  id: 'get_api_changelog',
+  description:
+    'What changed in the Zuper API / product in a given month (new endpoints, new fields, behaviour changes). ' +
+    'Exact by month, unlike semantic search. Call with no `month` to list available months. Useful to check ' +
+    'whether an API changed around the time a workflow started failing.',
+  inputSchema: z.object({ month: z.string().optional().describe('e.g. "september 2026" or "2026-09"') }),
+  execute: async ({ month }) => getApiChangelog(month),
+});
+
 export const knowledgeTools = {
   search_knowledge: searchKnowledgeTool,
   list_nodes: listNodesTool,
@@ -125,4 +186,8 @@ export const knowledgeTools = {
   get_code_runtime: getCodeRuntimeTool,
   get_trigger_filter_info: getTriggerFilterInfoTool,
   get_native_capabilities: getNativeCapabilitiesTool,
+  list_api_modules: listApiModulesTool,
+  list_api_endpoints: listApiEndpointsTool,
+  get_api_endpoint: getApiEndpointTool,
+  get_api_changelog: getApiChangelogTool,
 };

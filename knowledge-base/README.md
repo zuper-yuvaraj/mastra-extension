@@ -4,46 +4,56 @@ Raw Zuper knowledge used by the RCA / AI Workflow Builder agents. Everything out
 
 ## Layout
 
-| Path | What it is | How it will be used |
+| Path | What it is | How it is used |
 |---|---|---|
-| `zuper-api-docs/` | API reference pages (`api-reference/<area>/<module>/<endpoint>.md`), each wrapping a full OpenAPI document. `_manifest.json` lists title/url/file per folder. | Distilled into compact records, then searched. |
-| `zuper-docs/` | Business / help-center pages (Accounting, Projects, Dispatch, Workflow_builder, ...). | Chunked by heading and searched (planned). |
-| `workflow-builder/` | JSON extracted from the workflow worker/frontend code: node catalog, field schemas, code-node runtime, expression rules, trigger filters. | Exact lookup by key, not similarity search (planned). |
-| `.generated/` | Output of the distiller. Derived, never hand-edited. | Input to the vector index. |
+| `zuper-api-docs/` | API reference pages (`api-reference/<area>/<module>/<endpoint>.md`, each wrapping a full OpenAPI document), `guides/`, `changelog/`. `_manifest.json` lists title/url/file per folder. | Distilled into compact endpoint records (exact lookup) and chunked (semantic search). |
+| `zuper-docs/` | Business / help-center pages (Accounting, Projects, Dispatch, Workflow_builder, ...). | Chunked by heading and searched. |
+| `workflow-builder/` | JSON extracted from the workflow worker/frontend code: node catalog, field schemas, code-node runtime, expression rules, trigger filters. | Exact lookup by key plus a small search index. |
+| `.generated/` | Derived output: API records (`api/`), chunk dumps (`*-chunks.jsonl`), the local vector DB (`kb.db`, gitignored). Never hand-edited. | Input to lookup tools and the vector index. |
 
-## API docs: distillation
+## Commands
 
-A raw API page can be 150 KB (mostly a huge example response). `scripts/kb-distill.ts` reduces each page to one record of roughly 3-4 KB:
+```bash
+npm run kb:distill                # raw API pages -> .generated/api/*.json (also done by kb:sync -- api)
+npm run kb:chunks -- <kind>       # build + inspect chunks (business | api), no embedding calls
+npm run kb:sync -- --dry-run      # show what would change in the index
+npm run kb:sync                   # embed changed chunks, delete removed ones (all KBs); or: kb:sync -- api
+npm run kb:eval                   # retrieval + exact-lookup regression test
+```
+
+## API docs (`zuper-api-docs/`) — built
+
+**Distillation.** A raw API page can be 150 KB (mostly a huge example response). `src/mastra/knowledge/api/distill.ts` reduces each of the 502 endpoint pages to one record of ~2 KB (largest 17 KB):
 
 - method and path, description, parameters (the `authorization` header is dropped)
 - request body field paths and a size-bounded example
 - response field paths and a size-bounded example (arrays cut to one item, long strings shortened)
 - `associations`: other Zuper modules the response points at (customer, invoice, product, ...), with the field path where each appears
 
-```bash
-node scripts/kb-distill.ts                                   # all pages
-node scripts/kb-distill.ts work-order-management/jobs        # one or more path prefixes
-```
+Some pages ship their sample as a JavaScript-style string (unquoted keys, comments, trailing commas, a stray `}`); a lenient parser recovers most of them. 8 samples are still unusable and 17 endpoints document an empty response (`{}`/null) — those records say so rather than guess. Pages can hold several ```json blocks; the OpenAPI document is the one with a `paths` object.
 
-Output: `knowledge-base/.generated/api/<area>/<module>/<endpoint>.json`. Code: `src/mastra/knowledge/api/distill.ts`.
+**Two ways to read it.**
 
-Known limits: associations come from a hand-written list of module key names (`MODULE_KEYS` in `distill.ts`) so some will be wrong or missing; pages whose example has no usable JSON yield empty response fields.
+1. **Exact lookup** (`api/lookup.ts`, from `.generated/api/`): `list_api_modules`, `list_api_endpoints(module)`, `get_api_endpoint` (by `id`, by `method`+`path`, or by `title`+`module`; a path shared by two endpoints is reported as ambiguous, never guessed). Results are capped at ~14 KB: examples are dropped first, then long lists, and the response says what was trimmed — it is always valid JSON. `get_api_changelog(month)` returns that month's changelog by exact metadata filter, because embeddings are unreliable for dates.
+2. **Search** (`kind=api`, 644 chunks): one compact chunk per endpoint (title, method+path, params, top-level request/response fields, linked modules), one overview chunk per module (its endpoints and which other modules its responses link to), prose chunks for guides, the MCP server page, the changelog and the long custom-fields page. Endpoint pages whose prose just repeats the OpenAPI description are not duplicated. Each endpoint chunk names the exact `get_api_endpoint(...)` call that returns the full record.
 
-## When the APIs change
+Known limits: associations come from a hand-written list of module key names (`MODULE_KEYS` in `distill.ts`), so some will be wrong or missing; legacy `-copy` endpoints exist in the source docs and are indexed as they are; semantic search is weak on dates (use `get_api_changelog`).
 
-The raw docs are the source of truth. The distilled records and the vector index are derived and are always rebuilt from them, so a change is a refresh, not a rewrite.
+## When the docs change
 
-1. **Refresh the raw docs.** Re-download from the source in `zuper-api-docs/_manifest.json` (`https://developers.zuper.co/llms.txt`) or replace the files by hand. Each page carries an `updatedAt` in its front-matter.
-2. **Re-distill:** `node scripts/kb-distill.ts`.
-3. **Re-embed only what changed** *(planned, not built yet)*. Each record gets a content hash; unchanged records are skipped, changed ones re-embedded, records for deleted pages removed. Only changed endpoints cost embedding calls.
-4. **Review the drift** *(planned)*. The sync prints endpoints added/removed and response fields added/removed before the index is updated.
-5. **Planned entry point:** `npm run kb:sync` run manually when Zuper ships API changes; scheduling can come later.
+The raw docs are the source of truth. The records and the vector index are derived and always rebuilt from them, so a change is a refresh, not a rewrite.
+
+1. **Refresh the raw docs.** Re-download (`download-zuper-api-docs.cjs`, `download-zuper-docs.cjs`; sources in each `_manifest.json`) or replace files by hand. API pages carry `updatedAt`, business pages `fetched_at`.
+2. **Run `npm run kb:sync`.** API records are re-distilled, every chunk's content hash is compared with the index: unchanged chunks are skipped (no embedding calls), changed ones re-embedded, chunks of removed pages deleted. The output lists `+` added, `~` changed, `-` removed.
+3. **Run `npm run kb:eval`** to confirm retrieval still works.
+
+Not built yet: a field-level diff ("response field X was added/removed on endpoint Y") and a scheduled sync; for now `kb:sync` is run by hand when Zuper ships changes.
 
 ### Staleness rules for the agents
 
-- The docs can lag the live API. During RCA, **runtime data from the real API response wins over the docs**. A field missing from the docs is not evidence that a node is broken.
-- The index should record a "docs last synced" date so answers can state how fresh the knowledge is (planned).
-- Commit `.generated/` so git history shows exactly how the API docs changed between syncs (useful for questions like "did this field exist last month?"). Pending confirmation.
+- The docs can lag the live API. During RCA, **runtime data from the real API response wins over the docs**. A field missing from the docs is not evidence that a node is broken. `get_api_changelog` helps check whether an API changed around the time something broke.
+- Every chunk carries `generated_at` (the page's `updatedAt` / `fetched_at`) and lookup results carry the workflow-builder file versions, so answers can say how fresh the knowledge is.
+- `.generated/api/` is plain JSON (not gitignored), so committing it makes git history show how the API docs changed between syncs. Whether to commit it is still undecided.
 
 ## Workflow-builder knowledge (`workflow-builder/`) — built
 
@@ -55,6 +65,7 @@ Seven JSON files exported from the workflow worker/frontend code. They are exact
 `interactive_create_capabilities.json` is validated if present but not indexed: it only serves the future workflow builder.
 
 ```bash
+npm run kb:chunks -- business    # build + inspect chunks, no embedding calls
 npm run kb:sync -- --dry-run     # show what would change
 npm run kb:sync                  # embed changed chunks, delete removed ones
 npm run kb:eval                  # retrieval regression test
@@ -62,7 +73,27 @@ npm run kb:eval                  # retrieval regression test
 
 `kb:sync` is idempotent: each chunk has a stable id and content hash, unchanged chunks are not re-embedded. To refresh after a new export, overwrite the JSON files and run `kb:sync`; the output lists chunks added (`+`), changed (`~`) and removed (`-`).
 
-`kb:eval` has 19 retrieval cases (the right chunk must be in the top 3) plus off-topic questions that must return nothing. One case is a known limitation: the vague query "wait node inside a loop" ranks the loop node first; the precise "what wait type can I use inside a loop" works.
+`kb:eval` runs 46 retrieval cases (the right chunk must be in the top 3: 19 workflow-builder, 15 business, 12 API), 3 off-topic questions that must return nothing, and 11 exact-lookup checks (API endpoint by id / method+path / title, ambiguity, caps, changelog). Workflow-builder cases search their own KB; 2 cases search all KBs together on purpose. Two cases are known limitations and report WARN, not FAIL: the vague query "wait node inside a loop" ranks the loop node first (the precise "what wait type can I use inside a loop" works), and "API changes released in september 2026" (semantic search is weak on dates; `get_api_changelog` is exact).
+
+## Business docs (`zuper-docs/`) — built
+
+378 Mintlify help-center pages, prose, so they are searched (no exact-lookup layer). Code: `src/mastra/knowledge/business/chunks.ts`.
+
+**Cleaning.** Front-matter (`title`, `source`, `fetched_at`) becomes metadata. The "Documentation Index" banner and the Mintlify footer are removed. MDX components are flattened to text: `<Frame>`/`<img>`/`<iframe>` (long CDN image URLs) are dropped, `<Accordion title="X">` becomes a bold `X`, `<Note>`/`<Tip>`/`<Warning>` become `Note:` / `Tip:` / `Warning:` lines. Only a fixed list of known tags is stripped, so placeholders in prose such as `<variable_name>` survive.
+
+**Chunking.** Split at h1-h4 headings (never inside a code fence); a section is merged forward if under ~350 chars and split on paragraph/table boundaries if over ~2200 chars (an over-long table splits by rows and repeats its header). Each chunk starts with `Page title > Heading path`, so it reads on its own. Link-only sections ("Related topics") and one-line stubs are dropped. Result: 2,672 chunks from 378 pages (median ~865 chars, ~700k embedding tokens).
+
+**Metadata.** `kind=business`, `topic=doc`, `area` (top folder, e.g. `Accounting`), `source_url` (the public page, so an answer can cite it), `source_file`, `generated_at` (= the page's `fetched_at`), content `hash`. Chunk ids are `biz:<path>#<heading-slug>` and do not shift when unrelated sections change.
+
+`zuper-for-roofing` and `zuper-for-rooofing` (typo) are not copies of `Zuper_for_Roofing`; each holds one page not found elsewhere, so they are indexed. `untitled-page-2.md` is a real page ("Configuring inboxes").
+
+```bash
+npm run kb:sync -- business      # first run embeds all chunks (~3 min); later runs only embed what changed
+```
+
+Search tip for agents: pass `kind` (`business` or `workflow_builder`) when the question is clearly about one of them. An unfiltered search mixes both and a business page can outrank a precise workflow-builder rule.
+
+**When the docs change.** Re-download the pages (`download-zuper-docs.cjs`, source in `zuper-docs/_manifest.json`) and run `kb:sync -- business`: changed chunks are re-embedded, chunks of removed pages are deleted, and the output lists `+` / `~` / `-`.
 
 ## Vector store
 
@@ -74,9 +105,9 @@ npm run kb:eval                  # retrieval regression test
 | `TURSO_DATABASE_URL` (+ `TURSO_AUTH_TOKEN`) | Hosted Turso, if no `KB_*` variable is set. |
 | neither | Local file `knowledge-base/.generated/kb.db` (gitignored via `*.db`). |
 
-`mastra dev` runs from `.mastra/output`, so for the dev server set `KB_DATABASE_URL=file:<absolute path to kb.db>`, otherwise the server would look for a different file than `npm run kb:sync` wrote. Embeddings (`openai/text-embedding-3-small`) are an online call at sync time and for every search, so `OPENAI_API_KEY` is required. The index is always rebuildable from this folder.
+The index is tuned at creation (`compress_neighbors=float8`, `max_neighbors=32`): libSQL's default stores a full copy of every neighbour's vector, which took 881 MB for 2.8k vectors; tuned it is ~177 MB with unchanged retrieval. `mastra dev` runs from `.mastra/output`, so for the dev server set `KB_DATABASE_URL=file:<absolute path to kb.db>`, otherwise the server would look for a different file than `npm run kb:sync` wrote. Embeddings (`openai/text-embedding-3-small`) are an online call at sync time and for every search, so `OPENAI_API_KEY` is required. The index is always rebuildable from this folder.
 
 ## Status
 
-- Done: workflow-builder KB (lookup + vector finder, sync, eval); API distiller, piloted on `work-order-management/jobs`, `accounting/invoices`, `accounting/quotes-proposals`.
-- Next: API docs (distil all pages, embed, `get_api_endpoint`), then business docs. The content-hash sync described under "When the APIs change" is built for workflow-builder and will be reused for them.
+- Done: workflow-builder KB (lookup + 133 chunks), business docs KB (2,672 chunks), API docs KB (502 endpoint records, 644 chunks, exact lookup + changelog), shared content-hash sync and eval.
+- Next: attach the knowledge tools to the RCA investigator agent; field-level API diff on sync; past-RCA KB.

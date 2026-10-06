@@ -9,6 +9,7 @@
 // absolute `file:` URL so the server and `npm run kb:sync` read the same file.
 
 import path from 'node:path';
+import { createClient } from '@libsql/client';
 import { LibSQLVector } from '@mastra/libsql';
 import { ModelRouterEmbeddingModel } from '@mastra/core/llm';
 
@@ -37,6 +38,23 @@ export function getKbVector(): LibSQLVector {
   return vector;
 }
 
+/** libSQL's default vector index keeps a full float32 copy of every neighbour inside each graph node:
+ * ~300 KB per 1536-dim vector (881 MB for 2.8k vectors). Compressing neighbours to float8 and capping
+ * them at 32 gave 177 MB on the same data with the retrieval eval unchanged. Replaces the default
+ * index that createIndex() builds; the table and data are untouched. */
+async function tuneVectorIndex(): Promise<void> {
+  const { url, authToken } = resolveConnection();
+  const client = createClient({ url, authToken });
+  try {
+    await client.execute(`DROP INDEX IF EXISTS ${KB_INDEX}_vector_idx`);
+    await client.execute(
+      `CREATE INDEX ${KB_INDEX}_vector_idx ON ${KB_INDEX} (libsql_vector_idx(embedding, 'metric=cosine', 'compress_neighbors=float8', 'max_neighbors=32'))`,
+    );
+  } finally {
+    client.close();
+  }
+}
+
 /** Creates the index on first use (no-op afterwards). */
 export function ensureKbIndex(): Promise<void> {
   if (!indexReady) {
@@ -45,6 +63,7 @@ export function ensureKbIndex(): Promise<void> {
       const existing = await store.listIndexes();
       if (!existing.includes(KB_INDEX)) {
         await store.createIndex({ indexName: KB_INDEX, dimension: EMBEDDING_DIMENSION });
+        await tuneVectorIndex();
       }
     })().catch((err) => {
       indexReady = null; // let the next call retry instead of caching a failure

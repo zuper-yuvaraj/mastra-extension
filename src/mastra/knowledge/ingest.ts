@@ -14,8 +14,10 @@ export interface KbChunkMetadata {
   source_file: string;
   generated_at: string;
   hash: string;
-  /** Top-level product area (business docs), e.g. `Accounting`. */
+  /** Top-level product area (business docs) or API section, e.g. `Accounting`, `work-order-management`. */
   area?: string;
+  /** API module folder, e.g. `jobs`, `invoices`. */
+  module?: string;
   /** Public page the chunk came from, so an answer can cite it. */
   source_url?: string;
 }

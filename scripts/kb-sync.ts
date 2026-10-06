@@ -1,14 +1,18 @@
 // Usage: npm run kb:sync -- [kind] [--dry-run]
-//   kind: workflow_builder (default: all KBs that exist so far)
+//   kind: workflow_builder | business | api (default: all KBs that exist so far)
 // Idempotent: unchanged chunks are skipped (no embedding calls), changed ones re-embedded,
 // chunks whose source disappeared are removed. Prints a diff.
 
 import { syncChunks, type KbChunk } from '../src/mastra/knowledge/ingest';
+import { API_KIND, buildApiChunks } from '../src/mastra/knowledge/api/chunks';
+import { BUSINESS_KIND, buildBusinessChunks } from '../src/mastra/knowledge/business/chunks';
 import { buildWorkflowBuilderChunks, WORKFLOW_BUILDER_KIND } from '../src/mastra/knowledge/workflowBuilder/chunks';
 import { loadWorkflowBuilderKnowledge } from '../src/mastra/knowledge/workflowBuilder/loader';
 
 const KBS: Record<string, () => KbChunk[]> = {
   [WORKFLOW_BUILDER_KIND]: buildWorkflowBuilderChunks,
+  [BUSINESS_KIND]: buildBusinessChunks,
+  [API_KIND]: buildApiChunks,
 };
 
 const args = process.argv.slice(2);

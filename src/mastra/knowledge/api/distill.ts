@@ -44,7 +44,7 @@ const MAX_FIELD_PATHS = 250;
 const MAX_STRING_CHARS = 60;
 const MAX_KEYS_PER_OBJECT = 30;
 
-const FENCED_JSON = /```json\n([\s\S]*?)\n```/;
+const FENCED_JSON = /```json\n([\s\S]*?)\n```/g;
 
 /** Shrinks a sample payload: one element per array, short strings, bounded depth and width. */
 function trim(value: Json, depth: number): Json {
@@ -180,10 +180,70 @@ function firstBalancedJson(text: string): string | null {
   return null;
 }
 
-/** Some pages ship the sample as a JSON string (occasionally malformed); unwrap it when it parses. */
+/** Copies a double-quoted string starting at `start`; returns the end index (exclusive). */
+function skipString(text: string, start: number): number {
+  let i = start + 1;
+  while (i < text.length && text[i] !== '"') i += text[i] === '\\' ? 2 : 1;
+  return i + 1;
+}
+
+/** Turns the JavaScript-flavoured samples some pages ship into strict JSON: strips block and line
+ * comments, quotes bare object keys, and drops trailing commas. String contents are never touched. */
+function relaxJson(text: string): string {
+  let pass1 = '';
+  for (let i = 0; i < text.length; ) {
+    const ch = text[i]!;
+    if (ch === '"') {
+      const end = skipString(text, i);
+      pass1 += text.slice(i, end);
+      i = end;
+    } else if (ch === '/' && text[i + 1] === '*') {
+      const end = text.indexOf('*/', i + 2);
+      i = end === -1 ? text.length : end + 2;
+    } else if (ch === '/' && text[i + 1] === '/') {
+      const end = text.indexOf('\n', i);
+      i = end === -1 ? text.length : end;
+    } else if (/[A-Za-z_$]/.test(ch)) {
+      let j = i;
+      while (j < text.length && /[\w$]/.test(text[j]!)) j++;
+      let k = j;
+      while (k < text.length && /\s/.test(text[k]!)) k++;
+      const word = text.slice(i, j);
+      pass1 += text[k] === ':' ? `"${word}"` : word; // bare key vs true/false/null
+      i = j;
+    } else {
+      pass1 += ch;
+      i++;
+    }
+  }
+
+  let pass2 = '';
+  for (let i = 0; i < pass1.length; ) {
+    const ch = pass1[i]!;
+    if (ch === '"') {
+      const end = skipString(pass1, i);
+      pass2 += pass1.slice(i, end);
+      i = end;
+    } else if (ch === ',') {
+      let j = i + 1;
+      while (j < pass1.length && /\s/.test(pass1[j]!)) j++;
+      if (pass1[j] !== '}' && pass1[j] !== ']') pass2 += ch;
+      i++;
+    } else {
+      pass2 += ch;
+      i++;
+    }
+  }
+  return pass2;
+}
+
+/** Some pages ship the sample as a string, occasionally malformed (stray braces, JS-style objects);
+ * unwrap it when it can be recovered, otherwise keep the raw string. */
 function parseIfJsonString(value: Json | undefined): Json | undefined {
   if (typeof value !== 'string') return value;
-  for (const candidate of [value, firstBalancedJson(value)]) {
+  const balanced = firstBalancedJson(value);
+  const candidates = [value, balanced, balanced ? relaxJson(balanced) : null, relaxJson(value)];
+  for (const candidate of candidates) {
     if (!candidate) continue;
     try {
       const parsed = JSON.parse(candidate) as Json;
@@ -216,15 +276,22 @@ function schemaFieldPaths(schema: Record<string, any> | undefined, prefix = '', 
 }
 
 export function distillPage(markdown: string, sourceFile: string, root: string): ApiEndpointRecord | null {
-  const match = FENCED_JSON.exec(markdown);
-  if (!match) return null;
-
-  let spec: { paths?: Record<string, Record<string, OpenApiOperation>> };
-  try {
-    spec = JSON.parse(match[1]!);
-  } catch {
-    return null;
+  // A page can hold several ```json blocks (example payloads in prose); the OpenAPI document is the
+  // one with a `paths` object.
+  type OpenApiDocument = { paths?: Record<string, Record<string, OpenApiOperation>> };
+  let spec: OpenApiDocument | null = null;
+  for (const match of markdown.matchAll(FENCED_JSON)) {
+    try {
+      const parsed = JSON.parse(match[1]!) as OpenApiDocument | null;
+      if (parsed?.paths && Object.keys(parsed.paths).length > 0) {
+        spec = parsed;
+        break;
+      }
+    } catch {
+      // not the OpenAPI block
+    }
   }
+  if (!spec) return null;
 
   const first = Object.entries(spec.paths ?? {})[0];
   if (!first) return null;
