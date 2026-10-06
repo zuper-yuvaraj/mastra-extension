@@ -7,7 +7,11 @@
   "scripts": {
     "dev": "mastra dev",
     "build": "mastra build",
-    "start": "mastra start"
+    "start": "mastra start",
+    "kb:distill": "tsx scripts/kb-distill.ts",
+    "kb:sync": "tsx --env-file=.env scripts/kb-sync.ts",
+    "kb:eval": "tsx --env-file=.env scripts/kb-eval.ts",
+    "kb:chunks": "tsx scripts/kb-chunks.ts"
   },
   "keywords": [],
   "author": "",
@@ -27,6 +31,7 @@
   "devDependencies": {
     "@types/node": "latest",
     "mastra": "1.31.2",
+    "tsx": "^4.23.15",
     "typescript": "^6.0.3"
   }
 }

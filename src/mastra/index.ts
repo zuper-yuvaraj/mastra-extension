@@ -12,6 +12,7 @@ import { agent } from './agents/agent';
 import { startScheduleTool, stopScheduleTool } from './tools/schedule-tools';
 import { zuperClassifierAgent } from './agents/zuperClassifierAgent';
 import { zuperChatAgent } from './agents/zuperChatAgent';
+import { knowledgeTools } from './tools/knowledgeTools';
 import { handleZuperChat } from './routes/zuperChatRoute';
 import { handleZuperExplain } from './routes/zuperExplainRoute';
 
@@ -20,7 +21,7 @@ export const mastra = new Mastra({
     externals: ['@duckdb/node-bindings'],
   },
   agents: { agent, zuperClassifierAgent, zuperChatAgent },
-  tools: { startScheduleTool, stopScheduleTool },
+  tools: { startScheduleTool, stopScheduleTool, ...knowledgeTools },
   server: {
     apiRoutes: [
       // No Mastra-managed auth provider is configured (server.auth) — these routes do their own
