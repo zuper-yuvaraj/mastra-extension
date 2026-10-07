@@ -12,6 +12,17 @@ export const ROOT_CAUSE_CATEGORIES = [
   'OTHER',
 ] as const;
 
+const evidenceItemSchema = z.object({
+  node_uid: z
+    .string()
+    .describe('uid of the node this evidence comes from, copied from the seed or tool results. For the execution-level error message use the failed node\'s uid.'),
+  name: z.string(),
+  observation: z.string().describe('What this node showed, in plain words.'),
+  quote: z
+    .string()
+    .describe('One short, CONTIGUOUS, VERBATIM excerpt copied from a single tool result or the seed (a value, a key, an error text). Never paraphrase, never join pieces from different results, never add or drop characters.'),
+});
+
 export const verdictSchema = z.object({
   status: z
     .enum(['failed', 'unexpected_branch', 'no_issue', 'insufficient_evidence'])
@@ -28,32 +39,39 @@ export const verdictSchema = z.object({
       explanation: z.string(),
     })
     .nullable(),
-  evidence_chain: z
-    .array(
-      z.object({
-        node_uid: z.string(),
-        name: z.string(),
-        observation: z.string().describe('What this node showed, in plain words.'),
-        quote: z
-          .string()
-          .describe('A short VERBATIM excerpt copied from a tool result that proves the observation (a value, key or error text). Never paraphrase.'),
-      }),
-    )
-    .describe('Ordered from the failed node back to the root cause.'),
+  evidence_chain: z.array(evidenceItemSchema).describe('Ordered from the failed node back to the root cause.'),
   fix: z
     .object({
       description: z.string(),
-      node_uid: z.string().nullable(),
+      node_uid: z.string().nullable().describe('The uid of an EXISTING node in this execution to change, copied from the seed or tool results; null if the change is a new node or is not tied to one node.'),
       suggested_change: z.string().nullable().describe('Concrete change, e.g. the corrected expression or code line.'),
     })
     .nullable(),
   confidence: z.enum(['high', 'medium', 'low']),
   knowledge_used: z
     .array(z.object({ tool: z.string(), id: z.string() }))
-    .describe('Knowledge-base entries (tool + id/topic) the conclusion relied on.'),
+    .describe('Only KNOWLEDGE lookups the conclusion relied on (search_knowledge, get_node_info, get_node_output_shape, get_expression_rules, get_code_runtime, get_api_endpoint, ...) with the id or topic asked for. Not runtime inspection tools. Empty if none were used.'),
 });
 
 export type RcaVerdict = z.infer<typeof verdictSchema>;
+
+/** Used when the model produces nothing usable, so the caller still gets a well-formed answer. */
+export const INSUFFICIENT_VERDICT: RcaVerdict = {
+  status: 'insufficient_evidence',
+  summary: 'The investigation could not reach a conclusion from the available data.',
+  failed_node: null,
+  root_cause: null,
+  evidence_chain: [],
+  fix: null,
+  confidence: 'low',
+  knowledge_used: [],
+};
+
+/** Shape of a verified verdict, for workflow step output. */
+export const verifiedVerdictSchema = verdictSchema.omit({ evidence_chain: true }).extend({
+  evidence_chain: z.array(evidenceItemSchema.extend({ verified: z.boolean() })),
+  issues: z.array(z.string()),
+});
 
 export interface VerifiedEvidence {
   node_uid: string;

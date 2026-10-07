@@ -3,6 +3,7 @@
 
 import { readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
+import { projectPath } from '../knowledge/paths';
 import { createExecutionContext, type ExecutionContext, type ExecutionSummaryResponse } from '../lib/zuperExecutionApi';
 
 export interface RcaFixture {
@@ -23,7 +24,7 @@ export interface RcaFixture {
   };
 }
 
-export const FIXTURE_DIR = path.resolve(process.cwd(), 'fixtures/rca');
+export const FIXTURE_DIR = projectPath('fixtures', 'rca');
 
 export function executionContextFromFixture(fixture: RcaFixture): ExecutionContext {
   return createExecutionContext(fixture.summary, async (nodeUid) => {

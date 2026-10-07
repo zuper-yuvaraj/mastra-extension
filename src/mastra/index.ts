@@ -12,15 +12,19 @@ import { agent } from './agents/agent';
 import { startScheduleTool, stopScheduleTool } from './tools/schedule-tools';
 import { zuperClassifierAgent } from './agents/zuperClassifierAgent';
 import { zuperChatAgent } from './agents/zuperChatAgent';
+import { rcaInvestigatorAgent } from './agents/rcaInvestigatorAgent';
+import { rcaWorkflow } from './workflows/rcaWorkflow';
 import { knowledgeTools } from './tools/knowledgeTools';
 import { handleZuperChat } from './routes/zuperChatRoute';
 import { handleZuperExplain } from './routes/zuperExplainRoute';
+import { handleZuperRca } from './routes/zuperRcaRoute';
 
 export const mastra = new Mastra({
   bundler: {
     externals: ['@duckdb/node-bindings'],
   },
-  agents: { agent, zuperClassifierAgent, zuperChatAgent },
+  agents: { agent, zuperClassifierAgent, zuperChatAgent, rcaInvestigatorAgent },
+  workflows: { rcaWorkflow },
   tools: { startScheduleTool, stopScheduleTool, ...knowledgeTools },
   server: {
     apiRoutes: [
@@ -29,6 +33,7 @@ export const mastra = new Mastra({
       // Mastra's own auth gate is explicitly bypassed rather than left to its unconfigured default.
       { path: '/zuper/chat', method: 'POST', handler: handleZuperChat, requiresAuth: false },
       { path: '/zuper/explain', method: 'POST', handler: handleZuperExplain, requiresAuth: false },
+      { path: '/zuper/rca', method: 'POST', handler: handleZuperRca, requiresAuth: false },
     ],
   },
   storage: new MastraCompositeStore({

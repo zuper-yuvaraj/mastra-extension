@@ -18,7 +18,7 @@ const TERMINAL_STATUSES = new Set([
 
 /** Unrecognised statuses count as non-terminal on purpose: the cost of being wrong that way is one
  * extra fetch, whereas wrongly assuming "finished" serves a mid-run snapshot for the full TTL. */
-function isTerminalStatus(status: string | undefined): boolean {
+export function isTerminalStatus(status: string | undefined): boolean {
   return status ? TERMINAL_STATUSES.has(status.trim().toUpperCase()) : false;
 }
 

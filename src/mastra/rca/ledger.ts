@@ -16,17 +16,21 @@ function normalize(text: string): string {
 export class EvidenceLedger {
   private readonly entries: LedgerEntry[] = [];
   private haystack = '';
+  /** The same text with JSON string escaping removed: a value shown inside a JSON string (`\"job-1\"`) is
+   * quoted by readers as plain `"job-1"`, and that is still a verbatim quote of the value. */
+  private unescaped = '';
 
   record(tool: string, label: string, value: unknown): void {
     const text = typeof value === 'string' ? value : safeStringify(value);
     this.entries.push({ tool, label, text });
     this.haystack += `\n${normalize(text)}`;
+    this.unescaped += `\n${normalize(unescapeJson(text))}`;
   }
 
   /** True when `quote` appears verbatim (modulo whitespace) in any recorded result. */
   contains(quote: string): boolean {
     const needle = normalize(quote);
-    return needle.length > 0 && this.haystack.includes(needle);
+    return needle.length > 0 && (this.haystack.includes(needle) || this.unescaped.includes(needle));
   }
 
   get size(): number {
@@ -36,6 +40,10 @@ export class EvidenceLedger {
   toolCalls(): number {
     return this.entries.filter((e) => e.tool !== 'seed').length;
   }
+}
+
+function unescapeJson(text: string): string {
+  return text.replace(/\\"/g, '"').replace(/\\\\/g, '\\');
 }
 
 function safeStringify(value: unknown): string {

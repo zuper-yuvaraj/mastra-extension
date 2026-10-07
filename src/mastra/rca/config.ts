@@ -3,6 +3,15 @@
 /** Re-evaluate on real executions (see scripts/rca-eval.ts); gpt-5.6 is the likely upgrade. */
 export const RCA_MODEL = process.env.RCA_MODEL ?? 'openai/gpt-5-mini';
 
+/** Turns the investigator's final text into the structured verdict. Separate from the investigator so
+ * the investigator can use tools freely (not every model supports tools and a response schema in one
+ * call). Defaults to the investigator's model. */
+export const RCA_STRUCTURING_MODEL = process.env.RCA_STRUCTURING_MODEL ?? RCA_MODEL;
+
+/** How hard the model thinks per step. A 7-step investigation took 78 s at the default; this trades some
+ * depth for latency. Re-evaluate with scripts/rca-eval.ts. Ignored by providers without the option. */
+export const RCA_REASONING_EFFORT = process.env.RCA_REASONING_EFFORT ?? 'low';
+
 /** Tool-calling rounds the investigator may use before it must answer. */
 export const RCA_MAX_STEPS = Number(process.env.RCA_MAX_STEPS ?? 12);
 

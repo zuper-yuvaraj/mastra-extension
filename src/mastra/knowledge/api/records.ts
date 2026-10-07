@@ -4,13 +4,12 @@
 
 import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { knowledgeBasePath } from '../paths';
 import { readApiPage, type ApiEndpointRecord } from './distill';
 
-export const API_DOCS_ROOT =
-  process.env.KB_API_DOCS_DIR ?? path.resolve(process.cwd(), 'knowledge-base/zuper-api-docs');
+export const API_DOCS_ROOT = process.env.KB_API_DOCS_DIR ?? knowledgeBasePath('zuper-api-docs');
 export const API_REFERENCE_DIR = path.join(API_DOCS_ROOT, 'api-reference');
-export const GENERATED_API_DIR =
-  process.env.KB_GENERATED_API_DIR ?? path.resolve(process.cwd(), 'knowledge-base/.generated/api');
+export const GENERATED_API_DIR = process.env.KB_GENERATED_API_DIR ?? knowledgeBasePath('.generated', 'api');
 
 export function walkMarkdown(dir: string, out: string[] = []): string[] {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {

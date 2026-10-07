@@ -5,9 +5,9 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { z } from 'zod';
+import { knowledgeBasePath } from '../paths';
 
-export const WORKFLOW_BUILDER_DIR =
-  process.env.KB_WORKFLOW_BUILDER_DIR ?? path.resolve(process.cwd(), 'knowledge-base/workflow-builder');
+export const WORKFLOW_BUILDER_DIR = process.env.KB_WORKFLOW_BUILDER_DIR ?? knowledgeBasePath('workflow-builder');
 
 const anyRecord = z.record(z.string(), z.any());
 

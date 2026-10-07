@@ -5,10 +5,10 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { hashText, type KbChunk } from '../ingest';
+import { knowledgeBasePath } from '../paths';
 
 export const BUSINESS_KIND = 'business';
-export const BUSINESS_DOCS_DIR =
-  process.env.KB_BUSINESS_DOCS_DIR ?? path.resolve(process.cwd(), 'knowledge-base/zuper-docs');
+export const BUSINESS_DOCS_DIR = process.env.KB_BUSINESS_DOCS_DIR ?? knowledgeBasePath('zuper-docs');
 
 /** ~550 tokens. Large enough to hold a full procedure, small enough to keep one topic per chunk. */
 const MAX_CHUNK_CHARS = 2200;

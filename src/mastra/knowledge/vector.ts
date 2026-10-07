@@ -4,14 +4,14 @@
 // Storage: a local libSQL file in development, hosted Turso in production — chosen purely by env:
 //   KB_DATABASE_URL  (+ KB_DATABASE_AUTH_TOKEN)   explicit override
 //   TURSO_DATABASE_URL (+ TURSO_AUTH_TOKEN)       same Turso DB the rest of the app uses
-//   otherwise                                     file:<cwd>/knowledge-base/.generated/kb.db
-// Note: `mastra dev` runs from .mastra/output, so for the dev server set KB_DATABASE_URL to an
-// absolute `file:` URL so the server and `npm run kb:sync` read the same file.
+//   otherwise                                     file:<project root>/knowledge-base/.generated/kb.db
+// The project root is found by walking up from the cwd (see paths.ts), so `mastra dev`, which runs
+// from .mastra/output, and `npm run kb:sync` read the same file.
 
-import path from 'node:path';
 import { createClient } from '@libsql/client';
 import { LibSQLVector } from '@mastra/libsql';
 import { ModelRouterEmbeddingModel } from '@mastra/core/llm';
+import { knowledgeBasePath } from './paths';
 
 export const KB_INDEX = 'zuper_kb';
 export const EMBEDDING_MODEL = 'openai/text-embedding-3-small';
@@ -23,7 +23,7 @@ function resolveConnection(): { url: string; authToken?: string } {
   if (url) {
     return { url, authToken: process.env.KB_DATABASE_AUTH_TOKEN ?? process.env.TURSO_AUTH_TOKEN ?? undefined };
   }
-  const file = path.resolve(process.cwd(), 'knowledge-base/.generated/kb.db').replace(/\\/g, '/');
+  const file = knowledgeBasePath('.generated', 'kb.db').replace(/\\/g, '/');
   return { url: `file:${file}` };
 }
 

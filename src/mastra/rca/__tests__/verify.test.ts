@@ -86,3 +86,11 @@ test('rendered HTML escapes model text', () => {
   assert.ok(!html.includes('<script>'));
   assert.ok(html.includes('&lt;script&gt;'));
 });
+
+test('a value shown JSON-escaped inside a tool result can be quoted as the plain value', () => {
+  const ledger = new EvidenceLedger();
+  ledger.record('get_node_data', '{}', { selected: [{ selector: 'data.body.job_uid', value: '"job-1"' }] });
+  assert.equal(ledger.contains('"job-1"'), true, 'plain quote of the value');
+  assert.equal(ledger.contains('"job-2"'), false, 'a different value is still rejected');
+  assert.equal(ledger.contains('"job-1" and "customer":null'), false, 'joining pieces is still rejected');
+});
