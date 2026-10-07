@@ -27,6 +27,8 @@ export type InputStatus =
   /** A bracket the resolver cannot evaluate statically (e.g. a loop index). */
   | 'dynamic'
   | 'target_not_run'
+  /** The node ran, but its runtime data could not be loaded (API error), so nothing can be concluded about it. */
+  | 'fetch_failed'
   | 'target_unknown'
   | 'variable'
   /** Reference sits in a FIXED field, so the text is used literally and never evaluated. */
@@ -66,6 +68,15 @@ export function toWrapper(raw: unknown): { wrapper: unknown; assumed: boolean } 
     if (isObject(raw.data) && isObject(raw.data.execution_data)) return { wrapper: raw.data.execution_data, assumed: false };
   }
   return { wrapper: { data: raw }, assumed: true };
+}
+
+/** zuperExecutionApi turns a failed node-data fetch into `{ error: 'API_403' }`; that is not node data. */
+export function fetchFailure(raw: unknown): string | null {
+  if (isObject(raw)) {
+    const keys = Object.keys(raw);
+    if (keys.length === 1 && typeof raw.error === 'string' && /^(API_\d+|FETCH_FAILED)$/.test(raw.error)) return raw.error;
+  }
+  return null;
 }
 
 export function preview(value: unknown, limit = RCA_VALUE_PREVIEW_CHARS): string {
@@ -209,6 +220,15 @@ async function resolveReference(
   }
 
   const raw = await pending;
+  const failure = fetchFailure(raw);
+  if (failure) {
+    return {
+      ...base,
+      status: 'fetch_failed',
+      target: { uid: targetUid, name: targetName },
+      note: `"${targetName}" ran, but its data could not be loaded (${failure}). Do not conclude anything about its output.`,
+    };
+  }
 
   // A node that ran several times (e.g. inside a loop) comes back as one payload per run.
   const runs = (Array.isArray(raw) ? raw : [raw]).map(toWrapper);

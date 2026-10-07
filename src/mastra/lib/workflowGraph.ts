@@ -1,5 +1,6 @@
 import type { WorkflowConnection, WorkflowDetail, WorkflowNode } from './zuperWorkflowApi';
 import type { ExecutedWorkflowNode, ExecutionContext, NodeExecutionStatus } from './zuperExecutionApi';
+import { extractReferences, renderSegments } from '../rca/references';
 
 const GRAPH_CACHE_TTL_MS = 10 * 60 * 1000;
 
@@ -170,39 +171,16 @@ export function computeBranchDecisions(
   return decisions;
 }
 
-// Matches $.getLatestNodeData('Node Name')[...] references. These occur in form_fields across ALL
-// node types (Code-node JS, URLs, json_body, expressions) — not just Code nodes — so every string
-// value in form_fields is scanned, not just a `code` field.
-const NODE_DATA_REFERENCE = /\$\.getLatestNodeData\(\s*['"]([^'"]+)['"]\s*\)((?:\[[^\]]*\])*)/g;
-
-function collectStrings(value: unknown, out: string[]): void {
-  if (typeof value === 'string') {
-    out.push(value);
-  } else if (Array.isArray(value)) {
-    for (const item of value) collectStrings(item, out);
-  } else if (value && typeof value === 'object') {
-    for (const item of Object.values(value as Record<string, unknown>)) collectStrings(item, out);
-  }
-}
-
+/** Every `$.getLatestNodeData('X')` / `$.getNodeData('X')` reference in a node's form_fields (all node
+ * types — Code-node JS, URLs, json_body, expressions — not just Code nodes). Delegates to the RCA
+ * extractor, which also captures the field path (`.data.data.customer.email`) that the previous regex
+ * here dropped. `$item`, `$.getRecentNodeData` and variables are positional or non-node, so they are
+ * not lineage edges by name; the RCA input resolver follows them separately. */
 export function extractNodeReferences(node: RawNode): NodeReference[] {
   const record = node as unknown as Record<string, unknown>;
-  const formFields = (record.form_fields as Record<string, unknown>) ?? {};
-
-  const strings: string[] = [];
-  collectStrings(formFields, strings);
-
-  const references: NodeReference[] = [];
-  for (const text of strings) {
-    // A fresh RegExp per string: NODE_DATA_REFERENCE is a module-level /g pattern, and reusing one
-    // exec state across independent strings would silently skip matches after the first string.
-    const pattern = new RegExp(NODE_DATA_REFERENCE.source, 'g');
-    let match: RegExpExecArray | null;
-    while ((match = pattern.exec(text))) {
-      references.push({ targetName: match[1] ?? '', path: match[2] ?? '', rawExpression: match[0] });
-    }
-  }
-  return references;
+  return extractReferences(record.form_fields ?? {})
+    .filter((ref) => (ref.kind === 'latest' || ref.kind === 'all_runs') && ref.targetName)
+    .map((ref) => ({ targetName: ref.targetName!, path: renderSegments(ref.path), rawExpression: ref.raw }));
 }
 
 export function buildLineageGraph(nodes: RawNode[]): LineageGraph {

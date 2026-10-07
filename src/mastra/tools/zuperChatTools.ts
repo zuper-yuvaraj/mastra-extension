@@ -36,7 +36,7 @@ const DROP_NODE_FIELDS = new Set(['pinned_data', 'credentials', 'color', 'node_i
 // Drops cosmetic fields a tool result doesn't need. Unlike the list-shaped results, form_fields is
 // deliberately left intact: it holds the Code-node source and the expressions that carry every
 // node-to-node reference, which is the whole point of fetching a definition.
-function stripNodeDefinition(node: unknown): unknown {
+export function stripNodeDefinition(node: unknown): unknown {
   if (typeof node !== 'object' || node === null) return node;
   const trimmed: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(node as Record<string, unknown>)) {

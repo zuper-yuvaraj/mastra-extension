@@ -12,7 +12,8 @@
     "kb:sync": "tsx --env-file=.env scripts/kb-sync.ts",
     "kb:eval": "tsx --env-file=.env scripts/kb-eval.ts",
     "kb:chunks": "tsx scripts/kb-chunks.ts",
-    "test": "tsx --test \"src/mastra/rca/__tests__/*.test.ts\""
+    "test": "tsx --test \"src/mastra/rca/__tests__/*.test.ts\"",
+    "rca:capture": "tsx scripts/rca-capture.ts"
   },
   "keywords": [],
   "author": "",

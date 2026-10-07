@@ -152,13 +152,12 @@ async function fetchNodeExecutionData(
   return res.json();
 }
 
-async function fetchExecutionContext(
-  workflowUid: string,
-  executionUid: string,
-  token: string,
-  workflowBuilderUrl: string,
-): Promise<ExecutionContext> {
-  const summary = await fetchExecutionSummary(workflowUid, executionUid, token, workflowBuilderUrl);
+/** Builds an ExecutionContext from an execution summary and a way to load one node's runtime data.
+ * Split out of the fetch path so a captured fixture can be turned into the same context offline. */
+export function createExecutionContext(
+  summary: ExecutionSummaryResponse,
+  loadNodeData: (nodeUid: string) => Promise<unknown>,
+): ExecutionContext {
   const nodeExecution = summary.node_execution ?? [];
   const validNodeUids = new Set(nodeExecution.map((n) => n.node_uid));
   const nodeDataCache = new Map<string, Promise<unknown>>();
@@ -205,7 +204,7 @@ async function fetchExecutionContext(
 
     let cached = nodeDataCache.get(nodeUid);
     if (!cached) {
-      cached = fetchNodeExecutionData(workflowUid, executionUid, nodeUid, token, workflowBuilderUrl).catch((err) => ({
+      cached = loadNodeData(nodeUid).catch((err) => ({
         error: err instanceof Error ? err.message : 'FETCH_FAILED',
       }));
       nodeDataCache.set(nodeUid, cached);
@@ -214,6 +213,18 @@ async function fetchExecutionContext(
   };
 
   return { summary, workflowData, executedNodes, failure, findNode, getNodeExecutionData };
+}
+
+async function fetchExecutionContext(
+  workflowUid: string,
+  executionUid: string,
+  token: string,
+  workflowBuilderUrl: string,
+): Promise<ExecutionContext> {
+  const summary = await fetchExecutionSummary(workflowUid, executionUid, token, workflowBuilderUrl);
+  return createExecutionContext(summary, (nodeUid) =>
+    fetchNodeExecutionData(workflowUid, executionUid, nodeUid, token, workflowBuilderUrl),
+  );
 }
 
 /** Cached per execution_uid. A finished execution is immutable, so it gets a generous TTL — but a
