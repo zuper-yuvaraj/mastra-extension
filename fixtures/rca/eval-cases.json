@@ -1,0 +1,45 @@
+[
+  {
+    "id": "http-404-code-node",
+    "fixture": "update-appointment-404",
+    "note": "Real failure. The Code node 'Construct' builds the Update Appointment URL without the appointment uid; 'update Appointment' gets HTTP 404 'Cannot PUT /api/appointments'. The execution-level error_message is empty.",
+    "expected": { "status": "failed", "root_cause_node": "Construct", "category": "CODE_ERROR" }
+  },
+  {
+    "id": "loop-silent-flow-end",
+    "fixture": "loop-appointments-completed",
+    "question": "Why did the flow stop at If/Else 1 1 1 and not run Edit Record 1 1?",
+    "note": "Real completed run. 'If/Else 1 1 1' evaluated FALSE and nothing is connected to its FALSE output, so the workflow silently ended.",
+    "expected": { "status": "unexpected_branch", "root_cause_node": "If/Else 1 1 1", "category": "BRANCH_CONDITION" }
+  },
+  {
+    "id": "loop-no-question",
+    "fixture": "loop-appointments-completed",
+    "note": "Real completed run, no question asked: answered without the model.",
+    "expected": { "status": "no_issue" }
+  },
+  {
+    "id": "synthetic-null-customer",
+    "fixture": "synthetic",
+    "note": "Built-in synthetic run: Get Job returns customer null, so Send Email has no recipient.",
+    "expected": { "status": "failed", "root_cause_node": "Get Job", "category": ["BAD_UPSTREAM_DATA", "MISSING_DATA"] }
+  },
+  {
+    "id": "clear-schedule-no-node-data",
+    "summary": "samples/failed_executions/failed_execution_3.json",
+    "note": "Real failure, summary only (no node data). The execution error itself names the cause: 'Cannot clear schedule for a job with multiple Appointments.'",
+    "expected": { "status": "failed", "root_cause_node": "clear schedule" }
+  },
+  {
+    "id": "create-job-no-node-data",
+    "summary": "samples/failed_executions/faied_execution_1.json",
+    "note": "Real failure inside a loop, summary only. The error says customer/organization is missing from the request, but WHY is behind the unreadable output of 'Payload for job': the honest answer is insufficient evidence.",
+    "expected": { "status": "insufficient_evidence" }
+  },
+  {
+    "id": "empty-error-no-node-data",
+    "summary": "samples/failed_executions/failed_execution_2.json",
+    "note": "Real failure, summary only, EMPTY error message. Nothing can be concluded: insufficient evidence.",
+    "expected": { "status": "insufficient_evidence" }
+  }
+]

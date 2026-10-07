@@ -16,7 +16,8 @@
     "rca:capture": "tsx scripts/rca-capture.ts",
     "rca:run": "tsx --env-file=.env scripts/rca-run.ts",
     "rca:e2e": "tsx --env-file=.env scripts/rca-e2e.ts",
-    "rca:import": "tsx scripts/rca-import.ts"
+    "rca:import": "tsx scripts/rca-import.ts",
+    "rca:eval": "tsx --env-file=.env scripts/rca-eval.ts"
   },
   "keywords": [],
   "author": "",

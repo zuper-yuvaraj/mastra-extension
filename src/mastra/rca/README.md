@@ -68,6 +68,8 @@ npm test                 # unit tests (extractor, resolver, verifier, tools, rou
 npm run rca:run          # run the real agent offline on the synthetic fixture, or --fixture <file>
 npm run rca:e2e          # in-process end to end: request -> route -> workflow -> real agent; Zuper API stubbed
 npm run rca:capture      # save a real execution (token from ZUPER_TOKEN) to fixtures/rca/<name>.json
+npm run rca:import       # same, from requests copied out of the browser network tab (no token needed)
+npm run rca:eval         # the accuracy eval: real model over fixtures/rca/eval-cases.json, N runs per case
 ```
 
 ## What real executions taught us (samples/)
@@ -141,6 +143,23 @@ error message itself explains (a platform rule about clearing a schedule) at med
 blamed "the platform" because every fetch had failed, so the verifier now treats "could not be loaded" as a gap, never
 as evidence: a failure verdict needs a verified, informative quote from the failed node, the root-cause node or the
 execution's own error, and any unreadable data caps confidence at medium.
+
+## The eval (`npm run rca:eval`)
+
+`fixtures/rca/eval-cases.json` labels each case with what a person established (`status`, `root_cause_node`,
+`category`; several acceptable values allowed). A case is a fixture (sanitized capture, or `synthetic`) or a raw
+`summary` file (no node data), plus an optional `question`. Labels live apart from the sanitized data so they can
+change without re-importing a capture. Each case is run `--runs N` times (default 3) because the agent varies, and
+scored by `rca/evalScore.ts` (unit-tested): status, root-cause node and category match rates, the share of cited
+quotes that were really in the data, whether the verifier found nothing wrong, tool calls and seconds.
+
+The run **fails** (exit 1) unless: root-cause node match >= 80%, status match >= 80%, quote verification >= 90%,
+and **zero confident-but-wrong answers** (said "high" while wrong about the status or the node). Trust is checked
+first on purpose: a wrong confident answer is worse than a missed one, and a quote that is not in the data is worse
+than either. A wrong category with the right node is only a category miss. `--case <id>` runs one case, `--json
+<file>` saves the numbers (use it to compare a model or prompt change: `RCA_MODEL=openai/gpt-5.6 npm run rca:eval`).
+
+Cases built on `samples/` skip themselves when that folder is absent.
 
 ## Known limits
 

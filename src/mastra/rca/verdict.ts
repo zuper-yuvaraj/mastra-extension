@@ -15,7 +15,9 @@ export const ROOT_CAUSE_CATEGORIES = [
 const evidenceItemSchema = z.object({
   node_uid: z
     .string()
-    .describe('uid of the node this evidence comes from, copied from the seed or tool results. For the execution-level error message use the failed node\'s uid.'),
+    .describe(
+      'uid of the node this evidence concerns, copied from the seed or tool results. For a fact about the execution as a whole (its status, its error message, the executed-node list, a branch list) use the execution uid from the seed (execution.uid). Never invent a node name or uid.',
+    ),
   name: z.string(),
   observation: z.string().describe('What this node showed, in plain words.'),
   quote: z
