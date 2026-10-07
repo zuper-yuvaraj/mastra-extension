@@ -70,3 +70,32 @@ test('a node missing from the fixture surfaces as a fetch failure, not as empty 
   const input: any = await getNodeInput(context, 'Send Email');
   assert.equal(input.inputs[0].status, 'fetch_failed');
 });
+
+test('sanitize redacts the secret in a header/parameter pair even though its own key name is innocuous', () => {
+  const out: any = sanitize({
+    header_parameters: [
+      { header_key: { type: 'FIXED', value: 'x-api-key' }, header_value: { type: 'EXPRESSION', value: 'fbeaaf5723df022a211f298aef2b4799' } },
+      { header_key: { type: 'FIXED', value: 'Authorization' }, header_value: { type: 'EXPRESSION', value: 'tok-123' } },
+      { header_key: { type: 'FIXED', value: 'Accept' }, header_value: { type: 'FIXED', value: 'application/json' } },
+    ],
+    query: [{ key: 'api_key', value: 'abc123' }, { key: 'page', value: '2' }],
+  });
+  assert.equal(out.header_parameters[0].header_value.value, '[REDACTED]');
+  assert.equal(out.header_parameters[0].header_value.type, 'EXPRESSION', 'structure is kept');
+  assert.equal(out.header_parameters[1].header_value.value, '[REDACTED]');
+  assert.equal(out.header_parameters[2].header_value.value, 'application/json', 'harmless headers are untouched');
+  assert.equal(out.query[0].value, '[REDACTED]');
+  assert.equal(out.query[1].value, '2');
+  assert.ok(!JSON.stringify(out).includes('fbeaaf57'));
+});
+
+test('sanitize redacts phone numbers by key name and leaves ids and dates alone', () => {
+  const out: any = sanitize({
+    customer: { home_phone_number: '402.588.0008', work_phone_number: '', mobile: 2065557663, job_uid: 'e80d3250-a456-444f-95f8-58a9a0ec901b', created: '2026-07-23' },
+  });
+  assert.equal(out.customer.home_phone_number, '[REDACTED_PHONE]');
+  assert.equal(out.customer.mobile, '[REDACTED_PHONE]');
+  assert.equal(out.customer.work_phone_number, '', 'an empty value stays empty');
+  assert.equal(out.customer.job_uid, 'e80d3250-a456-444f-95f8-58a9a0ec901b');
+  assert.equal(out.customer.created, '2026-07-23');
+});

@@ -15,6 +15,16 @@ import {
 // request context (the bearer token never appears in tool input or output), and records its result in
 // the run's evidence ledger via withEvidence() so the verdict can be checked against it.
 
+const ITERATION_ARG = z
+  .number()
+  .int()
+  .min(0)
+  .optional()
+  .describe(
+    'Only for a node inside a loop: which iteration (0-based). Default: the iteration it failed in, otherwise the last. ' +
+      'The response lists available_iterations.',
+  );
+
 const NODE_ARG = z
   .string()
   .describe('Node name exactly as shown in the execution overview / used in expressions (e.g. "Get Job"), or its node uid.');
@@ -53,22 +63,28 @@ const nodeInputTool = createTool({
     'reference it reports resolved / null / undefined (and exactly which segment is missing, with the keys ' +
     'that do exist) / node did not run / node name not found / field is FIXED so never evaluated. This is ' +
     'the fastest way to find which input of the failed node is wrong and which node produced it.',
-  inputSchema: z.object({ node: NODE_ARG }),
-  execute: async ({ node }, context) => getNodeInput(ctx(context as never).executionContext, node),
+  inputSchema: z.object({ node: NODE_ARG, iteration: ITERATION_ARG }),
+  execute: async ({ node, iteration }, context) => getNodeInput(ctx(context as never).executionContext, node, iteration),
 });
 
 const nodeDataTool = createTool({
   id: 'get_node_data',
   description:
-    "What a node produced at runtime. Without `select` it returns the payload's SHAPE (keys, types, array " +
-    'lengths) plus status/error fields — never the whole payload. Pass `select` with paths (e.g. ' +
-    '["data.data.customer", "data.items[0].id"]) to read specific values in full. Paths start at the node\'s ' +
-    '{node, data} wrapper, so a payload field is reached through `data`.',
+    "What a node did at runtime. Always returns the node's own facts: its status, its own error text and HTTP " +
+    'status (an HTTP node\'s real failure is here, and the execution-level message can be empty), the fields it ' +
+    'actually ran with after expressions were evaluated, and which node fed it. Without `select` it then returns ' +
+    'the SHAPE of what it produced and of what it received. Pass `select` with paths (e.g. ' +
+    '["data.data.customer", "data.items[0].id"]) to read specific values in full; paths start at the node\'s ' +
+    '{node, data} wrapper, so a payload field is reached through `data`. Use which="input" to read what the node ' +
+    'RECEIVED (the previous node\'s data) instead of what it produced.',
   inputSchema: z.object({
     node: NODE_ARG,
     select: z.array(z.string()).max(8).optional().describe('Paths to read, e.g. ["data.data.customer"].'),
+    which: z.enum(['output', 'input']).optional().describe('output (default): what the node produced. input: what it received.'),
+    iteration: ITERATION_ARG,
   }),
-  execute: async ({ node, select }, context) => getNodeData(ctx(context as never).executionContext, node, select),
+  execute: async ({ node, select, which, iteration }, context) =>
+    getNodeData(ctx(context as never).executionContext, node, { select, which, iteration }),
 });
 
 const knowledge = Object.fromEntries(

@@ -5,7 +5,10 @@ import { resolveNodeInputs, toWrapper, walkPath, type ResolverEnv } from '../res
 // Wrapper shape per knowledge-base/workflow-builder/expressions_reference.json: {node, data: payload}.
 const wrap = (name: string, data: unknown) => ({ node: { node_name: name }, data });
 
-function makeEnv(nodes: Record<string, { name: string; data?: unknown; upstream?: string }>): ResolverEnv {
+function makeEnv(
+  nodes: Record<string, { name: string; data?: unknown; upstream?: string; iterations?: Record<number, unknown> }>,
+  reads: Array<[string, number | undefined]> = [],
+): ResolverEnv {
   const byName = new Map(Object.entries(nodes).map(([uid, n]) => [n.name.toLowerCase(), uid]));
   const chain = (uid: string, hops: number): string | undefined => {
     let current: string | undefined = uid;
@@ -17,7 +20,13 @@ function makeEnv(nodes: Record<string, { name: string; data?: unknown; upstream?
     nameByUid: (uid) => nodes[uid]?.name,
     previousNodeUid: (uid) => chain(uid, 1),
     recentNodeUid: (uid, n) => chain(uid, n),
-    getNodeExecutionData: (uid) => (nodes[uid]?.data === undefined ? undefined : Promise.resolve(nodes[uid]!.data)),
+    iterationsOf: (uid) => Object.keys(nodes[uid]?.iterations ?? {}).map(Number).sort((a, b) => a - b),
+    getNodeExecutionData: (uid, iteration) => {
+      reads.push([uid, iteration]);
+      const looped = nodes[uid]?.iterations;
+      if (looped) return iteration !== undefined && iteration in looped ? Promise.resolve(looped[iteration]) : undefined;
+      return nodes[uid]?.data === undefined ? undefined : Promise.resolve(nodes[uid]!.data);
+    },
   };
 }
 
@@ -90,20 +99,49 @@ test('$item resolves to the closest upstream node', async () => {
   assert.equal(r?.target?.name, 'A');
 });
 
-test('getNodeData picks the selected run; a missing run is reported', async () => {
-  const runs = [wrap('x', { v: 'first' }), wrap('x', { v: 'second' })];
-  const env = makeEnv({ up: { name: 'Loop Body', data: runs } });
+const loopBody = (v: string) => wrap('http', { v });
+
+test('a node inside a loop is read per iteration: getNodeData(...)[i] is the i-th iteration, a missing one is reported', async () => {
+  const reads: Array<[string, number | undefined]> = [];
+  const env = makeEnv({ body: { name: 'Loop Body', iterations: { 0: loopBody('first'), 1: loopBody('second') } } }, reads);
   const second = await resolve("{{ $.getNodeData('Loop Body')[1].data.v }}", env);
   assert.equal(second[0]?.value, '"second"');
+  assert.equal(second[0]?.iteration, 1);
+  assert.deepEqual(reads.at(-1), ['body', 1], 'asked the API for iteration 1');
+
   const missing = await resolve("{{ $.getNodeData('Loop Body')[5].data.v }}", env);
   assert.equal(missing[0]?.status, 'undefined');
   assert.match(missing[0]?.note ?? '', /2 run/);
 });
 
-test('loop-index selector is reported as dynamic, not guessed', async () => {
-  const env = makeEnv({ up: { name: 'Loop Body', data: [wrap('x', { v: 1 })] } });
-  const [r] = await resolve("{{ $.getNodeData('Loop Body')[$.getCurrentLoopIndex()].data.v }}", env);
-  assert.equal(r?.status, 'dynamic');
+test('a looped source is read at the SAME iteration as the node reading it, else at its last', async () => {
+  const reads: Array<[string, number | undefined]> = [];
+  const env = makeEnv({ body: { name: 'Loop Body', iterations: { 0: loopBody('a'), 1: loopBody('b') } } }, reads);
+  const at0 = await resolveNodeInputs('self', { f: { type: 'EXPRESSION', value: "{{ $.getLatestNodeData('Loop Body').data.v }}" } }, env, 0);
+  assert.equal(at0[0]?.value, '"a"');
+  const at1 = await resolveNodeInputs('self', { f: { type: 'EXPRESSION', value: "{{ $.getLatestNodeData('Loop Body').data.v }}" } }, env, 1);
+  assert.equal(at1[0]?.value, '"b"');
+  const outside = await resolve("{{ $.getLatestNodeData('Loop Body').data.v }}", env);
+  assert.equal(outside[0]?.value, '"b"', 'a reader outside the loop sees the last iteration');
+});
+
+test('[$.getCurrentLoopIndex()] means "this iteration"; without one it cannot be resolved', async () => {
+  const env = makeEnv({ body: { name: 'Loop Body', iterations: { 0: loopBody('a'), 1: loopBody('b') } } });
+  const expr = { f: { type: 'EXPRESSION', value: "{{ $.getNodeData('Loop Body')[$.getCurrentLoopIndex()].data.v }}" } };
+  assert.equal((await resolveNodeInputs('self', expr, env, 1))[0]?.value, '"b"');
+  assert.equal((await resolveNodeInputs('self', expr, env))[0]?.status, 'dynamic', 'no iteration to substitute');
+});
+
+test('an unreadable iteration is reported with its iteration number', async () => {
+  const env: ResolverEnv = {
+    ...makeEnv({ body: { name: 'Loop Body', iterations: { 0: loopBody('a') } } }),
+    iterationsOf: () => [0, 1],
+    getNodeExecutionData: (_uid, iteration) => (iteration === 1 ? Promise.resolve({ error: 'API_500' }) : Promise.resolve(loopBody('a'))),
+  };
+  const [r] = await resolveNodeInputs('self', { f: { type: 'EXPRESSION', value: "{{ $.getNodeData('Loop Body')[1].data.v }}" } }, env);
+  assert.equal(r?.status, 'fetch_failed');
+  assert.equal(r?.iteration, 1);
+  assert.match(r?.note ?? '', /iteration 1/);
 });
 
 test('numeric string key indexes an array (custom_fields["14"])', async () => {

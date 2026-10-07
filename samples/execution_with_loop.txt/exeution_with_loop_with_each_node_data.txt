@@ -1,0 +1,4065 @@
+Request URL
+https://us-east-1-workflow.zuperpro.com/api/workflows/488fbdce-9c5a-4179-a65c-e330da2de877/executions/9364b024-97af-4484-93aa-54d08d9cd4e1/summary
+Request method
+GET
+
+
+{
+    "workflow_execution": {
+        "execution_uid": "9364b024-97af-4484-93aa-54d08d9cd4e1",
+        "workflow_uid": "488fbdce-9c5a-4179-a65c-e330da2de877",
+        "mode": "AUTOMATED",
+        "type": "LIVE",
+        "status": "COMPLETED",
+        "workflow_data": {
+            "workflow_id": 14105,
+            "workflow_uid": "488fbdce-9c5a-4179-a65c-e330da2de877",
+            "workflow_name": "Sales Visit (Approved) -> Production with Appointments",
+            "workflow_description": "This workflow is triggered when a job status is updated to “Approved in the Sales Visit Job category.” It automatically performs the following actions: retrieves job details, updates the due date, clears any existing schedule, updates the job title with t",
+            "version": "qXwt0p0dvLxNlvatuF_n2",
+            "version_id": 125924,
+            "company_id": 1251102,
+            "created_by": 1272911,
+            "nodes": [
+                {
+                    "id": "job.status_update",
+                    "input": 0,
+                    "module": "JOB",
+                    "output": 1,
+                    "node_uid": "615d972b-2acf-4f0e-9090-62ddcddc50b2",
+                    "position": {
+                        "x": 12,
+                        "y": 91
+                    },
+                    "is_pinned": true,
+                    "node_icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/283a4296-e481-48b5-be1d-8c20de718d2d.svg",
+                    "node_name": "zuper",
+                    "action_key": "job.status_update",
+                    "action_name": "On Job Status Update",
+                    "action_type": "TRIGGER",
+                    "credentials": {},
+                    "form_fields": {
+                        "trigger_rules": {
+                            "type": "FIXED",
+                            "value": [
+                                {
+                                    "key": "status_uid",
+                                    "type": "nested_field",
+                                    "value": [
+                                        "a589decc-ccce-4da6-bddc-c3a3957254d6",
+                                        "712f4929-6279-49cf-945d-134439fc51ff"
+                                    ],
+                                    "module": "JOB",
+                                    "operator": "CONTAINS",
+                                    "field_type": "LOOKUP",
+                                    "displayKeyValue": [
+                                        "Approved",
+                                        "Claim Approved"
+                                    ]
+                                }
+                            ]
+                        },
+                        "loop_prevention": null,
+                        "excluded_user_uids": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "filter_rule_operator": "AND",
+                        "loop_prevention_workflow_uids": []
+                    },
+                    "pinned_data": {
+                        "data": {
+                            "body": {
+                                "status": {
+                                    "done_by": 1272911,
+                                    "category": {
+                                        "category_uid": "8cafd8d5-321b-4a02-bca7-2ee429be194e",
+                                        "category_name": "Sales Visit"
+                                    },
+                                    "checklist": [
+                                        {
+                                            "type": "MULTI_ITEM",
+                                            "answer": "Roofing,Gutters",
+                                            "question": "Services Provided",
+                                            "meta_data": {
+                                                "description": "",
+                                                "selected_values": [
+                                                    "Roofing",
+                                                    "Gutters"
+                                                ]
+                                            },
+                                            "hide_to_fe": false,
+                                            "updated_at": "2026-07-27T20:16:17.193Z"
+                                        }
+                                    ],
+                                    "synced_at": "2026-07-27T20:16:17.193Z",
+                                    "created_at": "2026-07-27T20:16:17.193Z",
+                                    "is_offline": false,
+                                    "status_uid": "a589decc-ccce-4da6-bddc-c3a3957254d6",
+                                    "updated_at": "2026-07-27T20:16:17.193Z",
+                                    "status_name": "Approved",
+                                    "status_type": "OTHER",
+                                    "status_color": "#1abc9c",
+                                    "customer_signature": "",
+                                    "status_history_uid": "29e625ea-475a-4894-a7f1-b909a5534c78",
+                                    "checklist_internal_object": {
+                                        "sales_visit_services_provided": "Roofing,Gutters"
+                                    }
+                                },
+                                "job_uid": "da545fb7-d965-4aca-8a28-c5b74084b131",
+                                "remarks": "",
+                                "job_title": "Production for Paul White",
+                                "company_uid": "d6ad3d9e-7355-49c9-a6ea-dcb104a48b16",
+                                "triggered_at": "2026-07-27T20:16:17.228Z",
+                                "triggered_by": {
+                                    "role": {
+                                        "role_key": "ADMIN",
+                                        "role_uid": "81479813-ead7-4074-a1b3-58dfc6ebe2d9",
+                                        "role_name": "Admin"
+                                    },
+                                    "email": "golden_roof@zuper.co",
+                                    "emp_code": "000",
+                                    "user_uid": "171bddf4-cf9a-4e0f-bbc3-d539e800cd20",
+                                    "last_name": "Roof",
+                                    "first_name": "Golden",
+                                    "designation": "DO NOT DELETE"
+                                },
+                                "wf_tree_expanded": true,
+                                "workflow_builder": {
+                                    "workflow_uid": null,
+                                    "from_workflow_builder": false
+                                },
+                                "remarks_free_text": "",
+                                "work_order_number": 309,
+                                "send_real_time_updates": true
+                            },
+                            "event": "job.status_update",
+                            "company_id": 1251102,
+                            "wf_tree_expanded": true
+                        },
+                        "node": {
+                            "node_key": "job.status_update",
+                            "node_uid": "615d972b-2acf-4f0e-9090-62ddcddc50b2",
+                            "node_name": "On Job Status Update",
+                            "is_trigger_node": true
+                        }
+                    },
+                    "master_node_uid": "721280c2-cf74-47fd-95f2-cdc4ad922c56",
+                    "execution_status": "NONE"
+                },
+                {
+                    "id": "zuper_get_record_zuper_get_record2725258c-e599-4540-9b18-5b65c01b0b01",
+                    "color": {
+                        "main": "#4682B4",
+                        "background": "#DFEFF9",
+                        "borderColor": "#E3E5E6",
+                        "iconBackground": "#C9DCE7"
+                    },
+                    "input": 1,
+                    "module": "",
+                    "output": 1,
+                    "node_uid": "376af848-7eed-49dd-a27c-0b4602f40b9a",
+                    "position": {
+                        "x": 328,
+                        "y": 90
+                    },
+                    "is_active": true,
+                    "node_icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/283a4296-e481-48b5-be1d-8c20de718d2d.svg",
+                    "node_name": "zuper_get_record",
+                    "action_key": "zuper_get_record",
+                    "action_name": "Get Job",
+                    "action_type": "ACTION",
+                    "credentials": {},
+                    "description": "Get a Record in Zuper",
+                    "form_fields": {
+                        "module": {
+                            "type": "FIXED",
+                            "value": "JOB"
+                        },
+                        "module_uid": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "status_uid": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "source_node": {
+                            "type": "FIXED",
+                            "value": "615d972b-2acf-4f0e-9090-62ddcddc50b2"
+                        },
+                        "source_type": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "category_uid": {
+                            "type": "FIXED",
+                            "value": ""
+                        }
+                    },
+                    "master_node_uid": "7bd69fec-sudhaid65-4eb8-a94b-3158c252921c",
+                    "execution_status": "NONE",
+                    "node_display_name": "Edit Record"
+                },
+                {
+                    "id": "zuper_update_zuper_update2f2ebcdd-a465-49e9-a07b-eddf5c96c5ae",
+                    "color": {
+                        "main": "#4682B4",
+                        "background": "#DFEFF9",
+                        "borderColor": "#E3E5E6",
+                        "iconBackground": "#C9DCE7"
+                    },
+                    "input": 1,
+                    "module": "",
+                    "output": 1,
+                    "node_uid": "713274cb-7e80-4aaf-8b96-ae5d544f37db",
+                    "position": {
+                        "x": 514,
+                        "y": 90
+                    },
+                    "is_active": true,
+                    "node_icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/283a4296-e481-48b5-be1d-8c20de718d2d.svg",
+                    "node_name": "zuper_update",
+                    "action_key": "zuper_update",
+                    "action_name": "Update due date",
+                    "action_type": "ACTION",
+                    "credentials": {},
+                    "description": "Update an entity in Zuper",
+                    "form_fields": {
+                        "date": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "days": {
+                            "type": "FIXED",
+                            "value": "1"
+                        },
+                        "team": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "time": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "hours": {
+                            "type": "FIXED",
+                            "value": "0"
+                        },
+                        "users": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "module": {
+                            "type": "FIXED",
+                            "value": "JOB"
+                        },
+                        "minutes": {
+                            "type": "FIXED",
+                            "value": "0"
+                        },
+                        "job_fields": [],
+                        "job_status": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "module_uid": {
+                            "type": "EXPRESSION",
+                            "value": "{{$.getLatestNodeData('Get Job')['data']['data']['job_uid']}}"
+                        },
+                        "offset_type": {
+                            "type": "FIXED",
+                            "value": "AFTER"
+                        },
+                        "source_node": {
+                            "type": "FIXED",
+                            "value": "CUSTOM"
+                        },
+                        "source_type": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "service_task": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "custom_fields": [],
+                        "duration_type": {
+                            "type": "FIXED",
+                            "value": "CUSTOM"
+                        },
+                        "operator_type": {
+                            "type": "FIXED",
+                            "value": "SCHEDULE"
+                        },
+                        "schedule_type": {
+                            "type": "FIXED",
+                            "value": "DUE_DATE"
+                        },
+                        "operation_type": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "schedule_value": {
+                            "type": "FIXED",
+                            "value": "EXECUTION_DATE_TIME"
+                        },
+                        "job_status_name": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "status_category": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "sub_operator_type": {
+                            "type": "FIXED",
+                            "value": null
+                        }
+                    },
+                    "master_node_uid": "7bd69fec-b465-4eb8-a94b-3158c252921c",
+                    "execution_status": "EXECUTED",
+                    "node_display_name": "Edit Record"
+                },
+                {
+                    "id": "http_request_v2_http_request_v25785758a-f99a-45f7-a0e2-9c4d9cad76c7",
+                    "color": {
+                        "main": "#4682B4",
+                        "background": "#DFEFF9",
+                        "borderColor": "#E3E5E6",
+                        "iconBackground": "#C9DCE7"
+                    },
+                    "input": 1,
+                    "module": "",
+                    "output": 2,
+                    "node_uid": "43e3f0bc-de08-4050-9462-851f97d37e60",
+                    "position": {
+                        "x": 1102,
+                        "y": 90
+                    },
+                    "is_active": true,
+                    "node_icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/14380500-c678-4798-b3b1-0abc9513abec.svg",
+                    "node_name": "http_request",
+                    "action_key": "http_request",
+                    "action_name": "GET Categories",
+                    "action_type": "ACTION",
+                    "credentials": {},
+                    "description": "Make HTTP call and handle error response",
+                    "form_fields": {
+                        "url": {
+                            "type": "EXPRESSION",
+                            "value": "{{$.getVariable('BASE_URL')}}/jobs/category"
+                        },
+                        "method": {
+                            "type": "FIXED",
+                            "value": "GET"
+                        },
+                        "timeout": {
+                            "type": "FIXED",
+                            "value": 60
+                        },
+                        "password": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "username": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "json_body": {
+                            "type": "EXPRESSION",
+                            "value": ""
+                        },
+                        "send_body": {
+                            "type": "FIXED",
+                            "value": false
+                        },
+                        "ignore_ssl": {
+                            "type": "FIXED",
+                            "value": false
+                        },
+                        "max_retries": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "content_type": {
+                            "type": "FIXED",
+                            "value": "application/json"
+                        },
+                        "enable_retry": {
+                            "type": "FIXED",
+                            "value": false
+                        },
+                        "error_action": {
+                            "type": "FIXED",
+                            "value": "STOP"
+                        },
+                        "send_headers": {
+                            "type": "FIXED",
+                            "value": true
+                        },
+                        "raw_body_data": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "authentication": {
+                            "type": "FIXED",
+                            "value": "NONE"
+                        },
+                        "body_data_type": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "retry_interval": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "query_parameters": [],
+                        "send_query_param": {
+                            "type": "FIXED",
+                            "value": false
+                        },
+                        "body_content_type": {
+                            "type": "FIXED",
+                            "value": "JSON"
+                        },
+                        "header_parameters": [
+                            {
+                                "header_key": {
+                                    "type": "FIXED",
+                                    "value": "x-api-key"
+                                },
+                                "header_value": {
+                                    "type": "EXPRESSION",
+                                    "value": "{{$.getVariable('API_KEY')}}"
+                                }
+                            }
+                        ],
+                        "form_data_parameters": []
+                    },
+                    "node_version": "v2",
+                    "node_category": "HELPERS",
+                    "master_node_uid": "462a06a3-b66e-413f-a937-475a98f2a42d",
+                    "execution_status": "NONE",
+                    "node_display_name": "HTTP Request"
+                },
+                {
+                    "id": "zuper_update_zuper_update18ab725c-417c-48f3-a2bb-eab51989bbe1",
+                    "color": {
+                        "main": "#4682B4",
+                        "background": "#DFEFF9",
+                        "borderColor": "#E3E5E6",
+                        "iconBackground": "#C9DCE7"
+                    },
+                    "input": 1,
+                    "module": "",
+                    "output": 1,
+                    "node_uid": "2f1df0b9-9ce7-4cde-8bef-da26c6631bea",
+                    "position": {
+                        "x": 906,
+                        "y": 90
+                    },
+                    "is_active": true,
+                    "node_icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/283a4296-e481-48b5-be1d-8c20de718d2d.svg",
+                    "node_name": "zuper_update",
+                    "action_key": "zuper_update",
+                    "action_name": "Change Job title",
+                    "action_type": "ACTION",
+                    "credentials": {},
+                    "description": "Update an entity in Zuper",
+                    "form_fields": {
+                        "date": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "days": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "team": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "time": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "hours": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "users": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "module": {
+                            "type": "FIXED",
+                            "value": "JOB"
+                        },
+                        "minutes": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "job_fields": [
+                            {
+                                "field_key": "job_title",
+                                "job_title": {
+                                    "type": "EXPRESSION",
+                                    "value": "Production for {{$.getNodeData('Get Job')[0]['data']['data']['customer']['customer_first_name']}} {{$.getNodeData('Get Job')[0]['data']['data']['customer']['customer_last_name']}}"
+                                }
+                            }
+                        ],
+                        "job_status": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "module_uid": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "offset_type": {
+                            "type": "FIXED",
+                            "value": "AFTER"
+                        },
+                        "source_node": {
+                            "type": "FIXED",
+                            "value": "615d972b-2acf-4f0e-9090-62ddcddc50b2"
+                        },
+                        "source_type": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "service_task": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "custom_fields": [],
+                        "duration_type": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "operator_type": {
+                            "type": "FIXED",
+                            "value": "FIELD"
+                        },
+                        "schedule_type": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "operation_type": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "schedule_value": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "job_status_name": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "status_category": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "sub_operator_type": {
+                            "type": "FIXED",
+                            "value": ""
+                        }
+                    },
+                    "master_node_uid": "7bd69fec-b465-4eb8-a94b-3158c252921c",
+                    "execution_status": "NONE",
+                    "node_display_name": "Edit Record"
+                },
+                {
+                    "id": "code_codecb4ae404-ffcb-4842-aa3d-cb96423965b8",
+                    "color": {
+                        "main": "#2E8B57",
+                        "background": "#E0F4EC",
+                        "borderColor": "#8ceac1",
+                        "iconBackground": "#BEEAD6"
+                    },
+                    "input": 1,
+                    "module": "",
+                    "output": 1,
+                    "node_uid": "b461c826-a9ce-4a74-b4b3-ea1937282552",
+                    "position": {
+                        "x": 128,
+                        "y": 90
+                    },
+                    "is_active": true,
+                    "node_icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/7f22be08-936d-4e6b-a054-0c4a9a438913.svg",
+                    "node_name": "code",
+                    "action_key": "code",
+                    "action_name": "Config",
+                    "action_type": "ACTION",
+                    "credentials": {},
+                    "description": "Run custom javascript code",
+                    "form_fields": {
+                        "code": "//Insert your code here \nlet category_to_update = \"Production\"\n//let custom_field_name = \"Inspection Schedule Date & Time\"\n//let service_task_name = \"need to map the service tasks\"\n return {\n   category_to_update,\n   //custom_field_name,\n   //service_task_name\n };\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+                    },
+                    "node_category": "FLOW",
+                    "master_node_uid": "d15fd095-70f3-4d53-9103-5786dfd52b37",
+                    "execution_status": "EXECUTED",
+                    "node_display_name": "Code"
+                },
+                {
+                    "id": "zuper_update_zuper_update99458513-8767-4a7b-b2fe-043e29dea2df",
+                    "color": {
+                        "main": "#4682B4",
+                        "background": "#DFEFF9",
+                        "borderColor": "#E3E5E6",
+                        "iconBackground": "#C9DCE7"
+                    },
+                    "input": 1,
+                    "module": "",
+                    "output": 1,
+                    "node_uid": "a987c612-0f94-4ca4-85e9-ee9cc5d4cd69",
+                    "position": {
+                        "x": 710,
+                        "y": 90
+                    },
+                    "is_active": false,
+                    "node_icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/283a4296-e481-48b5-be1d-8c20de718d2d.svg",
+                    "node_name": "zuper_update",
+                    "action_key": "zuper_update",
+                    "action_name": "clear schedule",
+                    "action_type": "ACTION",
+                    "credentials": {},
+                    "description": "Update an entity in Zuper",
+                    "form_fields": {
+                        "date": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "days": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "team": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "time": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "hours": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "users": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "module": {
+                            "type": "FIXED",
+                            "value": "JOB"
+                        },
+                        "minutes": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "job_fields": [],
+                        "job_status": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "module_uid": {
+                            "type": "EXPRESSION",
+                            "value": "{{$.getLatestNodeData('Get Job')['data']['data']['job_uid']}}"
+                        },
+                        "offset_type": {
+                            "type": "FIXED",
+                            "value": "AFTER"
+                        },
+                        "source_node": {
+                            "type": "FIXED",
+                            "value": "CUSTOM"
+                        },
+                        "source_type": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "service_task": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "custom_fields": [],
+                        "duration_type": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "operator_type": {
+                            "type": "FIXED",
+                            "value": "SCHEDULE"
+                        },
+                        "schedule_type": {
+                            "type": "FIXED",
+                            "value": "SCHEDULE_DATE"
+                        },
+                        "operation_type": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "schedule_value": {
+                            "type": "FIXED",
+                            "value": "CLEAR_SCHEDULE"
+                        },
+                        "job_status_name": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "status_category": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "sub_operator_type": {
+                            "type": "FIXED",
+                            "value": null
+                        }
+                    },
+                    "master_node_uid": "7bd69fec-b465-4eb8-a94b-3158c252921c",
+                    "execution_status": "ERROR",
+                    "node_display_name": "Edit Record"
+                },
+                {
+                    "id": "http_request_v2_http_request_v2f2000311-e95f-45c1-b04f-b111dd12130e",
+                    "color": {
+                        "main": "#4682B4",
+                        "background": "#DFEFF9",
+                        "borderColor": "#E3E5E6",
+                        "iconBackground": "#C9DCE7"
+                    },
+                    "input": 1,
+                    "module": "",
+                    "output": 2,
+                    "node_uid": "54c945b0-6810-445d-a461-53229112e2fa",
+                    "position": {
+                        "x": 1503,
+                        "y": 90
+                    },
+                    "is_active": true,
+                    "node_icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/14380500-c678-4798-b3b1-0abc9513abec.svg",
+                    "node_name": "http_request",
+                    "action_key": "http_request",
+                    "action_name": "Update Job",
+                    "action_type": "ACTION",
+                    "credentials": {},
+                    "description": "Make HTTP call and handle error response",
+                    "form_fields": {
+                        "url": {
+                            "type": "EXPRESSION",
+                            "value": "{{$.getVariable('BASE_URL')}}/jobs"
+                        },
+                        "method": {
+                            "type": "FIXED",
+                            "value": "PUT"
+                        },
+                        "timeout": {
+                            "type": "FIXED",
+                            "value": 60
+                        },
+                        "password": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "username": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "json_body": {
+                            "type": "EXPRESSION",
+                            "value": "{{$.getNodeData('Payload Construct')[0]['data']}}"
+                        },
+                        "send_body": {
+                            "type": "FIXED",
+                            "value": true
+                        },
+                        "ignore_ssl": {
+                            "type": "FIXED",
+                            "value": false
+                        },
+                        "max_retries": {
+                            "type": "FIXED",
+                            "value": 3
+                        },
+                        "content_type": {
+                            "type": "FIXED",
+                            "value": "application/json"
+                        },
+                        "enable_retry": {
+                            "type": "FIXED",
+                            "value": true
+                        },
+                        "error_action": {
+                            "type": "FIXED",
+                            "value": "STOP"
+                        },
+                        "send_headers": {
+                            "type": "FIXED",
+                            "value": true
+                        },
+                        "raw_body_data": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "authentication": {
+                            "type": "FIXED",
+                            "value": "NONE"
+                        },
+                        "body_data_type": {
+                            "type": "FIXED",
+                            "value": "JSON"
+                        },
+                        "retry_interval": {
+                            "type": "FIXED",
+                            "value": 3000
+                        },
+                        "query_parameters": [],
+                        "send_query_param": {
+                            "type": "FIXED",
+                            "value": false
+                        },
+                        "body_content_type": {
+                            "type": "FIXED",
+                            "value": "JSON"
+                        },
+                        "header_parameters": [
+                            {
+                                "header_key": {
+                                    "type": "FIXED",
+                                    "value": "x-api-key"
+                                },
+                                "header_value": {
+                                    "type": "EXPRESSION",
+                                    "value": "{{$.getVariable('API_KEY')}}"
+                                }
+                            }
+                        ],
+                        "form_data_parameters": []
+                    },
+                    "node_version": "v2",
+                    "node_category": "HELPERS",
+                    "master_node_uid": "462a06a3-b66e-413f-a937-475a98f2a42d",
+                    "execution_status": "NONE",
+                    "node_display_name": "HTTP Request"
+                },
+                {
+                    "id": "zuper_get_record_zuper_get_recordf3452b77-7d88-4f9e-bfb7-73d7c4dabe7a",
+                    "color": {
+                        "main": "#4682B4",
+                        "background": "#DFEFF9",
+                        "borderColor": "#E3E5E6",
+                        "iconBackground": "#C9DCE7"
+                    },
+                    "input": 1,
+                    "module": "",
+                    "output": 1,
+                    "node_uid": "9ebd6744-46f9-4901-9f5d-073bb5a3d72b",
+                    "position": {
+                        "x": 1704,
+                        "y": 90
+                    },
+                    "is_active": true,
+                    "node_icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/283a4296-e481-48b5-be1d-8c20de718d2d.svg",
+                    "node_name": "zuper_get_record",
+                    "action_key": "zuper_get_record",
+                    "action_name": "Get Record",
+                    "action_type": "ACTION",
+                    "credentials": {},
+                    "description": "Get a Record in Zuper",
+                    "form_fields": {
+                        "module": {
+                            "type": "FIXED",
+                            "value": "JOB"
+                        },
+                        "module_uid": {
+                            "type": "EXPRESSION",
+                            "value": "{{$.getLatestNodeData('Payload Construct')['data']['job']['job_uid']}}"
+                        },
+                        "status_uid": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "source_node": {
+                            "type": "FIXED",
+                            "value": "CUSTOM"
+                        },
+                        "source_type": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "category_uid": {
+                            "type": "FIXED",
+                            "value": ""
+                        }
+                    },
+                    "master_node_uid": "7bd69fec-sudhaid65-4eb8-a94b-3158c252921c",
+                    "execution_status": "NONE",
+                    "node_display_name": "Edit Record"
+                },
+                {
+                    "id": "http_request_v2_http_request_v237509a72-2283-4229-a0c2-d05791b27583",
+                    "color": {
+                        "main": "#2E8B57",
+                        "background": "#E0F4EC",
+                        "borderColor": "#8ceac1",
+                        "iconBackground": "#BEEAD6"
+                    },
+                    "input": 1,
+                    "module": "",
+                    "output": 2,
+                    "node_uid": "c49b22a7-763f-4f1c-b5f7-9f621630343d",
+                    "position": {
+                        "x": 3035,
+                        "y": 90.5
+                    },
+                    "is_active": true,
+                    "is_source": false,
+                    "node_icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/14380500-c678-4798-b3b1-0abc9513abec.svg",
+                    "node_name": "http_request",
+                    "action_key": "http_request",
+                    "action_name": "get job service task",
+                    "action_type": "ACTION",
+                    "credentials": {},
+                    "description": "Make HTTP call and handle error response",
+                    "form_fields": {
+                        "url": {
+                            "type": "EXPRESSION",
+                            "value": "{{$.getVariable('BASE_URL')}}/service_tasks?page=1&count=10&sort_by=created_at&sort=ASC&filter.module=JOB&filter.module_uid={{$.getLatestNodeData('On Job Status Update')['data']['body']['job_uid']}}"
+                        },
+                        "method": {
+                            "type": "FIXED",
+                            "value": "GET"
+                        },
+                        "timeout": {
+                            "type": "FIXED",
+                            "value": 60
+                        },
+                        "password": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "username": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "json_body": {
+                            "type": "EXPRESSION",
+                            "value": ""
+                        },
+                        "send_body": {
+                            "type": "FIXED",
+                            "value": false
+                        },
+                        "ignore_ssl": {
+                            "type": "FIXED",
+                            "value": false
+                        },
+                        "max_retries": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "content_type": {
+                            "type": "FIXED",
+                            "value": "application/json"
+                        },
+                        "enable_retry": {
+                            "type": "FIXED",
+                            "value": false
+                        },
+                        "error_action": {
+                            "type": "FIXED",
+                            "value": "STOP"
+                        },
+                        "send_headers": {
+                            "type": "FIXED",
+                            "value": true
+                        },
+                        "raw_body_data": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "authentication": {
+                            "type": "FIXED",
+                            "value": "HEADER_AUTH"
+                        },
+                        "body_data_type": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "retry_interval": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "query_parameters": [],
+                        "send_query_param": {
+                            "type": "FIXED",
+                            "value": false
+                        },
+                        "body_content_type": {
+                            "type": "FIXED",
+                            "value": "JSON"
+                        },
+                        "header_parameters": [
+                            {
+                                "header_key": {
+                                    "type": "FIXED",
+                                    "value": "x-api-key"
+                                },
+                                "header_value": {
+                                    "type": "EXPRESSION",
+                                    "value": "{{$.getVariable('API_KEY')}}"
+                                }
+                            }
+                        ],
+                        "form_data_parameters": []
+                    },
+                    "node_version": "v2",
+                    "node_category": "HELPERS",
+                    "master_node_uid": "462a06a3-b66e-413f-a937-475a98f2a42d",
+                    "execution_status": "NONE",
+                    "node_display_name": "HTTP Request"
+                },
+                {
+                    "id": "code_codefde25e44-5c77-4f77-9465-edff54a81377",
+                    "color": {
+                        "main": "#2E8B57",
+                        "background": "#E0F4EC",
+                        "borderColor": "#8ceac1",
+                        "iconBackground": "#BEEAD6"
+                    },
+                    "input": 1,
+                    "module": "",
+                    "output": 1,
+                    "node_uid": "c4cf6eec-e908-4053-956d-ac5c29f83d2d",
+                    "position": {
+                        "x": 3419,
+                        "y": 90.5
+                    },
+                    "is_active": true,
+                    "node_icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/7f22be08-936d-4e6b-a054-0c4a9a438913.svg",
+                    "node_name": "code",
+                    "action_key": "code",
+                    "action_name": "Construct",
+                    "action_type": "ACTION",
+                    "credentials": {},
+                    "description": "Run custom javascript code",
+                    "form_fields": {
+                        "code": "const normalize = (str) => (str ?? \"\").toString().trim().toLowerCase();\nconst moment = require(\"moment\");\n\nconst job_data = $input.getJob;\nconst custom_field_label = $input.getConfig?.custom_field_name || \"\";\nconst custom_fields = job_data.custom_fields || [];\nconst job_category_name = $input.getJob?.job_category?.category_name || '';\nconst job_checklist = $input.getChecklist || '';\nconst job_categories = $input.getCategories || [];\nconst customer = job_data.customer;\nconst service_tasks = $input.getServiceTasks;\nconst service_task_name = $input.getConfig?.service_task_name || \"\";\n// Which checklist question holds the services list (defaults to \"Services Provided\")\nconst services_question_name = $input.getConfig?.services_question_name || \"Services Provided\";\n\nconst job_uid = job_data.job_uid;\nconst base_url = $.getVariable('BASE_URL');\n\nconst find_date_custom_field =\n  custom_fields.find(item => normalize(item.label) === normalize(custom_field_label))?.value || null;\n\n// --- Service task associations (same set applied to each appointment) ---\nconst find_service_task = service_tasks.filter(\n  item => normalize(item.service_task_title) === normalize(service_task_name)\n);\nconst can_service_task_associate = find_service_task.length > 0;\nconst associations = find_service_task.map(item => ({\n  module: \"SERVICE_TASK\",\n  type: \"ASSOCIATE\",\n  module_uid: item.service_task_uid\n}));\n\n// --- Pull selected_values out of the checklist ---\nfunction extractChecklistItems(cl) {\n  if (!cl) return [];\n  if (Array.isArray(cl)) return cl;\n  if (Array.isArray(cl.data)) return cl.data;\n  if (cl.data && Array.isArray(cl.data.data)) return cl.data.data; // { data: { data: [...] } }\n  return [];\n}\n\nconst checklist_items = extractChecklistItems(job_checklist);\nconst services_item =\n  checklist_items.find(i => normalize(i.question) === normalize(services_question_name)) ||\n  checklist_items.find(i => Array.isArray(i?.meta_data?.selected_values));\n\nlet selected_values = services_item?.meta_data?.selected_values;\n// Fallback to the comma-joined answer if selected_values isn't populated\nif ((!selected_values || !selected_values.length) && services_item?.answer) {\n  selected_values = services_item.answer.split(',').map(v => v.trim()).filter(Boolean);\n}\nselected_values = selected_values || [];\n\n// --- Duration (computed once; only needed when we have a date) ---\nlet total_minutes = 0;\nif (find_date_custom_field) {\n  const find_category = job_categories.find(\n    item => normalize(item?.category_name) === normalize(job_category_name)\n  );\n  if (!find_category) throw new Error(\"Category not Found\");\n  const d = find_category?.estimated_duration;\n  total_minutes = (d?.days ?? 0) * 1440 + (d?.hours ?? 0) * 60 + (d?.minutes ?? 0);\n}\n\nconst appointment_url = `${base_url}/appointments`;\n\n// --- One create payload + association payload per selected value ---\nconst appointments = selected_values.map(value => {\n  const appointment_title = `${value} replacement for ${customer.customer_first_name}`;\n\n  const payload = {\n    appointment: {\n      job_uid,\n      appointment_title\n    }\n  };\n\n  // Optional scheduling — only when a date/time is present. Remove this block if you don't want it.\n  if (find_date_custom_field) {\n    const start = moment(find_date_custom_field, 'YYYY-MM-DD HH:mm:ss');\n    payload.appointment.scheduled_start_time = start.format('YYYY-MM-DD HH:mm:ss');\n    payload.appointment.scheduled_end_time   = start.clone().add(total_minutes, 'minutes').format('YYYY-MM-DD HH:mm:ss');\n  }\n\n  return {\n    service: value,\n    appointment_update_payload: {\n      url: appointment_url,\n      payload\n    },\n    // URL is finalized downstream once the create POST returns appointment_uid:\n    //   `${base_url}/appointments/${created_appointment_uid}/associations?job_uid=${job_uid}`\n    association_payload: {\n      payload: {\n        job_uid,\n        associations\n      },\n      can_service_task_associate\n    }\n  };\n});\n\nreturn {\n  data: {\n    appointments,   // loop: create each → read appointment_uid → build assoc URL → POST association_payload.payload\n    can_service_task_associate,\n    job_uid,\n    base_url        // for assembling the association URL downstream\n  }\n};",
+                        "inputs": {
+                            "type": "FIXED",
+                            "value": [
+                                {
+                                    "node": "Get Record",
+                                    "expression": "{{$.getLatestNodeData('Get Record')['data']['data']}}",
+                                    "source_type": "NODE",
+                                    "variable_name": "getJob"
+                                },
+                                {
+                                    "node": "Config",
+                                    "expression": "{{$.getLatestNodeData('Config')['data']}}",
+                                    "source_type": "NODE",
+                                    "variable_name": "getConfig"
+                                },
+                                {
+                                    "node": "GET Categories",
+                                    "expression": "{{$.getLatestNodeData('GET Categories')['data']['data']}}",
+                                    "source_type": "NODE",
+                                    "variable_name": "getCategories"
+                                },
+                                {
+                                    "node": "get job service task",
+                                    "expression": "{{$.getLatestNodeData('get job service task')['data']['data']}}",
+                                    "source_type": "NODE",
+                                    "variable_name": "getServiceTasks"
+                                },
+                                {
+                                    "node": "Get Record 1",
+                                    "expression": "{{$.getLatestNodeData('Get Record 1')['data']['data']}}",
+                                    "source_type": "NODE",
+                                    "variable_name": "getChecklist"
+                                }
+                            ]
+                        },
+                        "version": 2
+                    },
+                    "node_category": "FLOW",
+                    "master_node_uid": "d15fd095-70f3-4d53-9103-5786dfd52b37",
+                    "execution_status": "EXECUTED",
+                    "node_display_name": "Code"
+                },
+                {
+                    "id": "code_codee068fc8e-b22f-4ab2-90f2-5179919edc38",
+                    "color": {
+                        "main": "#2E8B57",
+                        "background": "#E0F4EC",
+                        "borderColor": "#8ceac1",
+                        "iconBackground": "#BEEAD6"
+                    },
+                    "input": 1,
+                    "module": "",
+                    "output": 1,
+                    "node_uid": "0541e0fe-0fc2-4550-86f8-5a78fa734121",
+                    "position": {
+                        "x": 1303,
+                        "y": 90
+                    },
+                    "is_active": true,
+                    "node_icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/7f22be08-936d-4e6b-a054-0c4a9a438913.svg",
+                    "node_name": "code",
+                    "action_key": "code",
+                    "action_name": "Payload Construct",
+                    "action_type": "ACTION",
+                    "credentials": {},
+                    "description": "Run custom javascript code",
+                    "form_fields": {
+                        "code": "let categories = $.getNodeData('GET Categories')[0]['data']['data']\nlet job_uid = $.getNodeData('On Job Status Update')[0]['data']['body']['job_uid']\n\nlet category_to_update = $.getLatestNodeData('Config')['data']['category_to_update']\n\nlet category = categories.find(c => \n  c.category_name.toLowerCase().trim() === category_to_update.toLowerCase().trim()\n)\n\nlet uid_category_to_update = category ? category.category_uid : null\n\nlet payload = {\n  job: {\n    job_uid: job_uid,\n    job_category: uid_category_to_update,\n    assigned_to: [],\n    assigned_to_team: []\n  },\n  update_all_jobs: false\n}\n\nreturn payload"
+                    },
+                    "node_category": "FLOW",
+                    "master_node_uid": "d15fd095-70f3-4d53-9103-5786dfd52b37",
+                    "execution_status": "NONE",
+                    "node_display_name": "Code"
+                },
+                {
+                    "id": "zuper_get_record_zuper_get_recordc9f5ffbf-4592-43c6-916d-3e2ecdbdb356",
+                    "color": {
+                        "main": "#4682B4",
+                        "background": "#DFEFF9",
+                        "borderColor": "#E3E5E6",
+                        "iconBackground": "#C9DCE7"
+                    },
+                    "input": 1,
+                    "module": "",
+                    "output": 1,
+                    "node_uid": "ebf9e807-65db-4824-9bdc-e1a97b63e008",
+                    "position": {
+                        "x": 3235,
+                        "y": 90.5
+                    },
+                    "is_active": true,
+                    "node_icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/283a4296-e481-48b5-be1d-8c20de718d2d.svg",
+                    "node_name": "zuper_get_record",
+                    "action_key": "zuper_get_record",
+                    "action_name": "Get Record 1",
+                    "action_type": "ACTION",
+                    "credentials": {},
+                    "description": "Get a Record in Zuper",
+                    "form_fields": {
+                        "module": {
+                            "type": "FIXED",
+                            "value": "JOB_CHECKLIST"
+                        },
+                        "module_uid": {
+                            "type": "EXPRESSION",
+                            "value": "{{$.getLatestNodeData('Get Job')['data']['data']['job_uid']}}"
+                        },
+                        "status_uid": {
+                            "type": "FIXED",
+                            "value": "a589decc-ccce-4da6-bddc-c3a3957254d6"
+                        },
+                        "source_node": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "source_type": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "category_uid": {
+                            "type": "FIXED",
+                            "value": "8cafd8d5-321b-4a02-bca7-2ee429be194e"
+                        }
+                    },
+                    "master_node_uid": "7bd69fec-sudhaid65-4eb8-a94b-3158c252921c",
+                    "execution_status": "NONE",
+                    "node_display_name": "Edit Record"
+                },
+                {
+                    "id": "loop_loopee143f87-9e2a-41c8-a5ce-ec4a195c0973",
+                    "color": {
+                        "main": "#4682B4",
+                        "background": "#DFEFF9",
+                        "borderColor": "#E3E5E6",
+                        "iconBackground": "#C9DCE7"
+                    },
+                    "input": 2,
+                    "module": "",
+                    "output": 1,
+                    "node_uid": "7fd8f581-0b38-44ce-be4e-e8060dc0ccb7",
+                    "position": {
+                        "x": 3618,
+                        "y": 39
+                    },
+                    "is_active": true,
+                    "node_icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/4d963bbb-f70b-4d68-a78b-7056f518e2d2.svg",
+                    "node_name": "loop",
+                    "action_key": "loop",
+                    "action_name": "Loop",
+                    "action_type": "ACTION",
+                    "credentials": {},
+                    "description": "Iterates logic based on iterators",
+                    "form_fields": {
+                        "input_data": {
+                            "value": "{{$.getLatestNodeData('Construct')['data']['data']['appointments']}}"
+                        }
+                    },
+                    "node_category": "FLOW",
+                    "master_node_uid": "5f32d064-8d96-4a51-b553-7f8cf0794ae6",
+                    "_loopInputPicked": true,
+                    "execution_status": "EXECUTED",
+                    "node_display_name": "Loop"
+                },
+                {
+                    "id": "http_request_v2_http_request_v205e58d7c-d339-4fa3-accb-22bb57c331fd",
+                    "color": {
+                        "main": "#4682B4",
+                        "background": "#DFEFF9",
+                        "borderColor": "#E3E5E6",
+                        "iconBackground": "#C9DCE7"
+                    },
+                    "input": 1,
+                    "module": "",
+                    "output": 2,
+                    "node_uid": "f877a3f1-23dd-47f1-8f86-b898ab4dff7a",
+                    "position": {
+                        "x": 3858,
+                        "y": 39
+                    },
+                    "is_active": true,
+                    "node_icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/14380500-c678-4798-b3b1-0abc9513abec.svg",
+                    "node_name": "http_request",
+                    "action_key": "http_request",
+                    "action_name": "create Appointment",
+                    "action_type": "ACTION",
+                    "credentials": {},
+                    "description": "Make HTTP call and handle error response",
+                    "form_fields": {
+                        "url": {
+                            "type": "EXPRESSION",
+                            "value": "{{$.getLatestNodeData('Loop')['data']['appointment_update_payload']['url']}}"
+                        },
+                        "method": {
+                            "type": "FIXED",
+                            "value": "POST"
+                        },
+                        "timeout": {
+                            "type": "FIXED",
+                            "value": 60
+                        },
+                        "password": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "username": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "json_body": {
+                            "type": "EXPRESSION",
+                            "value": "{{$.getLatestNodeData('Loop')['data']['appointment_update_payload']['payload']}}"
+                        },
+                        "send_body": {
+                            "type": "FIXED",
+                            "value": true
+                        },
+                        "ignore_ssl": {
+                            "type": "FIXED",
+                            "value": false
+                        },
+                        "max_retries": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "content_type": {
+                            "type": "FIXED",
+                            "value": "application/json"
+                        },
+                        "enable_retry": {
+                            "type": "FIXED",
+                            "value": false
+                        },
+                        "error_action": {
+                            "type": "FIXED",
+                            "value": "STOP"
+                        },
+                        "send_headers": {
+                            "type": "FIXED",
+                            "value": true
+                        },
+                        "raw_body_data": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "authentication": {
+                            "type": "FIXED",
+                            "value": "HEADER_AUTH"
+                        },
+                        "body_data_type": {
+                            "type": "FIXED",
+                            "value": "JSON"
+                        },
+                        "retry_interval": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "query_parameters": [],
+                        "send_query_param": {
+                            "type": "FIXED",
+                            "value": false
+                        },
+                        "body_content_type": {
+                            "type": "FIXED",
+                            "value": "JSON"
+                        },
+                        "header_parameters": [
+                            {
+                                "header_key": {
+                                    "type": "FIXED",
+                                    "value": "x-api-key"
+                                },
+                                "header_value": {
+                                    "type": "EXPRESSION",
+                                    "value": "{{$.getVariable('API_KEY')}}"
+                                }
+                            }
+                        ],
+                        "form_data_parameters": []
+                    },
+                    "node_version": "v2",
+                    "node_category": "HELPERS",
+                    "master_node_uid": "462a06a3-b66e-413f-a937-475a98f2a42d",
+                    "execution_status": "ERROR",
+                    "node_display_name": "HTTP Request"
+                },
+                {
+                    "id": "if_else_if_elsea1218a83-ce0f-4c87-98b5-f819439b2ac4",
+                    "color": {
+                        "main": "#4682B4",
+                        "background": "#DFEFF9",
+                        "borderColor": "#E3E5E6",
+                        "iconBackground": "#C9DCE7"
+                    },
+                    "input": 1,
+                    "module": "",
+                    "output": 2,
+                    "node_uid": "d388617c-a764-4057-88c5-80f1e644ac2b",
+                    "position": {
+                        "x": 1890,
+                        "y": 90
+                    },
+                    "is_active": true,
+                    "node_icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/b5fc5141-079b-4d5e-b58e-c309f53d7663.svg",
+                    "node_name": "if_else",
+                    "action_key": "if_else",
+                    "action_name": "If/Else",
+                    "action_type": "ACTION",
+                    "credentials": {},
+                    "description": "Route items to different branch",
+                    "form_fields": {
+                        "combine": {
+                            "type": "FIXED",
+                            "value": "AND"
+                        },
+                        "conditions": [
+                            {
+                                "value1": {
+                                    "type": "EXPRESSION",
+                                    "value": "{{$.getLatestNodeData('Get Record')['data']['data']['job_appointments']['appointments']}}"
+                                },
+                                "value2": {
+                                    "type": "FIXED",
+                                    "value": "1"
+                                },
+                                "field_key": "ARRAY",
+                                "operation": {
+                                    "type": "FIXED",
+                                    "value": "LENGTH_GREATER_THAN_EQUAL_TO"
+                                }
+                            }
+                        ]
+                    },
+                    "node_category": "FLOW",
+                    "master_node_uid": "19dd8b19-5974-4a2c-9735-a9ca36ac5a4d",
+                    "execution_status": "NONE",
+                    "node_display_name": "If/Else"
+                },
+                {
+                    "id": "zuper_get_record_zuper_get_recordee1339c9-87e6-4f03-aed7-accd76bffbec",
+                    "color": {
+                        "main": "#4682B4",
+                        "background": "#DFEFF9",
+                        "borderColor": "#E3E5E6",
+                        "iconBackground": "#C9DCE7"
+                    },
+                    "input": 1,
+                    "module": "",
+                    "output": 1,
+                    "node_uid": "6ced8a11-930a-49e8-98f0-fa5e9b1989d3",
+                    "position": {
+                        "x": 2051,
+                        "y": 90
+                    },
+                    "is_active": true,
+                    "node_icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/283a4296-e481-48b5-be1d-8c20de718d2d.svg",
+                    "node_name": "zuper_get_record",
+                    "action_key": "zuper_get_record",
+                    "action_name": "Get Record 1 1",
+                    "action_type": "ACTION",
+                    "credentials": {},
+                    "description": "Get a Record in Zuper",
+                    "form_fields": {
+                        "module": {
+                            "type": "FIXED",
+                            "value": "JOB_CHECKLIST"
+                        },
+                        "module_uid": {
+                            "type": "EXPRESSION",
+                            "value": "{{$.getLatestNodeData('Get Job')['data']['data']['job_uid']}}"
+                        },
+                        "status_uid": {
+                            "type": "FIXED",
+                            "value": "a589decc-ccce-4da6-bddc-c3a3957254d6"
+                        },
+                        "source_node": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "source_type": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "category_uid": {
+                            "type": "FIXED",
+                            "value": "8cafd8d5-321b-4a02-bca7-2ee429be194e"
+                        }
+                    },
+                    "master_node_uid": "7bd69fec-sudhaid65-4eb8-a94b-3158c252921c",
+                    "execution_status": "EXECUTED",
+                    "node_display_name": "Edit Record"
+                },
+                {
+                    "id": "split_split5fbddd94-c2dd-47e9-998b-716e24a4eabd",
+                    "color": {
+                        "main": "#4682B4",
+                        "background": "#DFEFF9",
+                        "borderColor": "#E3E5E6",
+                        "iconBackground": "#C9DCE7"
+                    },
+                    "input": 1,
+                    "module": "",
+                    "output": 1,
+                    "node_uid": "c3d9e02c-b39e-4eb7-8a8b-5fee0a4ff47f",
+                    "position": {
+                        "x": 2237,
+                        "y": 90
+                    },
+                    "is_active": true,
+                    "node_icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/854da5f3-f6c5-4dc5-8805-85fc65052e24.svg",
+                    "node_name": "split",
+                    "action_key": "split",
+                    "action_name": "Split",
+                    "action_type": "ACTION",
+                    "credentials": {},
+                    "description": "Split item into multiple branches",
+                    "form_fields": {},
+                    "node_category": "FLOW",
+                    "master_node_uid": "fd039350-fb54-40c9-9849-abbdedfe6951",
+                    "execution_status": "NONE",
+                    "node_display_name": "Split"
+                },
+                {
+                    "id": "if_else_if_else1f98f29c-4b33-4b76-aabd-f13a65c17ca4",
+                    "color": {
+                        "main": "#4682B4",
+                        "background": "#DFEFF9",
+                        "borderColor": "#E3E5E6",
+                        "iconBackground": "#C9DCE7"
+                    },
+                    "input": 1,
+                    "module": "",
+                    "output": 2,
+                    "node_uid": "d8e58a79-ef5a-4a21-8b54-e11fe19ddfb5",
+                    "position": {
+                        "x": 2438,
+                        "y": 168
+                    },
+                    "is_active": true,
+                    "node_icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/b5fc5141-079b-4d5e-b58e-c309f53d7663.svg",
+                    "node_name": "if_else",
+                    "action_key": "if_else",
+                    "action_name": "If/Else 1",
+                    "action_type": "ACTION",
+                    "credentials": {},
+                    "description": "Route items to different branch",
+                    "form_fields": {
+                        "combine": {
+                            "type": "FIXED",
+                            "value": "AND"
+                        },
+                        "conditions": [
+                            {
+                                "value1": {
+                                    "type": "EXPRESSION",
+                                    "value": "{{$.getLatestNodeData('Get Record 1 1')['data']['data']['0']['meta_data']['selected_values']}}"
+                                },
+                                "value2": {
+                                    "type": "FIXED",
+                                    "value": "Roofing"
+                                },
+                                "field_key": "ARRAY",
+                                "operation": {
+                                    "type": "FIXED",
+                                    "value": "CONTAINS"
+                                }
+                            }
+                        ]
+                    },
+                    "node_category": "FLOW",
+                    "master_node_uid": "19dd8b19-5974-4a2c-9735-a9ca36ac5a4d",
+                    "execution_status": "EXECUTED",
+                    "node_display_name": "If/Else"
+                },
+                {
+                    "id": "if_else_if_elsed65c321b-ebf9-409f-8325-67f67f673269",
+                    "color": {
+                        "main": "#4682B4",
+                        "background": "#DFEFF9",
+                        "borderColor": "#E3E5E6",
+                        "iconBackground": "#C9DCE7"
+                    },
+                    "input": 1,
+                    "module": "",
+                    "output": 2,
+                    "node_uid": "d4af1366-1253-4477-93e5-486cda9c3a0e",
+                    "position": {
+                        "x": 2438,
+                        "y": 12
+                    },
+                    "is_active": true,
+                    "node_icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/b5fc5141-079b-4d5e-b58e-c309f53d7663.svg",
+                    "node_name": "if_else",
+                    "action_key": "if_else",
+                    "action_name": "If/Else 1 1 1",
+                    "action_type": "ACTION",
+                    "credentials": {},
+                    "description": "Route items to different branch",
+                    "form_fields": {
+                        "combine": {
+                            "type": "FIXED",
+                            "value": "AND"
+                        },
+                        "conditions": [
+                            {
+                                "value1": {
+                                    "type": "EXPRESSION",
+                                    "value": "{{$.getLatestNodeData('Get Record 1 1')['data']['data']['0']['meta_data']['selected_values']}}"
+                                },
+                                "value2": {
+                                    "type": "FIXED",
+                                    "value": "Siding"
+                                },
+                                "field_key": "ARRAY",
+                                "operation": {
+                                    "type": "FIXED",
+                                    "value": "CONTAINS"
+                                }
+                            }
+                        ]
+                    },
+                    "node_category": "FLOW",
+                    "master_node_uid": "19dd8b19-5974-4a2c-9735-a9ca36ac5a4d",
+                    "execution_status": "EXECUTED",
+                    "node_display_name": "If/Else"
+                },
+                {
+                    "id": "if_else_if_elsecbcf9ef9-40e9-42c0-a17c-fa5b731aa8d6",
+                    "color": {
+                        "main": "#4682B4",
+                        "background": "#DFEFF9",
+                        "borderColor": "#E3E5E6",
+                        "iconBackground": "#C9DCE7"
+                    },
+                    "input": 1,
+                    "module": "",
+                    "output": 2,
+                    "node_uid": "1ff4ec02-bc36-4331-a64e-654953d33897",
+                    "position": {
+                        "x": 2438,
+                        "y": 90
+                    },
+                    "is_active": true,
+                    "node_icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/b5fc5141-079b-4d5e-b58e-c309f53d7663.svg",
+                    "node_name": "if_else",
+                    "action_key": "if_else",
+                    "action_name": "If/Else 1 1",
+                    "action_type": "ACTION",
+                    "credentials": {},
+                    "description": "Route items to different branch",
+                    "form_fields": {
+                        "combine": {
+                            "type": "FIXED",
+                            "value": "AND"
+                        },
+                        "conditions": [
+                            {
+                                "value1": {
+                                    "type": "EXPRESSION",
+                                    "value": "{{$.getLatestNodeData('Get Record 1 1')['data']['data']['0']['meta_data']['selected_values']}}"
+                                },
+                                "value2": {
+                                    "type": "FIXED",
+                                    "value": "Gutters"
+                                },
+                                "field_key": "ARRAY",
+                                "operation": {
+                                    "type": "FIXED",
+                                    "value": "CONTAINS"
+                                }
+                            }
+                        ]
+                    },
+                    "node_category": "FLOW",
+                    "master_node_uid": "19dd8b19-5974-4a2c-9735-a9ca36ac5a4d",
+                    "execution_status": "EXECUTED",
+                    "node_display_name": "If/Else"
+                },
+                {
+                    "id": "zuper_update_zuper_updateb616c3b4-e201-4467-b89f-07fce841943d",
+                    "color": {
+                        "main": "#4682B4",
+                        "background": "#DFEFF9",
+                        "borderColor": "#E3E5E6",
+                        "iconBackground": "#C9DCE7"
+                    },
+                    "input": 1,
+                    "module": "",
+                    "output": 1,
+                    "node_uid": "042b7a15-04cd-4786-a74d-8399238694e4",
+                    "position": {
+                        "x": 2639,
+                        "y": 167.5
+                    },
+                    "is_active": true,
+                    "node_icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/283a4296-e481-48b5-be1d-8c20de718d2d.svg",
+                    "node_name": "zuper_update",
+                    "action_key": "zuper_update",
+                    "action_name": "Edit Record",
+                    "action_type": "ACTION",
+                    "credentials": {},
+                    "description": "Update an entity in Zuper",
+                    "form_fields": {
+                        "date": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "days": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "team": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "time": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "hours": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "users": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "module": {
+                            "type": "FIXED",
+                            "value": "JOB"
+                        },
+                        "minutes": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "job_fields": [],
+                        "job_status": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "module_uid": {
+                            "type": "EXPRESSION",
+                            "value": "{{$.getLatestNodeData('Get Job')['data']['data']['job_uid']}}"
+                        },
+                        "offset_type": {
+                            "type": "FIXED",
+                            "value": "AFTER"
+                        },
+                        "source_node": {
+                            "type": "FIXED",
+                            "value": "CUSTOM"
+                        },
+                        "source_type": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "service_task": {
+                            "type": "FIXED",
+                            "value": [
+                                {
+                                    "id": "undefined",
+                                    "priority": "NONE",
+                                    "is_active": true,
+                                    "task_type": "TASK",
+                                    "created_at": "2026-02-12T10:08:51.927Z",
+                                    "created_by": {
+                                        "email": "john@shieldroofrepair.com",
+                                        "prefix": null,
+                                        "emp_code": "SR1",
+                                        "user_uid": "40f98c30-e31e-421f-80a8-0d1a9a487c84",
+                                        "is_active": true,
+                                        "last_name": "Biegler",
+                                        "created_at": "2026-02-12T10:08:29.000Z",
+                                        "first_name": "John",
+                                        "is_deleted": false,
+                                        "updated_at": "2026-05-26T16:34:30.000Z",
+                                        "designation": "CEO",
+                                        "is_billable": true,
+                                        "license_type": "PREMIUM",
+                                        "last_login_at": "2026-07-27T16:53:32.000Z",
+                                        "profile_picture": "https://s3.amazonaws.com/prod.us-east-1.app.zuperpro/attachments/d6ad3d9e-7355-49c9-a6ea-dcb104a48b16/c6ecc199-73ef-43d1-888b-6f962f85f439.jpg",
+                                        "external_login_id": null,
+                                        "home_phone_number": "402.588.0008",
+                                        "work_phone_number": "402.588.0008",
+                                        "hourly_labor_charge": null,
+                                        "mobile_phone_number": "531.229.3985"
+                                    },
+                                    "isSelected": true,
+                                    "is_deleted": false,
+                                    "assigned_to": [],
+                                    "business_unit": [],
+                                    "isTaskDisabled": false,
+                                    "inspection_form": {
+                                        "is_deleted": false,
+                                        "asset_form_uid": "f4c47c45-a50d-4f47-9e5b-27ac01db6f23",
+                                        "asset_form_name": "Site Preparation"
+                                    },
+                                    "estimated_duration": {
+                                        "days": 0,
+                                        "hours": 1,
+                                        "minutes": 0
+                                    },
+                                    "service_task_title": "Site Preparation",
+                                    "service_task_master_uid": "05e6f9f8-f379-4e77-a583-795440518797",
+                                    "service_task_description": null
+                                }
+                            ]
+                        },
+                        "custom_fields": [],
+                        "duration_type": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "operator_type": {
+                            "type": "FIXED",
+                            "value": "SERVICE_TASK"
+                        },
+                        "schedule_type": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "operation_type": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "schedule_value": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "job_status_name": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "status_category": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "sub_operator_type": {
+                            "type": "FIXED",
+                            "value": null
+                        }
+                    },
+                    "master_node_uid": "7bd69fec-b465-4eb8-a94b-3158c252921c",
+                    "execution_status": "NONE",
+                    "node_display_name": "Edit Record"
+                },
+                {
+                    "id": "zuper_update_zuper_update6685ac86-3c8a-4ab2-b067-f1cc2503ef82",
+                    "color": {
+                        "main": "#4682B4",
+                        "background": "#DFEFF9",
+                        "borderColor": "#E3E5E6",
+                        "iconBackground": "#C9DCE7"
+                    },
+                    "input": 1,
+                    "module": "",
+                    "output": 1,
+                    "node_uid": "de6f9449-418f-4156-a2f8-4abec55453ae",
+                    "position": {
+                        "x": 2640,
+                        "y": 90.5
+                    },
+                    "is_active": true,
+                    "node_icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/283a4296-e481-48b5-be1d-8c20de718d2d.svg",
+                    "node_name": "zuper_update",
+                    "action_key": "zuper_update",
+                    "action_name": "Edit Record 1",
+                    "action_type": "ACTION",
+                    "credentials": {},
+                    "description": "Update an entity in Zuper",
+                    "form_fields": {
+                        "date": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "days": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "team": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "time": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "hours": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "users": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "module": {
+                            "type": "FIXED",
+                            "value": "JOB"
+                        },
+                        "minutes": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "job_fields": [],
+                        "job_status": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "module_uid": {
+                            "type": "EXPRESSION",
+                            "value": "{{$.getLatestNodeData('Get Job')['data']['data']['job_uid']}}"
+                        },
+                        "offset_type": {
+                            "type": "FIXED",
+                            "value": "AFTER"
+                        },
+                        "source_node": {
+                            "type": "FIXED",
+                            "value": "CUSTOM"
+                        },
+                        "source_type": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "service_task": {
+                            "type": "FIXED",
+                            "value": [
+                                {
+                                    "id": "undefined",
+                                    "priority": "NONE",
+                                    "is_active": true,
+                                    "task_type": "TASK",
+                                    "created_at": "2026-02-12T10:08:46.787Z",
+                                    "created_by": {
+                                        "email": "john@shieldroofrepair.com",
+                                        "prefix": null,
+                                        "emp_code": "SR1",
+                                        "user_uid": "40f98c30-e31e-421f-80a8-0d1a9a487c84",
+                                        "is_active": true,
+                                        "last_name": "Biegler",
+                                        "created_at": "2026-02-12T10:08:29.000Z",
+                                        "first_name": "John",
+                                        "is_deleted": false,
+                                        "updated_at": "2026-05-26T16:34:30.000Z",
+                                        "designation": "CEO",
+                                        "is_billable": true,
+                                        "license_type": "PREMIUM",
+                                        "last_login_at": "2026-07-27T16:53:32.000Z",
+                                        "profile_picture": "https://s3.amazonaws.com/prod.us-east-1.app.zuperpro/attachments/d6ad3d9e-7355-49c9-a6ea-dcb104a48b16/c6ecc199-73ef-43d1-888b-6f962f85f439.jpg",
+                                        "external_login_id": null,
+                                        "home_phone_number": "402.588.0008",
+                                        "work_phone_number": "402.588.0008",
+                                        "hourly_labor_charge": null,
+                                        "mobile_phone_number": "531.229.3985"
+                                    },
+                                    "isSelected": true,
+                                    "is_deleted": false,
+                                    "assigned_to": [],
+                                    "business_unit": [],
+                                    "isTaskDisabled": false,
+                                    "inspection_form": null,
+                                    "estimated_duration": {
+                                        "days": 1,
+                                        "hours": 0,
+                                        "minutes": 0
+                                    },
+                                    "service_task_title": "Install Gutters ",
+                                    "service_task_master_uid": "63f5edec-26ea-4132-b1f0-6aba74e60c0b",
+                                    "service_task_description": null
+                                }
+                            ]
+                        },
+                        "custom_fields": [],
+                        "duration_type": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "operator_type": {
+                            "type": "FIXED",
+                            "value": "SERVICE_TASK"
+                        },
+                        "schedule_type": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "operation_type": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "schedule_value": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "job_status_name": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "status_category": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "sub_operator_type": {
+                            "type": "FIXED",
+                            "value": null
+                        }
+                    },
+                    "master_node_uid": "7bd69fec-b465-4eb8-a94b-3158c252921c",
+                    "execution_status": "NONE",
+                    "node_display_name": "Edit Record"
+                },
+                {
+                    "id": "zuper_update_zuper_update5ffea157-59cb-451c-80df-7c6e26a38b32",
+                    "color": {
+                        "main": "#4682B4",
+                        "background": "#DFEFF9",
+                        "borderColor": "#E3E5E6",
+                        "iconBackground": "#C9DCE7"
+                    },
+                    "input": 1,
+                    "module": "",
+                    "output": 1,
+                    "node_uid": "0ee67686-7d5d-47cf-916f-ec5093a9b2ea",
+                    "position": {
+                        "x": 2639,
+                        "y": 12.5
+                    },
+                    "is_active": true,
+                    "node_icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/283a4296-e481-48b5-be1d-8c20de718d2d.svg",
+                    "node_name": "zuper_update",
+                    "action_key": "zuper_update",
+                    "action_name": "Edit Record 1 1",
+                    "action_type": "ACTION",
+                    "credentials": {},
+                    "description": "Update an entity in Zuper",
+                    "form_fields": {
+                        "date": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "days": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "team": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "time": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "hours": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "users": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "module": {
+                            "type": "FIXED",
+                            "value": "JOB"
+                        },
+                        "minutes": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "job_fields": [],
+                        "job_status": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "module_uid": {
+                            "type": "EXPRESSION",
+                            "value": "{{$.getLatestNodeData('Get Job')['data']['data']['job_uid']}}"
+                        },
+                        "offset_type": {
+                            "type": "FIXED",
+                            "value": "AFTER"
+                        },
+                        "source_node": {
+                            "type": "FIXED",
+                            "value": "CUSTOM"
+                        },
+                        "source_type": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "service_task": {
+                            "type": "FIXED",
+                            "value": [
+                                {
+                                    "id": "undefined",
+                                    "priority": "NONE",
+                                    "is_active": true,
+                                    "task_type": "TASK",
+                                    "created_at": "2026-02-12T10:08:44.996Z",
+                                    "created_by": {
+                                        "email": "john@shieldroofrepair.com",
+                                        "prefix": null,
+                                        "emp_code": "SR1",
+                                        "user_uid": "40f98c30-e31e-421f-80a8-0d1a9a487c84",
+                                        "is_active": true,
+                                        "last_name": "Biegler",
+                                        "created_at": "2026-02-12T10:08:29.000Z",
+                                        "first_name": "John",
+                                        "is_deleted": false,
+                                        "updated_at": "2026-05-26T16:34:30.000Z",
+                                        "designation": "CEO",
+                                        "is_billable": true,
+                                        "license_type": "PREMIUM",
+                                        "last_login_at": "2026-07-27T16:53:32.000Z",
+                                        "profile_picture": "https://s3.amazonaws.com/prod.us-east-1.app.zuperpro/attachments/d6ad3d9e-7355-49c9-a6ea-dcb104a48b16/c6ecc199-73ef-43d1-888b-6f962f85f439.jpg",
+                                        "external_login_id": null,
+                                        "home_phone_number": "402.588.0008",
+                                        "work_phone_number": "402.588.0008",
+                                        "hourly_labor_charge": null,
+                                        "mobile_phone_number": "531.229.3985"
+                                    },
+                                    "isSelected": true,
+                                    "is_deleted": false,
+                                    "assigned_to": [],
+                                    "business_unit": [],
+                                    "isTaskDisabled": false,
+                                    "inspection_form": null,
+                                    "estimated_duration": {
+                                        "days": 1,
+                                        "hours": 0,
+                                        "minutes": 0
+                                    },
+                                    "service_task_title": "Install Siding ",
+                                    "service_task_master_uid": "1b24d721-99e9-4748-9f8f-eec2d24d1f84",
+                                    "service_task_description": null
+                                }
+                            ]
+                        },
+                        "custom_fields": [],
+                        "duration_type": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "operator_type": {
+                            "type": "FIXED",
+                            "value": "SERVICE_TASK"
+                        },
+                        "schedule_type": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "operation_type": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "schedule_value": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "job_status_name": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "status_category": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "sub_operator_type": {
+                            "type": "FIXED",
+                            "value": null
+                        }
+                    },
+                    "master_node_uid": "7bd69fec-b465-4eb8-a94b-3158c252921c",
+                    "execution_status": "EXECUTED",
+                    "node_display_name": "Edit Record"
+                },
+                {
+                    "id": "merge_merge4de4087b-c21e-403a-a243-e276d24e63e1",
+                    "color": {
+                        "main": "#4682B4",
+                        "background": "#DFEFF9",
+                        "borderColor": "#E3E5E6",
+                        "iconBackground": "#C9DCE7"
+                    },
+                    "input": 1,
+                    "module": "",
+                    "output": 1,
+                    "node_uid": "8804c6f1-efd5-46d9-a36f-14efd020b875",
+                    "position": {
+                        "x": 2835,
+                        "y": 90.5
+                    },
+                    "is_active": true,
+                    "node_icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/ce201077-6168-4272-8617-c41ef578ea4c.svg",
+                    "node_name": "merge",
+                    "action_key": "merge",
+                    "action_name": "Merge",
+                    "action_type": "ACTION",
+                    "credentials": {},
+                    "description": "Merges data of multiple streams once data from both is available",
+                    "form_fields": {},
+                    "node_category": "FLOW",
+                    "master_node_uid": "b5bdc33c-9d51-45f8-a733-1a45115a54f2",
+                    "node_display_name": "Merge"
+                }
+            ],
+            "connections": [
+                {
+                    "id": "reactflow__edge-zuper_get_record_zuper_get_record2725258c-e599-4540-9b18-5b65c01b0b01one-a-zuper_update_zuper_update2f2ebcdd-a465-49e9-a07b-eddf5c96c5aea",
+                    "type": "buttonEdge",
+                    "source": "zuper_get_record_zuper_get_record2725258c-e599-4540-9b18-5b65c01b0b01",
+                    "target": "zuper_update_zuper_update2f2ebcdd-a465-49e9-a07b-eddf5c96c5ae",
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "sourceHandle": "one-a",
+                    "targetHandle": "a"
+                },
+                {
+                    "id": "reactflow__edge-zuper_update_zuper_update18ab725c-417c-48f3-a2bb-eab51989bbe1one-a-http_request_v2_http_request_v25785758a-f99a-45f7-a0e2-9c4d9cad76c7a",
+                    "type": "buttonEdge",
+                    "source": "zuper_update_zuper_update18ab725c-417c-48f3-a2bb-eab51989bbe1",
+                    "target": "http_request_v2_http_request_v25785758a-f99a-45f7-a0e2-9c4d9cad76c7",
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "sourceHandle": "one-a",
+                    "targetHandle": "a"
+                },
+                {
+                    "id": "reactflow__edge-job.status_update-code_codecb4ae404-ffcb-4842-aa3d-cb96423965b8a",
+                    "type": "buttonEdge",
+                    "source": "job.status_update",
+                    "target": "code_codecb4ae404-ffcb-4842-aa3d-cb96423965b8",
+                    "selected": false,
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "sourceHandle": "trigger-a",
+                    "targetHandle": "a"
+                },
+                {
+                    "id": "reactflow__edge-code_codecb4ae404-ffcb-4842-aa3d-cb96423965b8one-a-zuper_get_record_zuper_get_record2725258c-e599-4540-9b18-5b65c01b0b01a",
+                    "type": "buttonEdge",
+                    "source": "code_codecb4ae404-ffcb-4842-aa3d-cb96423965b8",
+                    "target": "zuper_get_record_zuper_get_record2725258c-e599-4540-9b18-5b65c01b0b01",
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "sourceHandle": "one-a",
+                    "targetHandle": "a"
+                },
+                {
+                    "id": "reactflow__edge-zuper_update_zuper_update99458513-8767-4a7b-b2fe-043e29dea2dfone-a-zuper_update_zuper_update18ab725c-417c-48f3-a2bb-eab51989bbe1a",
+                    "type": "buttonEdge",
+                    "source": "zuper_update_zuper_update99458513-8767-4a7b-b2fe-043e29dea2df",
+                    "target": "zuper_update_zuper_update18ab725c-417c-48f3-a2bb-eab51989bbe1",
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "sourceHandle": "one-a",
+                    "targetHandle": "a"
+                },
+                {
+                    "id": "reactflow__edge-zuper_update_zuper_update2f2ebcdd-a465-49e9-a07b-eddf5c96c5aeone-a-zuper_update_zuper_update99458513-8767-4a7b-b2fe-043e29dea2dfa",
+                    "type": "buttonEdge",
+                    "source": "zuper_update_zuper_update2f2ebcdd-a465-49e9-a07b-eddf5c96c5ae",
+                    "target": "zuper_update_zuper_update99458513-8767-4a7b-b2fe-043e29dea2df",
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "sourceHandle": "one-a",
+                    "targetHandle": "a"
+                },
+                {
+                    "id": "reactflow__edge-http_request_v2_http_request_v2f2000311-e95f-45c1-b04f-b111dd12130eone-a-zuper_get_record_zuper_get_recordf3452b77-7d88-4f9e-bfb7-73d7c4dabe7aa",
+                    "type": "buttonEdge",
+                    "source": "http_request_v2_http_request_v2f2000311-e95f-45c1-b04f-b111dd12130e",
+                    "target": "zuper_get_record_zuper_get_recordf3452b77-7d88-4f9e-bfb7-73d7c4dabe7a",
+                    "selected": false,
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "sourceHandle": "one-a",
+                    "targetHandle": "a"
+                },
+                {
+                    "id": "reactflow__edge-code_codee068fc8e-b22f-4ab2-90f2-5179919edc38one-a-http_request_v2_http_request_v2f2000311-e95f-45c1-b04f-b111dd12130ea",
+                    "type": "buttonEdge",
+                    "source": "code_codee068fc8e-b22f-4ab2-90f2-5179919edc38",
+                    "target": "http_request_v2_http_request_v2f2000311-e95f-45c1-b04f-b111dd12130e",
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "sourceHandle": "one-a",
+                    "targetHandle": "a"
+                },
+                {
+                    "id": "reactflow__edge-http_request_v2_http_request_v25785758a-f99a-45f7-a0e2-9c4d9cad76c7one-a-code_codee068fc8e-b22f-4ab2-90f2-5179919edc38a",
+                    "type": "buttonEdge",
+                    "source": "http_request_v2_http_request_v25785758a-f99a-45f7-a0e2-9c4d9cad76c7",
+                    "target": "code_codee068fc8e-b22f-4ab2-90f2-5179919edc38",
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "sourceHandle": "one-a",
+                    "targetHandle": "a"
+                },
+                {
+                    "id": "reactflow__edge-zuper_get_record_zuper_get_recordc9f5ffbf-4592-43c6-916d-3e2ecdbdb356one-a-code_codefde25e44-5c77-4f77-9465-edff54a81377a",
+                    "type": "buttonEdge",
+                    "source": "zuper_get_record_zuper_get_recordc9f5ffbf-4592-43c6-916d-3e2ecdbdb356",
+                    "target": "code_codefde25e44-5c77-4f77-9465-edff54a81377",
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "sourceHandle": "one-a",
+                    "targetHandle": "a"
+                },
+                {
+                    "id": "reactflow__edge-http_request_v2_http_request_v237509a72-2283-4229-a0c2-d05791b27583-zuper_get_record_zuper_get_recordc9f5ffbf-4592-43c6-916d-3e2ecdbdb356a",
+                    "type": "buttonEdge",
+                    "source": "http_request_v2_http_request_v237509a72-2283-4229-a0c2-d05791b27583",
+                    "target": "zuper_get_record_zuper_get_recordc9f5ffbf-4592-43c6-916d-3e2ecdbdb356",
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "sourceHandle": "one-a",
+                    "targetHandle": "a"
+                },
+                {
+                    "id": "reactflow__edge-code_codefde25e44-5c77-4f77-9465-edff54a81377-loop_loopee143f87-9e2a-41c8-a5ce-ec4a195c0973a",
+                    "type": "buttonEdge",
+                    "source": "code_codefde25e44-5c77-4f77-9465-edff54a81377",
+                    "target": "loop_loopee143f87-9e2a-41c8-a5ce-ec4a195c0973",
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "sourceHandle": "one-a",
+                    "targetHandle": "a"
+                },
+                {
+                    "id": "reactflow__edge-http_request_v2_http_request_v205e58d7c-d339-4fa3-accb-22bb57c331fdone-a-loop_loopee143f87-9e2a-41c8-a5ce-ec4a195c0973b",
+                    "type": "loopEdge",
+                    "source": "http_request_v2_http_request_v205e58d7c-d339-4fa3-accb-22bb57c331fd",
+                    "target": "loop_loopee143f87-9e2a-41c8-a5ce-ec4a195c0973",
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "sourceHandle": "one-a",
+                    "targetHandle": "b"
+                },
+                {
+                    "id": "reactflow__edge-loop_loopee143f87-9e2a-41c8-a5ce-ec4a195c0973two-b-http_request_v2_http_request_v205e58d7c-d339-4fa3-accb-22bb57c331fda",
+                    "type": "buttonEdge",
+                    "source": "loop_loopee143f87-9e2a-41c8-a5ce-ec4a195c0973",
+                    "target": "http_request_v2_http_request_v205e58d7c-d339-4fa3-accb-22bb57c331fd",
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "output_value": false,
+                    "sourceHandle": "two-b",
+                    "targetHandle": "a"
+                },
+                {
+                    "id": "reactflow__edge-zuper_get_record_zuper_get_recordf3452b77-7d88-4f9e-bfb7-73d7c4dabe7aone-a-if_else_if_elsea1218a83-ce0f-4c87-98b5-f819439b2ac4a",
+                    "type": "buttonEdge",
+                    "source": "zuper_get_record_zuper_get_recordf3452b77-7d88-4f9e-bfb7-73d7c4dabe7a",
+                    "target": "if_else_if_elsea1218a83-ce0f-4c87-98b5-f819439b2ac4",
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "sourceHandle": "one-a",
+                    "targetHandle": "a"
+                },
+                {
+                    "id": "reactflow__edge-if_else_if_elsea1218a83-ce0f-4c87-98b5-f819439b2ac4two-a-zuper_get_record_zuper_get_recordee1339c9-87e6-4f03-aed7-accd76bffbeca",
+                    "type": "buttonEdge",
+                    "source": "if_else_if_elsea1218a83-ce0f-4c87-98b5-f819439b2ac4",
+                    "target": "zuper_get_record_zuper_get_recordee1339c9-87e6-4f03-aed7-accd76bffbec",
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "output_value": true,
+                    "sourceHandle": "two-a",
+                    "targetHandle": "a"
+                },
+                {
+                    "id": "reactflow__edge-zuper_get_record_zuper_get_recordee1339c9-87e6-4f03-aed7-accd76bffbecone-a-split_split5fbddd94-c2dd-47e9-998b-716e24a4eabda",
+                    "type": "buttonEdge",
+                    "source": "zuper_get_record_zuper_get_recordee1339c9-87e6-4f03-aed7-accd76bffbec",
+                    "target": "split_split5fbddd94-c2dd-47e9-998b-716e24a4eabd",
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "sourceHandle": "one-a",
+                    "targetHandle": "a"
+                },
+                {
+                    "id": "reactflow__edge-split_split5fbddd94-c2dd-47e9-998b-716e24a4eabdone-a-if_else_if_else1f98f29c-4b33-4b76-aabd-f13a65c17ca4a",
+                    "type": "buttonEdge",
+                    "source": "split_split5fbddd94-c2dd-47e9-998b-716e24a4eabd",
+                    "target": "if_else_if_else1f98f29c-4b33-4b76-aabd-f13a65c17ca4",
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "sourceHandle": "one-a",
+                    "targetHandle": "a"
+                },
+                {
+                    "id": "reactflow__edge-split_split5fbddd94-c2dd-47e9-998b-716e24a4eabdone-a-if_else_if_elsed65c321b-ebf9-409f-8325-67f67f673269a",
+                    "type": "buttonEdge",
+                    "source": "split_split5fbddd94-c2dd-47e9-998b-716e24a4eabd",
+                    "target": "if_else_if_elsed65c321b-ebf9-409f-8325-67f67f673269",
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "sourceHandle": "one-a",
+                    "targetHandle": "a"
+                },
+                {
+                    "id": "reactflow__edge-split_split5fbddd94-c2dd-47e9-998b-716e24a4eabdone-a-if_else_if_elsecbcf9ef9-40e9-42c0-a17c-fa5b731aa8d6a",
+                    "type": "buttonEdge",
+                    "source": "split_split5fbddd94-c2dd-47e9-998b-716e24a4eabd",
+                    "target": "if_else_if_elsecbcf9ef9-40e9-42c0-a17c-fa5b731aa8d6",
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "sourceHandle": "one-a",
+                    "targetHandle": "a"
+                },
+                {
+                    "id": "reactflow__edge-if_else_if_else1f98f29c-4b33-4b76-aabd-f13a65c17ca4two-a-zuper_update_zuper_updateb616c3b4-e201-4467-b89f-07fce841943da",
+                    "type": "buttonEdge",
+                    "source": "if_else_if_else1f98f29c-4b33-4b76-aabd-f13a65c17ca4",
+                    "target": "zuper_update_zuper_updateb616c3b4-e201-4467-b89f-07fce841943d",
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "output_value": true,
+                    "sourceHandle": "two-a",
+                    "targetHandle": "a"
+                },
+                {
+                    "id": "reactflow__edge-if_else_if_elsecbcf9ef9-40e9-42c0-a17c-fa5b731aa8d6two-a-zuper_update_zuper_update6685ac86-3c8a-4ab2-b067-f1cc2503ef82a",
+                    "type": "buttonEdge",
+                    "source": "if_else_if_elsecbcf9ef9-40e9-42c0-a17c-fa5b731aa8d6",
+                    "target": "zuper_update_zuper_update6685ac86-3c8a-4ab2-b067-f1cc2503ef82",
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "output_value": true,
+                    "sourceHandle": "two-a",
+                    "targetHandle": "a"
+                },
+                {
+                    "id": "reactflow__edge-if_else_if_elsed65c321b-ebf9-409f-8325-67f67f673269two-a-zuper_update_zuper_update5ffea157-59cb-451c-80df-7c6e26a38b32a",
+                    "type": "buttonEdge",
+                    "source": "if_else_if_elsed65c321b-ebf9-409f-8325-67f67f673269",
+                    "target": "zuper_update_zuper_update5ffea157-59cb-451c-80df-7c6e26a38b32",
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "output_value": true,
+                    "sourceHandle": "two-a",
+                    "targetHandle": "a"
+                },
+                {
+                    "id": "reactflow__edge-merge_merge4de4087b-c21e-403a-a243-e276d24e63e1one-a-http_request_v2_http_request_v237509a72-2283-4229-a0c2-d05791b27583a",
+                    "type": "buttonEdge",
+                    "source": "merge_merge4de4087b-c21e-403a-a243-e276d24e63e1",
+                    "target": "http_request_v2_http_request_v237509a72-2283-4229-a0c2-d05791b27583",
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "sourceHandle": "one-a",
+                    "targetHandle": "a"
+                },
+                {
+                    "id": "reactflow__edge-zuper_update_zuper_updateb616c3b4-e201-4467-b89f-07fce841943done-a-merge_merge4de4087b-c21e-403a-a243-e276d24e63e1a",
+                    "type": "buttonEdge",
+                    "source": "zuper_update_zuper_updateb616c3b4-e201-4467-b89f-07fce841943d",
+                    "target": "merge_merge4de4087b-c21e-403a-a243-e276d24e63e1",
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "sourceHandle": "one-a",
+                    "targetHandle": "a"
+                },
+                {
+                    "id": "reactflow__edge-zuper_update_zuper_update6685ac86-3c8a-4ab2-b067-f1cc2503ef82one-a-merge_merge4de4087b-c21e-403a-a243-e276d24e63e1a",
+                    "type": "buttonEdge",
+                    "source": "zuper_update_zuper_update6685ac86-3c8a-4ab2-b067-f1cc2503ef82",
+                    "target": "merge_merge4de4087b-c21e-403a-a243-e276d24e63e1",
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "sourceHandle": "one-a",
+                    "targetHandle": "a"
+                },
+                {
+                    "id": "reactflow__edge-zuper_update_zuper_update5ffea157-59cb-451c-80df-7c6e26a38b32one-a-merge_merge4de4087b-c21e-403a-a243-e276d24e63e1a",
+                    "type": "buttonEdge",
+                    "source": "zuper_update_zuper_update5ffea157-59cb-451c-80df-7c6e26a38b32",
+                    "target": "merge_merge4de4087b-c21e-403a-a243-e276d24e63e1",
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "sourceHandle": "one-a",
+                    "targetHandle": "a"
+                }
+            ],
+            "meta_data": {
+                "variables": {},
+                "total_nodes": 25,
+                "initial_nodes": [
+                    {
+                        "id": "job.status_update",
+                        "data": {
+                            "icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/283a4296-e481-48b5-be1d-8c20de718d2d.svg",
+                            "color": {
+                                "main": "#4682B4",
+                                "background": "#DFEFF9",
+                                "borderColor": "#E3E5E6",
+                                "iconBackground": "#C9DCE7"
+                            },
+                            "label": "On Job Status Update",
+                            "module": "JOB",
+                            "node_uid": "615d972b-2acf-4f0e-9090-62ddcddc50b2",
+                            "viewOnly": false,
+                            "node_name": "zuper",
+                            "action_key": "job.status_update",
+                            "action_name": "On Job Status Update",
+                            "action_type": "TRIGGER",
+                            "cyclic_actions": [
+                                {
+                                    "module": "JOB",
+                                    "action_key": "zuper_create"
+                                },
+                                {
+                                    "module": "JOB",
+                                    "action_key": "zuper_update"
+                                }
+                            ],
+                            "master_node_uid": "721280c2-cf74-47fd-95f2-cdc4ad922c56",
+                            "warning_message": "",
+                            "workflow_status": "NONE",
+                            "execution_status": "EXECUTED"
+                        },
+                        "type": "triggerNode",
+                        "style": {
+                            "background": "#fff"
+                        },
+                        "width": 36,
+                        "height": 36,
+                        "position": {
+                            "x": 12,
+                            "y": 91
+                        },
+                        "positionAbsolute": {
+                            "x": 12,
+                            "y": 91
+                        }
+                    },
+                    {
+                        "id": "code_codecb4ae404-ffcb-4842-aa3d-cb96423965b8",
+                        "data": {
+                            "icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/7f22be08-936d-4e6b-a054-0c4a9a438913.svg",
+                            "color": {
+                                "main": "#2E8B57",
+                                "background": "#E0F4EC",
+                                "borderColor": "#8ceac1",
+                                "iconBackground": "#BEEAD6"
+                            },
+                            "label": "Config",
+                            "module": "",
+                            "node_uid": "b461c826-a9ce-4a74-b4b3-ea1937282552",
+                            "viewOnly": false,
+                            "is_active": true,
+                            "node_name": "code",
+                            "action_key": "code",
+                            "action_name": "Config",
+                            "action_type": "ACTION",
+                            "description": "Run custom javascript code",
+                            "cyclic_actions": [],
+                            "master_node_uid": "d15fd095-70f3-4d53-9103-5786dfd52b37",
+                            "warning_message": "",
+                            "workflow_status": "NONE",
+                            "execution_status": "EXECUTED"
+                        },
+                        "type": "actionNodeOne",
+                        "style": {
+                            "background": "#fff"
+                        },
+                        "width": 120,
+                        "height": 38,
+                        "position": {
+                            "x": 128,
+                            "y": 90
+                        },
+                        "positionAbsolute": {
+                            "x": 128,
+                            "y": 90
+                        }
+                    },
+                    {
+                        "id": "zuper_get_record_zuper_get_record2725258c-e599-4540-9b18-5b65c01b0b01",
+                        "data": {
+                            "icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/283a4296-e481-48b5-be1d-8c20de718d2d.svg",
+                            "color": {
+                                "main": "#4682B4",
+                                "background": "#DFEFF9",
+                                "borderColor": "#E3E5E6",
+                                "iconBackground": "#C9DCE7"
+                            },
+                            "label": "Get Job",
+                            "module": "",
+                            "node_uid": "376af848-7eed-49dd-a27c-0b4602f40b9a",
+                            "viewOnly": false,
+                            "is_active": true,
+                            "node_name": "zuper_get_record",
+                            "action_key": "zuper_get_record",
+                            "action_name": "Get Job",
+                            "action_type": "ACTION",
+                            "description": "Get a Record in Zuper",
+                            "cyclic_actions": [],
+                            "master_node_uid": "7bd69fec-sudhaid65-4eb8-a94b-3158c252921c",
+                            "warning_message": "",
+                            "workflow_status": "NONE",
+                            "execution_status": "EXECUTED"
+                        },
+                        "type": "actionNodeOne",
+                        "style": {
+                            "background": "#fff"
+                        },
+                        "width": 106,
+                        "height": 38,
+                        "position": {
+                            "x": 328,
+                            "y": 90
+                        },
+                        "positionAbsolute": {
+                            "x": 328,
+                            "y": 90
+                        }
+                    }
+                ]
+            },
+            "internal_connections": {
+                "On Job Status Update": {
+                    "output_nodes": [
+                        {
+                            "action_name": "Config",
+                            "node_uid": "b461c826-a9ce-4a74-b4b3-ea1937282552",
+                            "action_key": "code"
+                        }
+                    ]
+                },
+                "Config": {
+                    "input_nodes": [
+                        {
+                            "action_name": "On Job Status Update",
+                            "node_uid": "615d972b-2acf-4f0e-9090-62ddcddc50b2",
+                            "action_key": "job.status_update"
+                        }
+                    ],
+                    "output_nodes": [
+                        {
+                            "action_name": "Get Job",
+                            "node_uid": "376af848-7eed-49dd-a27c-0b4602f40b9a",
+                            "action_key": "zuper_get_record"
+                        }
+                    ]
+                },
+                "Get Job": {
+                    "output_nodes": [
+                        {
+                            "action_name": "Update due date",
+                            "node_uid": "713274cb-7e80-4aaf-8b96-ae5d544f37db",
+                            "action_key": "zuper_update"
+                        }
+                    ],
+                    "input_nodes": [
+                        {
+                            "action_name": "Config",
+                            "node_uid": "b461c826-a9ce-4a74-b4b3-ea1937282552",
+                            "action_key": "code"
+                        }
+                    ]
+                },
+                "Update due date": {
+                    "input_nodes": [
+                        {
+                            "action_name": "Get Job",
+                            "node_uid": "376af848-7eed-49dd-a27c-0b4602f40b9a",
+                            "action_key": "zuper_get_record"
+                        }
+                    ],
+                    "output_nodes": [
+                        {
+                            "action_name": "clear schedule",
+                            "node_uid": "a987c612-0f94-4ca4-85e9-ee9cc5d4cd69",
+                            "action_key": "zuper_update"
+                        }
+                    ]
+                },
+                "clear schedule": {
+                    "input_nodes": [
+                        {
+                            "action_name": "Update due date",
+                            "node_uid": "713274cb-7e80-4aaf-8b96-ae5d544f37db",
+                            "action_key": "zuper_update"
+                        }
+                    ],
+                    "output_nodes": [
+                        {
+                            "action_name": "Change Job title",
+                            "node_uid": "2f1df0b9-9ce7-4cde-8bef-da26c6631bea",
+                            "action_key": "zuper_update"
+                        }
+                    ]
+                },
+                "GET Categories": {
+                    "output_nodes": [
+                        {
+                            "action_name": "Payload Construct",
+                            "node_uid": "0541e0fe-0fc2-4550-86f8-5a78fa734121",
+                            "action_key": "code"
+                        }
+                    ],
+                    "input_nodes": [
+                        {
+                            "action_name": "Change Job title",
+                            "node_uid": "2f1df0b9-9ce7-4cde-8bef-da26c6631bea",
+                            "action_key": "zuper_update"
+                        }
+                    ]
+                },
+                "Payload Construct": {
+                    "input_nodes": [
+                        {
+                            "action_name": "GET Categories",
+                            "node_uid": "43e3f0bc-de08-4050-9462-851f97d37e60",
+                            "action_key": "http_request"
+                        }
+                    ],
+                    "output_nodes": [
+                        {
+                            "action_name": "Update Job",
+                            "node_uid": "54c945b0-6810-445d-a461-53229112e2fa",
+                            "action_key": "http_request"
+                        }
+                    ]
+                },
+                "Change Job title": {
+                    "output_nodes": [
+                        {
+                            "action_name": "GET Categories",
+                            "node_uid": "43e3f0bc-de08-4050-9462-851f97d37e60",
+                            "action_key": "http_request"
+                        }
+                    ],
+                    "input_nodes": [
+                        {
+                            "action_name": "clear schedule",
+                            "node_uid": "a987c612-0f94-4ca4-85e9-ee9cc5d4cd69",
+                            "action_key": "zuper_update"
+                        }
+                    ]
+                },
+                "Update Job": {
+                    "output_nodes": [
+                        {
+                            "action_name": "Get Record",
+                            "node_uid": "9ebd6744-46f9-4901-9f5d-073bb5a3d72b",
+                            "action_key": "zuper_get_record"
+                        }
+                    ],
+                    "input_nodes": [
+                        {
+                            "action_name": "Payload Construct",
+                            "node_uid": "0541e0fe-0fc2-4550-86f8-5a78fa734121",
+                            "action_key": "code"
+                        }
+                    ]
+                },
+                "Get Record": {
+                    "input_nodes": [
+                        {
+                            "action_name": "Update Job",
+                            "node_uid": "54c945b0-6810-445d-a461-53229112e2fa",
+                            "action_key": "http_request"
+                        }
+                    ],
+                    "output_nodes": [
+                        {
+                            "action_name": "If/Else",
+                            "node_uid": "d388617c-a764-4057-88c5-80f1e644ac2b",
+                            "action_key": "if_else"
+                        }
+                    ]
+                },
+                "If/Else": {
+                    "input_nodes": [
+                        {
+                            "action_name": "Get Record",
+                            "node_uid": "9ebd6744-46f9-4901-9f5d-073bb5a3d72b",
+                            "action_key": "zuper_get_record"
+                        }
+                    ],
+                    "output_nodes": [
+                        {
+                            "action_name": "Get Record 1 1",
+                            "node_uid": "6ced8a11-930a-49e8-98f0-fa5e9b1989d3",
+                            "action_key": "zuper_get_record",
+                            "output_value": true
+                        }
+                    ]
+                },
+                "get job service task": {
+                    "output_nodes": [
+                        {
+                            "action_name": "Get Record 1",
+                            "node_uid": "ebf9e807-65db-4824-9bdc-e1a97b63e008",
+                            "action_key": "zuper_get_record"
+                        }
+                    ],
+                    "input_nodes": [
+                        {
+                            "action_name": "Merge",
+                            "node_uid": "8804c6f1-efd5-46d9-a36f-14efd020b875",
+                            "action_key": "merge"
+                        }
+                    ]
+                },
+                "Get Record 1": {
+                    "input_nodes": [
+                        {
+                            "action_name": "get job service task",
+                            "node_uid": "c49b22a7-763f-4f1c-b5f7-9f621630343d",
+                            "action_key": "http_request"
+                        }
+                    ],
+                    "output_nodes": [
+                        {
+                            "action_name": "Construct",
+                            "node_uid": "c4cf6eec-e908-4053-956d-ac5c29f83d2d",
+                            "action_key": "code"
+                        }
+                    ]
+                },
+                "Construct": {
+                    "output_nodes": [
+                        {
+                            "action_name": "Loop",
+                            "node_uid": "7fd8f581-0b38-44ce-be4e-e8060dc0ccb7",
+                            "action_key": "loop"
+                        }
+                    ],
+                    "input_nodes": [
+                        {
+                            "action_name": "Get Record 1",
+                            "node_uid": "ebf9e807-65db-4824-9bdc-e1a97b63e008",
+                            "action_key": "zuper_get_record"
+                        }
+                    ]
+                },
+                "Loop": {
+                    "input_nodes": [
+                        {
+                            "action_name": "Construct",
+                            "node_uid": "c4cf6eec-e908-4053-956d-ac5c29f83d2d",
+                            "action_key": "code"
+                        },
+                        {
+                            "action_name": "create Appointment",
+                            "node_uid": "f877a3f1-23dd-47f1-8f86-b898ab4dff7a",
+                            "action_key": "http_request"
+                        }
+                    ],
+                    "output_nodes": [
+                        {
+                            "action_name": "create Appointment",
+                            "node_uid": "f877a3f1-23dd-47f1-8f86-b898ab4dff7a",
+                            "action_key": "http_request",
+                            "output_value": false
+                        }
+                    ]
+                },
+                "create Appointment": {
+                    "input_nodes": [
+                        {
+                            "action_name": "Loop",
+                            "node_uid": "7fd8f581-0b38-44ce-be4e-e8060dc0ccb7",
+                            "output_value": false,
+                            "action_key": "loop"
+                        }
+                    ],
+                    "output_nodes": [
+                        {
+                            "action_name": "Loop",
+                            "node_uid": "7fd8f581-0b38-44ce-be4e-e8060dc0ccb7",
+                            "action_key": "loop"
+                        }
+                    ]
+                },
+                "Get Record 1 1": {
+                    "input_nodes": [
+                        {
+                            "action_name": "If/Else",
+                            "node_uid": "d388617c-a764-4057-88c5-80f1e644ac2b",
+                            "output_value": true,
+                            "action_key": "if_else"
+                        }
+                    ],
+                    "output_nodes": [
+                        {
+                            "action_name": "Split",
+                            "node_uid": "c3d9e02c-b39e-4eb7-8a8b-5fee0a4ff47f",
+                            "action_key": "split"
+                        }
+                    ]
+                },
+                "Split": {
+                    "input_nodes": [
+                        {
+                            "action_name": "Get Record 1 1",
+                            "node_uid": "6ced8a11-930a-49e8-98f0-fa5e9b1989d3",
+                            "action_key": "zuper_get_record"
+                        }
+                    ],
+                    "output_nodes": [
+                        {
+                            "action_name": "If/Else 1",
+                            "node_uid": "d8e58a79-ef5a-4a21-8b54-e11fe19ddfb5",
+                            "action_key": "if_else"
+                        },
+                        {
+                            "action_name": "If/Else 1 1 1",
+                            "node_uid": "d4af1366-1253-4477-93e5-486cda9c3a0e",
+                            "action_key": "if_else"
+                        },
+                        {
+                            "action_name": "If/Else 1 1",
+                            "node_uid": "1ff4ec02-bc36-4331-a64e-654953d33897",
+                            "action_key": "if_else"
+                        }
+                    ]
+                },
+                "If/Else 1": {
+                    "input_nodes": [
+                        {
+                            "action_name": "Split",
+                            "node_uid": "c3d9e02c-b39e-4eb7-8a8b-5fee0a4ff47f",
+                            "action_key": "split"
+                        }
+                    ],
+                    "output_nodes": [
+                        {
+                            "action_name": "Edit Record",
+                            "node_uid": "042b7a15-04cd-4786-a74d-8399238694e4",
+                            "action_key": "zuper_update",
+                            "output_value": true
+                        }
+                    ]
+                },
+                "If/Else 1 1 1": {
+                    "input_nodes": [
+                        {
+                            "action_name": "Split",
+                            "node_uid": "c3d9e02c-b39e-4eb7-8a8b-5fee0a4ff47f",
+                            "action_key": "split"
+                        }
+                    ],
+                    "output_nodes": [
+                        {
+                            "action_name": "Edit Record 1 1",
+                            "node_uid": "0ee67686-7d5d-47cf-916f-ec5093a9b2ea",
+                            "action_key": "zuper_update",
+                            "output_value": true
+                        }
+                    ]
+                },
+                "If/Else 1 1": {
+                    "input_nodes": [
+                        {
+                            "action_name": "Split",
+                            "node_uid": "c3d9e02c-b39e-4eb7-8a8b-5fee0a4ff47f",
+                            "action_key": "split"
+                        }
+                    ],
+                    "output_nodes": [
+                        {
+                            "action_name": "Edit Record 1",
+                            "node_uid": "de6f9449-418f-4156-a2f8-4abec55453ae",
+                            "action_key": "zuper_update",
+                            "output_value": true
+                        }
+                    ]
+                },
+                "Edit Record": {
+                    "input_nodes": [
+                        {
+                            "action_name": "If/Else 1",
+                            "node_uid": "d8e58a79-ef5a-4a21-8b54-e11fe19ddfb5",
+                            "output_value": true,
+                            "action_key": "if_else"
+                        }
+                    ],
+                    "output_nodes": [
+                        {
+                            "action_name": "Merge",
+                            "node_uid": "8804c6f1-efd5-46d9-a36f-14efd020b875",
+                            "action_key": "merge"
+                        }
+                    ]
+                },
+                "Edit Record 1 1": {
+                    "input_nodes": [
+                        {
+                            "action_name": "If/Else 1 1 1",
+                            "node_uid": "d4af1366-1253-4477-93e5-486cda9c3a0e",
+                            "output_value": true,
+                            "action_key": "if_else"
+                        }
+                    ],
+                    "output_nodes": [
+                        {
+                            "action_name": "Merge",
+                            "node_uid": "8804c6f1-efd5-46d9-a36f-14efd020b875",
+                            "action_key": "merge"
+                        }
+                    ]
+                },
+                "Edit Record 1": {
+                    "input_nodes": [
+                        {
+                            "action_name": "If/Else 1 1",
+                            "node_uid": "1ff4ec02-bc36-4331-a64e-654953d33897",
+                            "output_value": true,
+                            "action_key": "if_else"
+                        }
+                    ],
+                    "output_nodes": [
+                        {
+                            "action_name": "Merge",
+                            "node_uid": "8804c6f1-efd5-46d9-a36f-14efd020b875",
+                            "action_key": "merge"
+                        }
+                    ]
+                },
+                "Merge": {
+                    "input_nodes": [
+                        {
+                            "action_name": "Edit Record",
+                            "node_uid": "042b7a15-04cd-4786-a74d-8399238694e4",
+                            "action_key": "zuper_update"
+                        },
+                        {
+                            "action_name": "Edit Record 1",
+                            "node_uid": "de6f9449-418f-4156-a2f8-4abec55453ae",
+                            "action_key": "zuper_update"
+                        },
+                        {
+                            "action_name": "Edit Record 1 1",
+                            "node_uid": "0ee67686-7d5d-47cf-916f-ec5093a9b2ea",
+                            "action_key": "zuper_update"
+                        }
+                    ],
+                    "output_nodes": [
+                        {
+                            "action_name": "get job service task",
+                            "node_uid": "c49b22a7-763f-4f1c-b5f7-9f621630343d",
+                            "action_key": "http_request"
+                        }
+                    ]
+                }
+            },
+            "loop_connections": {
+                "Loop": [
+                    {
+                        "action_name": "create Appointment",
+                        "node_uid": "f877a3f1-23dd-47f1-8f86-b898ab4dff7a",
+                        "action_key": "http_request",
+                        "output_value": false
+                    }
+                ]
+            }
+        },
+        "version_details": {
+            "revision_uid": "50a2ceb1-9fb5-44e6-8b95-c7988e95c892",
+            "type": "LIVE",
+            "version": "qXwt0p0dvLxNlvatuF_n2",
+            "created_at": "2026-07-27T20:31:04.000Z"
+        },
+        "error_message": null,
+        "error_code": null,
+        "failed_node_uid": null
+    },
+    "node_execution": [
+        {
+            "node_uid": "615d972b-2acf-4f0e-9090-62ddcddc50b2",
+            "status": "COMPLETED",
+            "current_iteration": null,
+            "total_iterations": null,
+            "output_value": null,
+            "is_loop": false
+        },
+        {
+            "node_uid": "b461c826-a9ce-4a74-b4b3-ea1937282552",
+            "status": "COMPLETED",
+            "current_iteration": null,
+            "total_iterations": null,
+            "output_value": null,
+            "is_loop": false
+        },
+        {
+            "node_uid": "376af848-7eed-49dd-a27c-0b4602f40b9a",
+            "status": "COMPLETED",
+            "current_iteration": null,
+            "total_iterations": null,
+            "output_value": null,
+            "is_loop": false
+        },
+        {
+            "node_uid": "713274cb-7e80-4aaf-8b96-ae5d544f37db",
+            "status": "COMPLETED",
+            "current_iteration": null,
+            "total_iterations": null,
+            "output_value": null,
+            "is_loop": false
+        },
+        {
+            "node_uid": "a987c612-0f94-4ca4-85e9-ee9cc5d4cd69",
+            "status": "COMPLETED",
+            "current_iteration": null,
+            "total_iterations": null,
+            "output_value": null,
+            "is_loop": false
+        },
+        {
+            "node_uid": "2f1df0b9-9ce7-4cde-8bef-da26c6631bea",
+            "status": "COMPLETED",
+            "current_iteration": null,
+            "total_iterations": null,
+            "output_value": null,
+            "is_loop": false
+        },
+        {
+            "node_uid": "43e3f0bc-de08-4050-9462-851f97d37e60",
+            "status": "COMPLETED",
+            "current_iteration": null,
+            "total_iterations": null,
+            "output_value": true,
+            "is_loop": false
+        },
+        {
+            "node_uid": "0541e0fe-0fc2-4550-86f8-5a78fa734121",
+            "status": "COMPLETED",
+            "current_iteration": null,
+            "total_iterations": null,
+            "output_value": null,
+            "is_loop": false
+        },
+        {
+            "node_uid": "54c945b0-6810-445d-a461-53229112e2fa",
+            "status": "COMPLETED",
+            "current_iteration": null,
+            "total_iterations": null,
+            "output_value": true,
+            "is_loop": false
+        },
+        {
+            "node_uid": "9ebd6744-46f9-4901-9f5d-073bb5a3d72b",
+            "status": "COMPLETED",
+            "current_iteration": null,
+            "total_iterations": null,
+            "output_value": null,
+            "is_loop": false
+        },
+        {
+            "node_uid": "d388617c-a764-4057-88c5-80f1e644ac2b",
+            "status": "COMPLETED",
+            "current_iteration": null,
+            "total_iterations": null,
+            "output_value": true,
+            "is_loop": false
+        },
+        {
+            "node_uid": "6ced8a11-930a-49e8-98f0-fa5e9b1989d3",
+            "status": "COMPLETED",
+            "current_iteration": null,
+            "total_iterations": null,
+            "output_value": null,
+            "is_loop": false
+        },
+        {
+            "node_uid": "c3d9e02c-b39e-4eb7-8a8b-5fee0a4ff47f",
+            "status": "COMPLETED",
+            "current_iteration": null,
+            "total_iterations": null,
+            "output_value": null,
+            "is_loop": false
+        },
+        {
+            "node_uid": "d8e58a79-ef5a-4a21-8b54-e11fe19ddfb5",
+            "status": "COMPLETED",
+            "current_iteration": null,
+            "total_iterations": null,
+            "output_value": true,
+            "is_loop": false
+        },
+        {
+            "node_uid": "d4af1366-1253-4477-93e5-486cda9c3a0e",
+            "status": "COMPLETED",
+            "current_iteration": null,
+            "total_iterations": null,
+            "output_value": false,
+            "is_loop": false
+        },
+        {
+            "node_uid": "1ff4ec02-bc36-4331-a64e-654953d33897",
+            "status": "COMPLETED",
+            "current_iteration": null,
+            "total_iterations": null,
+            "output_value": true,
+            "is_loop": false
+        },
+        {
+            "node_uid": "042b7a15-04cd-4786-a74d-8399238694e4",
+            "status": "COMPLETED",
+            "current_iteration": null,
+            "total_iterations": null,
+            "output_value": null,
+            "is_loop": false
+        },
+        {
+            "node_uid": "de6f9449-418f-4156-a2f8-4abec55453ae",
+            "status": "COMPLETED",
+            "current_iteration": null,
+            "total_iterations": null,
+            "output_value": null,
+            "is_loop": false
+        },
+        {
+            "node_uid": "8804c6f1-efd5-46d9-a36f-14efd020b875",
+            "status": "COMPLETED",
+            "current_iteration": null,
+            "total_iterations": null,
+            "output_value": null,
+            "is_loop": false
+        },
+        {
+            "node_uid": "c49b22a7-763f-4f1c-b5f7-9f621630343d",
+            "status": "COMPLETED",
+            "current_iteration": null,
+            "total_iterations": null,
+            "output_value": true,
+            "is_loop": false
+        },
+        {
+            "node_uid": "ebf9e807-65db-4824-9bdc-e1a97b63e008",
+            "status": "COMPLETED",
+            "current_iteration": null,
+            "total_iterations": null,
+            "output_value": null,
+            "is_loop": false
+        },
+        {
+            "node_uid": "c4cf6eec-e908-4053-956d-ac5c29f83d2d",
+            "status": "COMPLETED",
+            "current_iteration": null,
+            "total_iterations": null,
+            "output_value": null,
+            "is_loop": false
+        },
+        {
+            "node_uid": "7fd8f581-0b38-44ce-be4e-e8060dc0ccb7",
+            "status": "COMPLETED",
+            "current_iteration": 0,
+            "total_iterations": 2,
+            "output_value": null,
+            "is_loop": true
+        },
+        {
+            "node_uid": "f877a3f1-23dd-47f1-8f86-b898ab4dff7a",
+            "status": "COMPLETED",
+            "current_iteration": 0,
+            "total_iterations": 2,
+            "output_value": true,
+            "is_loop": false
+        },
+        {
+            "node_uid": "7fd8f581-0b38-44ce-be4e-e8060dc0ccb7",
+            "status": "COMPLETED",
+            "current_iteration": 1,
+            "total_iterations": 2,
+            "output_value": null,
+            "is_loop": true
+        },
+        {
+            "node_uid": "f877a3f1-23dd-47f1-8f86-b898ab4dff7a",
+            "status": "COMPLETED",
+            "current_iteration": 1,
+            "total_iterations": 2,
+            "output_value": true,
+            "is_loop": false
+        },
+        {
+            "node_uid": "7fd8f581-0b38-44ce-be4e-e8060dc0ccb7",
+            "status": "COMPLETED",
+            "current_iteration": 2,
+            "total_iterations": 2,
+            "output_value": null,
+            "is_loop": true
+        }
+    ]
+}
+
+
+
+Request URL
+https://us-east-1-workflow.zuperpro.com/api/workflows/488fbdce-9c5a-4179-a65c-e330da2de877/executions/9364b024-97af-4484-93aa-54d08d9cd4e1/nodes/c4cf6eec-e908-4053-956d-ac5c29f83d2d
+Request method
+GET
+{
+    "node_execution": {
+        "node_uid": "c4cf6eec-e908-4053-956d-ac5c29f83d2d",
+        "status": "COMPLETED",
+        "input_data": {
+            "data": {
+                "data": [
+                    {
+                        "type": "MULTI_ITEM",
+                        "answer": "Roofing,Gutters",
+                        "question": "Services Provided",
+                        "meta_data": {
+                            "description": "",
+                            "selected_values": [
+                                "Roofing",
+                                "Gutters"
+                            ]
+                        },
+                        "read_only": false,
+                        "hide_field": false,
+                        "hide_to_fe": false,
+                        "updated_at": "2026-07-28T16:57:41.249Z"
+                    }
+                ],
+                "status": 200
+            },
+            "node": {
+                "node_key": "zuper_get_record",
+                "node_uid": "ebf9e807-65db-4824-9bdc-e1a97b63e008",
+                "node_name": "Get Record 1"
+            }
+        },
+        "execution_data": {
+            "data": {
+                "data": {
+                    "job_uid": "c587693e-7101-428e-9028-9b501e812020",
+                    "base_url": "https://us-east-1.zuperpro.com/api",
+                    "appointments": [
+                        {
+                            "service": "Roofing",
+                            "association_payload": {
+                                "payload": {
+                                    "job_uid": "c587693e-7101-428e-9028-9b501e812020",
+                                    "associations": []
+                                },
+                                "can_service_task_associate": false
+                            },
+                            "appointment_update_payload": {
+                                "url": "https://us-east-1.zuperpro.com/api/appointments",
+                                "payload": {
+                                    "appointment": {
+                                        "job_uid": "c587693e-7101-428e-9028-9b501e812020",
+                                        "appointment_title": "Roofing replacement for Heath"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "service": "Gutters",
+                            "association_payload": {
+                                "payload": {
+                                    "job_uid": "c587693e-7101-428e-9028-9b501e812020",
+                                    "associations": []
+                                },
+                                "can_service_task_associate": false
+                            },
+                            "appointment_update_payload": {
+                                "url": "https://us-east-1.zuperpro.com/api/appointments",
+                                "payload": {
+                                    "appointment": {
+                                        "job_uid": "c587693e-7101-428e-9028-9b501e812020",
+                                        "appointment_title": "Gutters replacement for Heath"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "can_service_task_associate": false
+                }
+            },
+            "node": {
+                "node_key": "code",
+                "node_uid": "c4cf6eec-e908-4053-956d-ac5c29f83d2d",
+                "node_name": "Construct"
+            }
+        },
+        "current_iteration": null,
+        "total_iterations": null,
+        "remarks": null
+    }
+}
+
+
+Request URL
+https://us-east-1-workflow.zuperpro.com/api/workflows/488fbdce-9c5a-4179-a65c-e330da2de877/executions/9364b024-97af-4484-93aa-54d08d9cd4e1/nodes/7fd8f581-0b38-44ce-be4e-e8060dc0ccb7?iteration=0
+
+{
+    "node_execution": {
+        "node_uid": "7fd8f581-0b38-44ce-be4e-e8060dc0ccb7",
+        "status": "COMPLETED",
+        "input_data": {
+            "data": {
+                "data": {
+                    "job_uid": "c587693e-7101-428e-9028-9b501e812020",
+                    "base_url": "https://us-east-1.zuperpro.com/api",
+                    "appointments": [
+                        {
+                            "service": "Roofing",
+                            "association_payload": {
+                                "payload": {
+                                    "job_uid": "c587693e-7101-428e-9028-9b501e812020",
+                                    "associations": []
+                                },
+                                "can_service_task_associate": false
+                            },
+                            "appointment_update_payload": {
+                                "url": "https://us-east-1.zuperpro.com/api/appointments",
+                                "payload": {
+                                    "appointment": {
+                                        "job_uid": "c587693e-7101-428e-9028-9b501e812020",
+                                        "appointment_title": "Roofing replacement for Heath"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "service": "Gutters",
+                            "association_payload": {
+                                "payload": {
+                                    "job_uid": "c587693e-7101-428e-9028-9b501e812020",
+                                    "associations": []
+                                },
+                                "can_service_task_associate": false
+                            },
+                            "appointment_update_payload": {
+                                "url": "https://us-east-1.zuperpro.com/api/appointments",
+                                "payload": {
+                                    "appointment": {
+                                        "job_uid": "c587693e-7101-428e-9028-9b501e812020",
+                                        "appointment_title": "Gutters replacement for Heath"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "can_service_task_associate": false
+                }
+            },
+            "node": {
+                "node_key": "code",
+                "node_uid": "c4cf6eec-e908-4053-956d-ac5c29f83d2d",
+                "node_name": "Construct"
+            }
+        },
+        "execution_data": {
+            "data": {
+                "service": "Roofing",
+                "association_payload": {
+                    "payload": {
+                        "job_uid": "c587693e-7101-428e-9028-9b501e812020",
+                        "associations": []
+                    },
+                    "can_service_task_associate": false
+                },
+                "appointment_update_payload": {
+                    "url": "https://us-east-1.zuperpro.com/api/appointments",
+                    "payload": {
+                        "appointment": {
+                            "job_uid": "c587693e-7101-428e-9028-9b501e812020",
+                            "appointment_title": "Roofing replacement for Heath"
+                        }
+                    }
+                }
+            },
+            "node": {
+                "node_key": "loop",
+                "node_uid": "7fd8f581-0b38-44ce-be4e-e8060dc0ccb7",
+                "node_name": "Loop"
+            },
+            "overall_data": [
+                {
+                    "service": "Roofing",
+                    "association_payload": {
+                        "payload": {
+                            "job_uid": "c587693e-7101-428e-9028-9b501e812020",
+                            "associations": []
+                        },
+                        "can_service_task_associate": false
+                    },
+                    "appointment_update_payload": {
+                        "url": "https://us-east-1.zuperpro.com/api/appointments",
+                        "payload": {
+                            "appointment": {
+                                "job_uid": "c587693e-7101-428e-9028-9b501e812020",
+                                "appointment_title": "Roofing replacement for Heath"
+                            }
+                        }
+                    }
+                },
+                {
+                    "service": "Gutters",
+                    "association_payload": {
+                        "payload": {
+                            "job_uid": "c587693e-7101-428e-9028-9b501e812020",
+                            "associations": []
+                        },
+                        "can_service_task_associate": false
+                    },
+                    "appointment_update_payload": {
+                        "url": "https://us-east-1.zuperpro.com/api/appointments",
+                        "payload": {
+                            "appointment": {
+                                "job_uid": "c587693e-7101-428e-9028-9b501e812020",
+                                "appointment_title": "Gutters replacement for Heath"
+                            }
+                        }
+                    }
+                }
+            ],
+            "total_iterations": 2,
+            "current_iteration": 0
+        },
+        "current_iteration": 0,
+        "total_iterations": 2,
+        "remarks": null
+    }
+}
+
+Request URL
+https://us-east-1-workflow.zuperpro.com/api/workflows/488fbdce-9c5a-4179-a65c-e330da2de877/executions/9364b024-97af-4484-93aa-54d08d9cd4e1/nodes/7fd8f581-0b38-44ce-be4e-e8060dc0ccb7?iteration=1
+Request method
+GET
+
+{
+    "node_execution": {
+        "node_uid": "7fd8f581-0b38-44ce-be4e-e8060dc0ccb7",
+        "status": "COMPLETED",
+        "input_data": {
+            "data": {
+                "data": {
+                    "appointment_uid": "c3c7eab8-a6d1-4894-86c8-c95c328ab630"
+                },
+                "type": "success",
+                "title": "Appointment Created Successfully",
+                "message": "Appointment Created Successfully"
+            },
+            "node": {
+                "node_key": "http_request",
+                "node_uid": "f877a3f1-23dd-47f1-8f86-b898ab4dff7a",
+                "node_name": "create Appointment"
+            },
+            "status": 200,
+            "form_fields": {
+                "url": {
+                    "type": "EXPRESSION",
+                    "value": "https://us-east-1.zuperpro.com/api/appointments"
+                },
+                "method": {
+                    "type": "FIXED",
+                    "value": "POST"
+                },
+                "timeout": {
+                    "type": "FIXED",
+                    "value": 60
+                },
+                "password": {
+                    "type": "FIXED",
+                    "value": ""
+                },
+                "username": {
+                    "type": "FIXED",
+                    "value": ""
+                },
+                "json_body": {
+                    "type": "EXPRESSION",
+                    "value": "{\"appointment\":{\"job_uid\":\"c587693e-7101-428e-9028-9b501e812020\",\"appointment_title\":\"Roofing replacement for Heath\"}}"
+                },
+                "send_body": {
+                    "type": "FIXED",
+                    "value": true
+                },
+                "ignore_ssl": {
+                    "type": "FIXED",
+                    "value": false
+                },
+                "header_type": {
+                    "value": "KEY_VALUE_PAIR"
+                },
+                "max_retries": {
+                    "type": "FIXED",
+                    "value": null
+                },
+                "content_type": {
+                    "type": "FIXED",
+                    "value": "application/json"
+                },
+                "enable_retry": {
+                    "type": "FIXED",
+                    "value": false
+                },
+                "error_action": {
+                    "type": "FIXED",
+                    "value": "STOP"
+                },
+                "send_headers": {
+                    "type": "FIXED",
+                    "value": true
+                },
+                "raw_body_data": {
+                    "type": "FIXED",
+                    "value": ""
+                },
+                "authentication": {
+                    "type": "FIXED",
+                    "value": "HEADER_AUTH"
+                },
+                "body_data_type": {
+                    "type": "FIXED",
+                    "value": "JSON"
+                },
+                "retry_interval": {
+                    "type": "FIXED",
+                    "value": null
+                },
+                "query_param_type": {
+                    "value": "KEY_VALUE_PAIR"
+                },
+                "query_parameters": [],
+                "send_query_param": {
+                    "type": "FIXED",
+                    "value": false
+                },
+                "body_content_type": {
+                    "type": "FIXED",
+                    "value": "JSON"
+                },
+                "header_parameters": [
+                    {
+                        "header_key": {
+                            "type": "FIXED",
+                            "value": "x-api-key"
+                        },
+                        "header_value": {
+                            "type": "EXPRESSION",
+                            "value": "fbeaaf5723df022a211f298aef2b4799"
+                        }
+                    }
+                ],
+                "form_data_parameters": []
+            },
+            "output_value": true,
+            "request_data": {
+                "url": "https://us-east-1.zuperpro.com/api/appointments",
+                "data": {
+                    "appointment": {
+                        "job_uid": "c587693e-7101-428e-9028-9b501e812020",
+                        "appointment_title": "Roofing replacement for Heath"
+                    }
+                },
+                "method": "post",
+                "headers": {
+                    "x-api-key": "fbeaaf5723df022a211f298aef2b4799",
+                    "Content-Type": "application/json",
+                    "workflow-uid": "488fbdce-9c5a-4179-a65c-e330da2de877",
+                    "from-workflow-builder": "true"
+                }
+            },
+            "total_iterations": 2,
+            "current_iteration": 0
+        },
+        "execution_data": {
+            "data": {
+                "service": "Gutters",
+                "association_payload": {
+                    "payload": {
+                        "job_uid": "c587693e-7101-428e-9028-9b501e812020",
+                        "associations": []
+                    },
+                    "can_service_task_associate": false
+                },
+                "appointment_update_payload": {
+                    "url": "https://us-east-1.zuperpro.com/api/appointments",
+                    "payload": {
+                        "appointment": {
+                            "job_uid": "c587693e-7101-428e-9028-9b501e812020",
+                            "appointment_title": "Gutters replacement for Heath"
+                        }
+                    }
+                }
+            },
+            "node": {
+                "node_key": "loop",
+                "node_uid": "7fd8f581-0b38-44ce-be4e-e8060dc0ccb7",
+                "node_name": "Loop"
+            },
+            "total_iterations": 2,
+            "current_iteration": 1
+        },
+        "current_iteration": 1,
+        "total_iterations": 2,
+        "remarks": null
+    }
+}
+
+
+https://us-east-1-workflow.zuperpro.com/api/workflows/488fbdce-9c5a-4179-a65c-e330da2de877/executions/9364b024-97af-4484-93aa-54d08d9cd4e1/nodes/f877a3f1-23dd-47f1-8f86-b898ab4dff7a?iteration=0
+{
+    "node_execution": {
+        "node_uid": "f877a3f1-23dd-47f1-8f86-b898ab4dff7a",
+        "status": "COMPLETED",
+        "input_data": {
+            "data": {
+                "service": "Roofing",
+                "association_payload": {
+                    "payload": {
+                        "job_uid": "c587693e-7101-428e-9028-9b501e812020",
+                        "associations": []
+                    },
+                    "can_service_task_associate": false
+                },
+                "appointment_update_payload": {
+                    "url": "https://us-east-1.zuperpro.com/api/appointments",
+                    "payload": {
+                        "appointment": {
+                            "job_uid": "c587693e-7101-428e-9028-9b501e812020",
+                            "appointment_title": "Roofing replacement for Heath"
+                        }
+                    }
+                }
+            },
+            "node": {
+                "node_key": "loop",
+                "node_uid": "7fd8f581-0b38-44ce-be4e-e8060dc0ccb7",
+                "node_name": "Loop"
+            },
+            "overall_data": [
+                {
+                    "service": "Roofing",
+                    "association_payload": {
+                        "payload": {
+                            "job_uid": "c587693e-7101-428e-9028-9b501e812020",
+                            "associations": []
+                        },
+                        "can_service_task_associate": false
+                    },
+                    "appointment_update_payload": {
+                        "url": "https://us-east-1.zuperpro.com/api/appointments",
+                        "payload": {
+                            "appointment": {
+                                "job_uid": "c587693e-7101-428e-9028-9b501e812020",
+                                "appointment_title": "Roofing replacement for Heath"
+                            }
+                        }
+                    }
+                },
+                {
+                    "service": "Gutters",
+                    "association_payload": {
+                        "payload": {
+                            "job_uid": "c587693e-7101-428e-9028-9b501e812020",
+                            "associations": []
+                        },
+                        "can_service_task_associate": false
+                    },
+                    "appointment_update_payload": {
+                        "url": "https://us-east-1.zuperpro.com/api/appointments",
+                        "payload": {
+                            "appointment": {
+                                "job_uid": "c587693e-7101-428e-9028-9b501e812020",
+                                "appointment_title": "Gutters replacement for Heath"
+                            }
+                        }
+                    }
+                }
+            ],
+            "total_iterations": 2,
+            "current_iteration": 0
+        },
+        "execution_data": {
+            "data": {
+                "data": {
+                    "appointment_uid": "c3c7eab8-a6d1-4894-86c8-c95c328ab630"
+                },
+                "type": "success",
+                "title": "Appointment Created Successfully",
+                "message": "Appointment Created Successfully"
+            },
+            "node": {
+                "node_key": "http_request",
+                "node_uid": "f877a3f1-23dd-47f1-8f86-b898ab4dff7a",
+                "node_name": "create Appointment"
+            },
+            "status": 200,
+            "form_fields": {
+                "url": {
+                    "type": "EXPRESSION",
+                    "value": "https://us-east-1.zuperpro.com/api/appointments"
+                },
+                "method": {
+                    "type": "FIXED",
+                    "value": "POST"
+                },
+                "timeout": {
+                    "type": "FIXED",
+                    "value": 60
+                },
+                "password": {
+                    "type": "FIXED",
+                    "value": ""
+                },
+                "username": {
+                    "type": "FIXED",
+                    "value": ""
+                },
+                "json_body": {
+                    "type": "EXPRESSION",
+                    "value": "{\"appointment\":{\"job_uid\":\"c587693e-7101-428e-9028-9b501e812020\",\"appointment_title\":\"Roofing replacement for Heath\"}}"
+                },
+                "send_body": {
+                    "type": "FIXED",
+                    "value": true
+                },
+                "ignore_ssl": {
+                    "type": "FIXED",
+                    "value": false
+                },
+                "header_type": {
+                    "value": "KEY_VALUE_PAIR"
+                },
+                "max_retries": {
+                    "type": "FIXED",
+                    "value": null
+                },
+                "content_type": {
+                    "type": "FIXED",
+                    "value": "application/json"
+                },
+                "enable_retry": {
+                    "type": "FIXED",
+                    "value": false
+                },
+                "error_action": {
+                    "type": "FIXED",
+                    "value": "STOP"
+                },
+                "send_headers": {
+                    "type": "FIXED",
+                    "value": true
+                },
+                "raw_body_data": {
+                    "type": "FIXED",
+                    "value": ""
+                },
+                "authentication": {
+                    "type": "FIXED",
+                    "value": "HEADER_AUTH"
+                },
+                "body_data_type": {
+                    "type": "FIXED",
+                    "value": "JSON"
+                },
+                "retry_interval": {
+                    "type": "FIXED",
+                    "value": null
+                },
+                "query_param_type": {
+                    "value": "KEY_VALUE_PAIR"
+                },
+                "query_parameters": [],
+                "send_query_param": {
+                    "type": "FIXED",
+                    "value": false
+                },
+                "body_content_type": {
+                    "type": "FIXED",
+                    "value": "JSON"
+                },
+                "header_parameters": [
+                    {
+                        "header_key": {
+                            "type": "FIXED",
+                            "value": "x-api-key"
+                        },
+                        "header_value": {
+                            "type": "EXPRESSION",
+                            "value": "fbeaaf5723df022a211f298aef2b4799"
+                        }
+                    }
+                ],
+                "form_data_parameters": []
+            },
+            "output_value": true,
+            "request_data": {
+                "url": "https://us-east-1.zuperpro.com/api/appointments",
+                "data": {
+                    "appointment": {
+                        "job_uid": "c587693e-7101-428e-9028-9b501e812020",
+                        "appointment_title": "Roofing replacement for Heath"
+                    }
+                },
+                "method": "post",
+                "headers": {
+                    "x-api-key": "fbeaaf5723df022a211f298aef2b4799",
+                    "Content-Type": "application/json",
+                    "workflow-uid": "488fbdce-9c5a-4179-a65c-e330da2de877",
+                    "from-workflow-builder": "true"
+                }
+            },
+            "total_iterations": 2,
+            "current_iteration": 0
+        },
+        "current_iteration": 0,
+        "total_iterations": 2,
+        "remarks": null
+    }
+}
+
+
+https://us-east-1-workflow.zuperpro.com/api/workflows/488fbdce-9c5a-4179-a65c-e330da2de877/executions/9364b024-97af-4484-93aa-54d08d9cd4e1/nodes/f877a3f1-23dd-47f1-8f86-b898ab4dff7a?iteration=1
+
+
+{
+    "node_execution": {
+        "node_uid": "f877a3f1-23dd-47f1-8f86-b898ab4dff7a",
+        "status": "COMPLETED",
+        "input_data": {
+            "data": {
+                "service": "Gutters",
+                "association_payload": {
+                    "payload": {
+                        "job_uid": "c587693e-7101-428e-9028-9b501e812020",
+                        "associations": []
+                    },
+                    "can_service_task_associate": false
+                },
+                "appointment_update_payload": {
+                    "url": "https://us-east-1.zuperpro.com/api/appointments",
+                    "payload": {
+                        "appointment": {
+                            "job_uid": "c587693e-7101-428e-9028-9b501e812020",
+                            "appointment_title": "Gutters replacement for Heath"
+                        }
+                    }
+                }
+            },
+            "node": {
+                "node_key": "loop",
+                "node_uid": "7fd8f581-0b38-44ce-be4e-e8060dc0ccb7",
+                "node_name": "Loop"
+            },
+            "total_iterations": 2,
+            "current_iteration": 1
+        },
+        "execution_data": {
+            "data": {
+                "data": {
+                    "appointment_uid": "48ae0572-3c18-4a1f-acee-9066eb1ef2cc"
+                },
+                "type": "success",
+                "title": "Appointment Created Successfully",
+                "message": "Appointment Created Successfully"
+            },
+            "node": {
+                "node_key": "http_request",
+                "node_uid": "f877a3f1-23dd-47f1-8f86-b898ab4dff7a",
+                "node_name": "create Appointment"
+            },
+            "status": 200,
+            "form_fields": {
+                "url": {
+                    "type": "EXPRESSION",
+                    "value": "https://us-east-1.zuperpro.com/api/appointments"
+                },
+                "method": {
+                    "type": "FIXED",
+                    "value": "POST"
+                },
+                "timeout": {
+                    "type": "FIXED",
+                    "value": 60
+                },
+                "password": {
+                    "type": "FIXED",
+                    "value": ""
+                },
+                "username": {
+                    "type": "FIXED",
+                    "value": ""
+                },
+                "json_body": {
+                    "type": "EXPRESSION",
+                    "value": "{\"appointment\":{\"job_uid\":\"c587693e-7101-428e-9028-9b501e812020\",\"appointment_title\":\"Gutters replacement for Heath\"}}"
+                },
+                "send_body": {
+                    "type": "FIXED",
+                    "value": true
+                },
+                "ignore_ssl": {
+                    "type": "FIXED",
+                    "value": false
+                },
+                "header_type": {
+                    "value": "KEY_VALUE_PAIR"
+                },
+                "max_retries": {
+                    "type": "FIXED",
+                    "value": null
+                },
+                "content_type": {
+                    "type": "FIXED",
+                    "value": "application/json"
+                },
+                "enable_retry": {
+                    "type": "FIXED",
+                    "value": false
+                },
+                "error_action": {
+                    "type": "FIXED",
+                    "value": "STOP"
+                },
+                "send_headers": {
+                    "type": "FIXED",
+                    "value": true
+                },
+                "raw_body_data": {
+                    "type": "FIXED",
+                    "value": ""
+                },
+                "authentication": {
+                    "type": "FIXED",
+                    "value": "HEADER_AUTH"
+                },
+                "body_data_type": {
+                    "type": "FIXED",
+                    "value": "JSON"
+                },
+                "retry_interval": {
+                    "type": "FIXED",
+                    "value": null
+                },
+                "query_param_type": {
+                    "value": "KEY_VALUE_PAIR"
+                },
+                "query_parameters": [],
+                "send_query_param": {
+                    "type": "FIXED",
+                    "value": false
+                },
+                "body_content_type": {
+                    "type": "FIXED",
+                    "value": "JSON"
+                },
+                "header_parameters": [
+                    {
+                        "header_key": {
+                            "type": "FIXED",
+                            "value": "x-api-key"
+                        },
+                        "header_value": {
+                            "type": "EXPRESSION",
+                            "value": "fbeaaf5723df022a211f298aef2b4799"
+                        }
+                    }
+                ],
+                "form_data_parameters": []
+            },
+            "output_value": true,
+            "request_data": {
+                "url": "https://us-east-1.zuperpro.com/api/appointments",
+                "data": {
+                    "appointment": {
+                        "job_uid": "c587693e-7101-428e-9028-9b501e812020",
+                        "appointment_title": "Gutters replacement for Heath"
+                    }
+                },
+                "method": "post",
+                "headers": {
+                    "x-api-key": "fbeaaf5723df022a211f298aef2b4799",
+                    "Content-Type": "application/json",
+                    "workflow-uid": "488fbdce-9c5a-4179-a65c-e330da2de877",
+                    "from-workflow-builder": "true"
+                }
+            },
+            "total_iterations": 2,
+            "current_iteration": 1
+        },
+        "current_iteration": 1,
+        "total_iterations": 2,
+        "remarks": null
+    }
+}
+
+

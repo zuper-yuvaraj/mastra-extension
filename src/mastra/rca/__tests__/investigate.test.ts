@@ -132,7 +132,12 @@ test('the user message states the question, or a default one', async () => {
 test('an oversized seed is trimmed to a bounded prompt', async () => {
   const execution = fakeExecution(true);
   const seed = await buildSeed(execution, assembleContext(execution, null));
-  const huge = { ...seed, executed_nodes: Array.from({ length: 3000 }, (_, i) => ({ order: i, uid: `u${i}`, name: `Node ${i}`, type: 't', status: 'COMPLETED' })) };
+  const huge = {
+    ...seed,
+    executed_nodes: Array.from({ length: 3000 }, (_, i) => ({
+      order: i, uid: `u${i}`, name: `Node ${i}`, type: 't', status: 'COMPLETED', runs: 1, total_iterations: null, is_loop: false, failed_iterations: [],
+    })),
+  };
   assert.ok(buildUserMessage(huge).length < 16000);
 });
 

@@ -2,7 +2,8 @@
 // each reference in a node's form_fields, find the producing node's real execution data and walk the
 // access path segment by segment. The result says WHERE a path breaks, not just that it did.
 
-import { RCA_VALUE_PREVIEW_CHARS } from './config';
+import { parseNodeExecution } from './nodeData';
+import { preview } from './preview';
 import { extractReferences, renderSegments, type ExtractedReference, type ReferenceKind, type Segment } from './references';
 
 /** What the resolver needs from a run. Kept narrow so it is testable without a live execution. */
@@ -13,8 +14,11 @@ export interface ResolverEnv {
   previousNodeUid(uid: string): string | undefined;
   /** The n-th previous node along the upstream chain (1 = previous). */
   recentNodeUid(uid: string, n: number): string | undefined;
-  /** Raw node-execution payload, or undefined when the node did not run in this execution. */
-  getNodeExecutionData(uid: string): Promise<unknown> | undefined;
+  /** Raw node-execution payload, or undefined when the node did not run in this execution. A node inside a
+   * loop is read per iteration. */
+  getNodeExecutionData(uid: string, iteration?: number): Promise<unknown> | undefined;
+  /** Loop iterations the node ran in (empty if it ran once). */
+  iterationsOf(uid: string): number[];
 }
 
 export type InputStatus =
@@ -36,10 +40,14 @@ export type InputStatus =
 
 export interface ResolvedInput {
   field: string;
+  /** Code v2 declared input: the node reads this value as `$input.<alias>`. */
+  alias?: string;
   expression: string;
   kind: ReferenceKind;
   status: InputStatus;
   target?: { uid?: string; name?: string };
+  /** Which loop iteration of the source node was read, when it ran in a loop. */
+  iteration?: number;
   /** Bounded JSON preview of the resolved value. */
   value?: string;
   valueType?: string;
@@ -59,9 +67,13 @@ function isObject(value: unknown): value is Record<string, unknown> {
 
 /**
  * Accessors act on the node's {node, data} wrapper (expressions_reference.json). The node-execution
- * API's exact envelope is not documented, so find the wrapper defensively and say when it was assumed.
+ * API returns `{ node_execution: { execution_data: <that wrapper>, input_data, ... } }` (confirmed on a
+ * real execution, see nodeData.ts); other shapes are still recognised defensively, and `assumed` says
+ * when none matched and the payload was taken to be the data itself.
  */
 export function toWrapper(raw: unknown): { wrapper: unknown; assumed: boolean } {
+  const parsed = parseNodeExecution(raw);
+  if (parsed) return { wrapper: parsed.executionData ?? {}, assumed: false };
   if (isObject(raw)) {
     if (isObject(raw.execution_data)) return { wrapper: raw.execution_data, assumed: false };
     if ('data' in raw && 'node' in raw) return { wrapper: raw, assumed: false };
@@ -79,15 +91,7 @@ export function fetchFailure(raw: unknown): string | null {
   return null;
 }
 
-export function preview(value: unknown, limit = RCA_VALUE_PREVIEW_CHARS): string {
-  let text: string;
-  try {
-    text = JSON.stringify(value) ?? String(value);
-  } catch {
-    text = String(value);
-  }
-  return text.length <= limit ? text : `${text.slice(0, limit)}…(${text.length} chars)`;
-}
+export { preview };
 
 function typeOf(value: unknown): string {
   return Array.isArray(value) ? 'array' : value === null ? 'null' : typeof value;
@@ -173,8 +177,9 @@ async function resolveReference(
   ref: ExtractedReference,
   ownerUid: string,
   env: ResolverEnv,
+  iteration?: number,
 ): Promise<ResolvedInput> {
-  const base = { field: ref.field, expression: ref.raw, kind: ref.kind };
+  const base = { field: ref.field, alias: ref.alias, expression: ref.raw, kind: ref.kind };
 
   if (!ref.evaluated) {
     return {
@@ -185,6 +190,29 @@ async function resolveReference(
   }
   if (ref.kind === 'variable') {
     return { ...base, status: 'variable', note: `workflow variable "${ref.variable}" (value not exposed here)` };
+  }
+
+  // Native Zuper nodes name the node whose record they act on (not an expression, so there is no path).
+  if (ref.kind === 'source_node') {
+    const uid = ref.targetUid;
+    const name = uid ? env.nameByUid(uid) : undefined;
+    if (!uid || !name) {
+      return {
+        ...base,
+        status: 'target_unknown',
+        target: { uid },
+        note: `This node acts on the record from node ${uid}, which is not part of the workflow version that ran.`,
+      };
+    }
+    if (!env.getNodeExecutionData(uid)) {
+      return { ...base, status: 'target_not_run', target: { uid, name }, note: `This node acts on the record from "${name}", but "${name}" did not run.` };
+    }
+    return {
+      ...base,
+      status: 'resolved',
+      target: { uid, name },
+      note: `Acts on the record supplied by "${name}" (selected as its record source). If that record is wrong or missing, the cause is upstream of this node.`,
+    };
   }
 
   let targetUid: string | undefined;
@@ -209,7 +237,45 @@ async function resolveReference(
     };
   }
 
-  const pending = env.getNodeExecutionData(targetUid);
+  // Which run of the target to read. A node inside a loop ran once per iteration and is fetched per
+  // iteration: the same iteration as the node doing the reading when the target has it, otherwise its last.
+  const targetIterations = env.iterationsOf(targetUid);
+  let wanted: number | undefined;
+  if (targetIterations.length > 0) {
+    wanted = iteration !== undefined && targetIterations.includes(iteration) ? iteration : targetIterations[targetIterations.length - 1];
+  }
+  if (ref.kind === 'all_runs') {
+    // getNodeData returns every run; a leading [i] selects the i-th (default: the first).
+    const selector = ref.runSelector;
+    if (selector?.kind === 'dynamic') {
+      const thisIteration = /getCurrentLoopIndex/.test(selector.raw) && iteration !== undefined && targetIterations.includes(iteration);
+      if (!thisIteration) {
+        return {
+          ...base,
+          status: 'dynamic',
+          target: { uid: targetUid, name: targetName },
+          note: `run selected by [${selector.raw}], which depends on runtime state`,
+        };
+      }
+      wanted = iteration;
+    } else {
+      const runIndex = selector?.kind === 'index' ? selector.index : 0;
+      const runCount = Math.max(targetIterations.length, 1);
+      if (runIndex >= runCount) {
+        return {
+          ...base,
+          status: 'undefined',
+          target: { uid: targetUid, name: targetName },
+          failedAt: `getNodeData('${targetName}')`,
+          segment: `[${runIndex}]`,
+          note: `"${targetName}" has ${runCount} run(s); run ${runIndex} does not exist`,
+        };
+      }
+      if (targetIterations.length > 0) wanted = targetIterations[runIndex];
+    }
+  }
+
+  const pending = env.getNodeExecutionData(targetUid, wanted);
   if (!pending) {
     return {
       ...base,
@@ -226,50 +292,21 @@ async function resolveReference(
       ...base,
       status: 'fetch_failed',
       target: { uid: targetUid, name: targetName },
-      note: `"${targetName}" ran, but its data could not be loaded (${failure}). Do not conclude anything about its output.`,
+      iteration: wanted,
+      note: `"${targetName}" ran${wanted !== undefined ? ` (iteration ${wanted})` : ''}, but its data could not be loaded (${failure}). Do not conclude anything about its output.`,
     };
   }
 
-  // A node that ran several times (e.g. inside a loop) comes back as one payload per run.
-  const runs = (Array.isArray(raw) ? raw : [raw]).map(toWrapper);
-  const assumed = runs.some((r) => r.assumed);
-
+  const { wrapper, assumed } = toWrapper(raw);
   const segments = ref.path;
-  let root: unknown;
-  if (ref.kind === 'all_runs') {
-    // getNodeData returns every run; a leading [i] selects one (default: the first).
-    const selector = ref.runSelector;
-    if (selector?.kind === 'dynamic') {
-      return {
-        ...base,
-        status: 'dynamic',
-        target: { uid: targetUid, name: targetName },
-        note: `run selected by [${selector.raw}], which depends on the loop iteration`,
-        shapeAssumed: assumed || undefined,
-      };
-    }
-    const runIndex = selector?.kind === 'index' ? selector.index : 0;
-    if (runIndex >= runs.length) {
-      return {
-        ...base,
-        status: 'undefined',
-        target: { uid: targetUid, name: targetName },
-        failedAt: `getNodeData('${targetName}')`,
-        segment: `[${runIndex}]`,
-        note: `"${targetName}" has ${runs.length} run(s); run ${runIndex} does not exist`,
-      };
-    }
-    root = runs[runIndex]!.wrapper;
-  } else {
-    // latest / $item / recent: the most recent run.
-    root = runs[runs.length - 1]!.wrapper;
-  }
+  const root: unknown = wrapper;
 
   const walked = walkPath(root, segments);
   return {
     ...base,
     status: walked.status,
     target: { uid: targetUid, name: targetName },
+    iteration: wanted,
     value: walked.status === 'resolved' || walked.status === 'null' ? preview(walked.value) : undefined,
     valueType: walked.status === 'resolved' ? typeOf(walked.value) : undefined,
     failedAt: walked.failedAt,
@@ -285,6 +322,8 @@ export async function resolveNodeInputs(
   nodeUid: string,
   formFields: unknown,
   env: ResolverEnv,
+  /** The loop iteration the reading node is running in, if any: looped sources are read at the same one. */
+  iteration?: number,
 ): Promise<ResolvedInput[]> {
   const seen = new Set<string>();
   const refs = extractReferences(formFields).filter((ref) => {
@@ -293,5 +332,5 @@ export async function resolveNodeInputs(
     seen.add(key);
     return true;
   });
-  return Promise.all(refs.map((ref) => resolveReference(ref, nodeUid, env)));
+  return Promise.all(refs.map((ref) => resolveReference(ref, nodeUid, env, iteration)));
 }

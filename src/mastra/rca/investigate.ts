@@ -133,7 +133,8 @@ export async function investigate(input: InvestigationInput): Promise<RcaResult>
     ...(executionContext?.executedNodes.map((n) => n.node_uid) ?? []),
     ...((executionContext?.workflowData?.nodes ?? []).map((n) => n.node_uid).filter((uid): uid is string => Boolean(uid))),
   ]);
-  const verdict = verifyVerdict(raw, { nodeUids, ledger });
+  // fetch_failed anywhere in what the agent was shown means some node data was never readable.
+  const verdict = verifyVerdict(raw, { nodeUids, ledger, executionUid, dataGaps: ledger.contains('fetch_failed') });
 
   return {
     verdict,

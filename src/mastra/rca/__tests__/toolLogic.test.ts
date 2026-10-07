@@ -50,12 +50,14 @@ test('a node with only literal fields says it reads nothing', async () => {
   assert.match(result.summary, /literal/);
 });
 
-test('get_node_data without select returns a shape, never the raw payload', async () => {
+test('get_node_data without select returns shapes of what the node produced and received, never the raw payload', async () => {
   const result: any = await getNodeData(failed, 'Get Job');
   assert.equal(result.ran, true);
-  assert.ok(result.shape);
+  assert.ok(result.output_shape);
+  assert.ok(result.input_shape, 'Get Job received the output of On Webhook');
   assert.equal(result.selected, undefined);
   assert.match(result.hint, /select/);
+  assert.equal(result.runtime.received_from, 'On Webhook');
 });
 
 test('get_node_data with select reads exact values and reports misses with the real keys', async () => {
@@ -63,14 +65,27 @@ test('get_node_data with select reads exact values and reports misses with the r
   assert.equal(result.selected[0].status, 'resolved');
   assert.equal(result.selected[0].value, '"job-1"');
   assert.equal(result.selected[1].status, 'undefined');
-  assert.deepEqual(result.selected[1].availableKeys, ['data']);
+  assert.ok(result.selected[1].availableKeys.includes('data'), 'the real keys are offered');
 });
 
-test('top-level status and error are surfaced for a failed node', async () => {
+test('which="input" reads what the node RECEIVED (the previous node data), not what it produced', async () => {
+  const received: any = await getNodeData(failed, 'Send Email', { which: 'input', select: ['data.data.customer'] });
+  assert.equal(received.which, 'input');
+  assert.equal(received.selected[0].status, 'null', 'Send Email was handed a job whose customer is null');
+
+  const produced: any = await getNodeData(failed, 'Send Email', { select: ['data.data.customer'] });
+  assert.notEqual(produced.selected[0].status, 'null', 'Send Email itself produced no job data');
+
+  const trigger: any = await getNodeData(failed, 'On Webhook', { which: 'input', select: ['data'] });
+  assert.match(trigger.message, /received no input/);
+});
+
+test("a failed node's own error and status are surfaced as runtime facts", async () => {
   const result: any = await getNodeData(failed, 'Send Email');
-  assert.equal(result.top_level.status, 'FAILED');
-  assert.equal(result.top_level.error, 'recipient is required');
-  assert.equal(result.shape_assumed, true, 'this payload is not a {node,data} wrapper, so that is reported');
+  assert.equal(result.runtime.node_status, 'FAILED');
+  assert.equal(result.runtime.error, 'recipient is required');
+  assert.equal(result.runtime.received_from, 'Get Job');
+  assert.equal(result.shape_assumed, undefined, 'the real envelope shape is recognised, nothing is assumed');
 });
 
 test('a failed node-data fetch is reported as such, not as empty data', async () => {

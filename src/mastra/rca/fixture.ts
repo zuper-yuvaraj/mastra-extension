@@ -12,8 +12,11 @@ export interface RcaFixture {
   captured_at: string;
   workflow_uid: string;
   summary: ExecutionSummaryResponse;
-  /** node_uid -> raw node-execution payload exactly as the API returned it (after sanitizing). */
+  /** node_uid -> raw node-execution payload exactly as the API returned it (after sanitizing), for a node
+   * that was fetched without an iteration. */
   node_data: Record<string, unknown>;
+  /** node_uid -> iteration -> payload, for nodes inside a loop (fetched as `.../nodes/<uid>?iteration=N`). */
+  iteration_data?: Record<string, Record<string, unknown>>;
   /** What a human established for this execution; the eval scores the agent against it. */
   expected?: {
     status?: 'failed' | 'unexpected_branch' | 'no_issue' | 'insufficient_evidence';
@@ -27,7 +30,13 @@ export interface RcaFixture {
 export const FIXTURE_DIR = projectPath('fixtures', 'rca');
 
 export function executionContextFromFixture(fixture: RcaFixture): ExecutionContext {
-  return createExecutionContext(fixture.summary, async (nodeUid) => {
+  return createExecutionContext(fixture.summary, async (nodeUid, iteration) => {
+    if (iteration !== undefined) {
+      const run = fixture.iteration_data?.[nodeUid]?.[String(iteration)];
+      if (run !== undefined) return run;
+      // the capture holds only some iterations: an iteration that was not captured is simply unreadable
+      if (fixture.iteration_data?.[nodeUid]) throw new Error('FETCH_FAILED');
+    }
     if (nodeUid in fixture.node_data) return fixture.node_data[nodeUid];
     throw new Error('FETCH_FAILED');
   });

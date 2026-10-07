@@ -12,7 +12,7 @@ export type Segment =
   /** A bracket the extractor cannot evaluate statically, e.g. `[$.getCurrentLoopIndex()]`. */
   | { kind: 'dynamic'; raw: string };
 
-export type ReferenceKind = 'latest' | 'all_runs' | 'previous' | 'recent' | 'variable';
+export type ReferenceKind = 'latest' | 'all_runs' | 'previous' | 'recent' | 'variable' | 'source_node';
 
 export interface ExtractedReference {
   kind: ReferenceKind;
@@ -20,6 +20,8 @@ export interface ExtractedReference {
   raw: string;
   /** Display name for `latest` / `all_runs` references. */
   targetName?: string;
+  /** For `source_node`: the uid of the node whose record this node acts on. */
+  targetUid?: string;
   /** For `recent`: how many nodes back (0 or empty = the previous node). */
   recent?: number;
   /** For `all_runs`: the run selector (`[0]`, `[$.getCurrentLoopIndex()]`) when one was written. */
@@ -34,9 +36,12 @@ export interface ExtractedReference {
   fieldType?: string;
   /** False for a FIXED field: its text is used literally and the reference is never evaluated. */
   evaluated: boolean;
+  /** Code v2 declared input: the name the code reads it by (`$input.<alias>`). */
+  alias?: string;
 }
 
 const IDENT_START = /[A-Za-z_$]/;
+const NODE_UID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const IDENT = /[\w$]/;
 
 /** Reads `.key` / `['key']` / `[0]` / `[expr]` accessors starting at `start`; stops at anything else. */
@@ -94,13 +99,14 @@ export function renderSegments(segments: Segment[]): string {
 interface Scan {
   field: string;
   fieldType?: string;
+  alias?: string;
 }
 
 /** Every reference inside one string. */
 export function extractFromString(text: string, scan: Scan = { field: '' }): ExtractedReference[] {
   const refs: ExtractedReference[] = [];
   const evaluated = scan.fieldType === undefined || scan.fieldType === 'EXPRESSION';
-  const base = { field: scan.field, fieldType: scan.fieldType, evaluated };
+  const base = { field: scan.field, fieldType: scan.fieldType, evaluated, alias: scan.alias };
 
   const named = /\$\.(getLatestNodeData|getNodeData)\(\s*(['"])(.*?)\2\s*\)/g;
   for (const m of text.matchAll(named)) {
@@ -146,24 +152,51 @@ export function extractFromString(text: string, scan: Scan = { field: '' }): Ext
   return refs;
 }
 
-/** Walks `form_fields`, tracking the field path and the FIXED/EXPRESSION envelope each string sits in. */
+/** Walks `form_fields`, tracking the field path and the FIXED/EXPRESSION envelope each string sits in.
+ *
+ * A `{type, value}` envelope decides whether *its own string value* is evaluated. When `value` is a list
+ * or object instead, `type` describes the container and not what is inside it: a Code v2 node keeps its
+ * declared inputs as `{type: 'FIXED', value: [{node, expression, variable_name}, ...]}` and every one of
+ * those `expression`s IS evaluated (real executions confirm). Children therefore do not inherit a type. */
 export function extractReferences(formFields: unknown): ExtractedReference[] {
   const out: ExtractedReference[] = [];
 
-  const walk = (value: unknown, field: string, fieldType: string | undefined): void => {
+  const walk = (value: unknown, field: string, fieldType: string | undefined, alias: string | undefined): void => {
     if (typeof value === 'string') {
-      if (value.includes('$') || /variable/i.test(value)) out.push(...extractFromString(value, { field, fieldType }));
+      if (value.includes('$') || /variable/i.test(value)) out.push(...extractFromString(value, { field, fieldType, alias }));
     } else if (Array.isArray(value)) {
-      value.forEach((item, i) => walk(item, `${field}[${i}]`, fieldType));
+      value.forEach((item, i) => walk(item, `${field}[${i}]`, undefined, undefined));
     } else if (value && typeof value === 'object') {
       const record = value as Record<string, unknown>;
-      const envelopeType = typeof record.type === 'string' && 'value' in record ? record.type : fieldType;
+      const isStringEnvelope = typeof record.type === 'string' && typeof record.value === 'string';
+      // Native Zuper nodes (update / get record) pick the record to act on by naming a node, not with an
+      // expression: `source_node: {type: 'FIXED', value: '<node uid>'}`. 'CUSTOM' means they use module_uid.
+      const source = record.source_node as { type?: unknown; value?: unknown } | undefined;
+      if (source && typeof source.value === 'string' && NODE_UID.test(source.value)) {
+        out.push({
+          kind: 'source_node',
+          raw: `source_node=${source.value}`,
+          targetUid: source.value,
+          path: [],
+          field: field ? `${field}.source_node.value` : 'source_node.value',
+          fieldType: typeof source.type === 'string' ? source.type : undefined,
+          evaluated: true,
+        });
+      }
+      // Code v2 input mapping: this expression is what `$input.<variable_name>` holds inside the code.
+      const inputAlias =
+        typeof record.variable_name === 'string' && typeof record.expression === 'string' ? record.variable_name : undefined;
       for (const [key, child] of Object.entries(record)) {
-        walk(child, field ? `${field}.${key}` : key, key === 'type' ? undefined : envelopeType);
+        walk(
+          child,
+          field ? `${field}.${key}` : key,
+          isStringEnvelope && key === 'value' ? (record.type as string) : undefined,
+          key === 'expression' ? inputAlias : undefined,
+        );
       }
     }
   };
 
-  walk(formFields, '', undefined);
+  walk(formFields, '', undefined, undefined);
   return out;
 }

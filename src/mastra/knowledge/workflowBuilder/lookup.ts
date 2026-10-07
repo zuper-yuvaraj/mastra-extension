@@ -10,6 +10,7 @@ const FIELD_SCHEMA_KEY: Record<string, string> = {
   internal_notification: 'notification',
   zuper_customer_notifications: 'notification',
   external_webhook: 'trigger',
+  zuper_event_trigger: 'trigger',
   schedule: 'schedule',
 };
 const OUTPUT_SHAPE_KEY: Record<string, string> = {
@@ -31,8 +32,19 @@ function catalogKey(node: CatalogNode): string {
   return node.action_key.includes(' ') || node.action_key.includes('(') ? ZUPER_EVENT_KEY : node.action_key;
 }
 
+/** Real executions name nodes differently from the catalog: an HTTP node is `http_request` (the catalog
+ * says `http_request_v2`) and a Zuper event trigger has node_name `zuper` and an action_key such as
+ * `job.status_update`, `estimate.created`... The catalog has one placeholder entry for all of them.
+ * Accept what an execution shows and translate to the catalog's key. */
+function canonicalKey(input: string): string {
+  const key = input.trim().toLowerCase();
+  if (key === 'http_request') return 'http_request_v2';
+  if (key === 'zuper' || /^[a-z_]+\.[a-z_.]+$/.test(key)) return ZUPER_EVENT_KEY;
+  return key;
+}
+
 function findCatalogNode(actionKey: string): CatalogNode | undefined {
-  const wanted = actionKey.trim().toLowerCase();
+  const wanted = canonicalKey(actionKey);
   return loadWorkflowBuilderKnowledge().nodeCatalog.nodes.find((n) => catalogKey(n).toLowerCase() === wanted);
 }
 
@@ -88,7 +100,7 @@ export function getNodeFields(actionKey: string, options: { mode?: string; field
   const { mode, field } = options;
   const knowledge = loadWorkflowBuilderKnowledge();
   const node = findCatalogNode(actionKey);
-  const key = node ? catalogKey(node) : actionKey.trim();
+  const key = node ? catalogKey(node) : canonicalKey(actionKey);
   const schemaKey = FIELD_SCHEMA_KEY[key] ?? key;
   const schema = knowledge.nodeFieldSchemas.nodes[schemaKey] as Record<string, any> | undefined;
   if (!schema) return { found: false, message: `No field schema for "${actionKey}". Call list_nodes for valid keys.` };
@@ -152,7 +164,7 @@ export function getNodeFields(actionKey: string, options: { mode?: string; field
 export function getNodeOutputShape(actionKey: string) {
   const knowledge = loadWorkflowBuilderKnowledge();
   const node = findCatalogNode(actionKey);
-  const key = node ? catalogKey(node) : actionKey.trim();
+  const key = node ? catalogKey(node) : canonicalKey(actionKey);
   const shapes = knowledge.expressions.node_output_shapes as Record<string, unknown>;
   const trigger = (knowledge.expressions as Record<string, any>).trigger_data_shapes as Record<string, unknown> | undefined;
   const shape = shapes[OUTPUT_SHAPE_KEY[key] ?? key] ?? trigger?.[key === ZUPER_EVENT_KEY ? 'zuper_event' : key];

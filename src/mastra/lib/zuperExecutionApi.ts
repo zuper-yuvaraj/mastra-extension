@@ -62,6 +62,11 @@ export interface WorkflowExecutionSummary {
   error_message?: string;
   error_code?: string;
   failed_node_uid?: string;
+  /** AUTOMATED (fired by a trigger) or MANUAL (a person ran it, e.g. Test Workflow). */
+  mode?: string;
+  /** LIVE (the published version) or DRAFT (an unpublished test version). */
+  type?: string;
+  version_details?: { revision_uid?: string; type?: string; version?: string; created_at?: string };
   workflow_data?: ExecutedWorkflowData;
 }
 
@@ -94,8 +99,13 @@ export interface ExecutionContext {
   /**
    * Lazily fetches (and caches) one node's raw execution detail, by node name or node_uid. Returns
    * undefined if it didn't run in this execution. Nothing is fetched until this is actually called.
+   * A node inside a loop ran once per iteration and is fetched per iteration (`?iteration=N`): pass the
+   * iteration; see `iterationsOf` for which exist.
    */
-  getNodeExecutionData: (nameOrUid: string) => Promise<unknown> | undefined;
+  getNodeExecutionData: (nameOrUid: string, iteration?: number) => Promise<unknown> | undefined;
+  /** The loop iterations a node ran in (ascending), from the execution summary. Empty for a node that
+   * ran once outside any loop. A loop node itself has one more (the final "done" pass) than its body. */
+  iterationsOf: (nameOrUid: string) => number[];
 }
 
 /** Reference names are hand-typed into expressions, so match forgivingly on case/whitespace. */
@@ -143,9 +153,11 @@ async function fetchNodeExecutionData(
   nodeUid: string,
   token: string,
   workflowBuilderUrl: string,
+  iteration?: number,
 ): Promise<unknown> {
+  const query = iteration === undefined ? '' : `?iteration=${iteration}`;
   const res = await fetch(
-    `${workflowBuilderUrl}/api/workflows/${workflowUid}/executions/${executionUid}/nodes/${nodeUid}`,
+    `${workflowBuilderUrl}/api/workflows/${workflowUid}/executions/${executionUid}/nodes/${nodeUid}${query}`,
     { headers: authHeaders(token) },
   );
   if (!res.ok) throw new Error(`API_${res.status}`);
@@ -156,7 +168,7 @@ async function fetchNodeExecutionData(
  * Split out of the fetch path so a captured fixture can be turned into the same context offline. */
 export function createExecutionContext(
   summary: ExecutionSummaryResponse,
-  loadNodeData: (nodeUid: string) => Promise<unknown>,
+  loadNodeData: (nodeUid: string, iteration?: number) => Promise<unknown>,
 ): ExecutionContext {
   const nodeExecution = summary.node_execution ?? [];
   const validNodeUids = new Set(nodeExecution.map((n) => n.node_uid));
@@ -198,21 +210,39 @@ export function createExecutionContext(
   const findNode = (nameOrUid: string): ExecutedWorkflowNode | undefined =>
     nodesByUid.get(nameOrUid) ?? nodesByName.get(normalizeName(nameOrUid));
 
-  const getNodeExecutionData = (nameOrUid: string): Promise<unknown> | undefined => {
+  const resolveUid = (nameOrUid: string): string | undefined => {
     const nodeUid = validNodeUids.has(nameOrUid) ? nameOrUid : findNode(nameOrUid)?.node_uid;
-    if (!nodeUid || !validNodeUids.has(nodeUid)) return undefined;
+    return nodeUid && validNodeUids.has(nodeUid) ? nodeUid : undefined;
+  };
 
-    let cached = nodeDataCache.get(nodeUid);
+  const iterationsByUid = new Map<string, number[]>();
+  for (const entry of nodeExecution) {
+    if (entry.current_iteration === null || entry.current_iteration === undefined) continue;
+    const list = iterationsByUid.get(entry.node_uid) ?? [];
+    if (!list.includes(entry.current_iteration)) list.push(entry.current_iteration);
+    iterationsByUid.set(entry.node_uid, list.sort((a, b) => a - b));
+  }
+  const iterationsOf = (nameOrUid: string): number[] => {
+    const uid = resolveUid(nameOrUid);
+    return uid ? [...(iterationsByUid.get(uid) ?? [])] : [];
+  };
+
+  const getNodeExecutionData = (nameOrUid: string, iteration?: number): Promise<unknown> | undefined => {
+    const nodeUid = resolveUid(nameOrUid);
+    if (!nodeUid) return undefined;
+
+    const key = `${nodeUid}:${iteration ?? ''}`;
+    let cached = nodeDataCache.get(key);
     if (!cached) {
-      cached = loadNodeData(nodeUid).catch((err) => ({
+      cached = loadNodeData(nodeUid, iteration).catch((err) => ({
         error: err instanceof Error ? err.message : 'FETCH_FAILED',
       }));
-      nodeDataCache.set(nodeUid, cached);
+      nodeDataCache.set(key, cached);
     }
     return cached;
   };
 
-  return { summary, workflowData, executedNodes, failure, findNode, getNodeExecutionData };
+  return { summary, workflowData, executedNodes, failure, findNode, getNodeExecutionData, iterationsOf };
 }
 
 async function fetchExecutionContext(
@@ -222,8 +252,8 @@ async function fetchExecutionContext(
   workflowBuilderUrl: string,
 ): Promise<ExecutionContext> {
   const summary = await fetchExecutionSummary(workflowUid, executionUid, token, workflowBuilderUrl);
-  return createExecutionContext(summary, (nodeUid) =>
-    fetchNodeExecutionData(workflowUid, executionUid, nodeUid, token, workflowBuilderUrl),
+  return createExecutionContext(summary, (nodeUid, iteration) =>
+    fetchNodeExecutionData(workflowUid, executionUid, nodeUid, token, workflowBuilderUrl, iteration),
   );
 }
 

@@ -15,7 +15,8 @@
     "test": "tsx --test \"src/mastra/rca/__tests__/*.test.ts\"",
     "rca:capture": "tsx scripts/rca-capture.ts",
     "rca:run": "tsx --env-file=.env scripts/rca-run.ts",
-    "rca:e2e": "tsx --env-file=.env scripts/rca-e2e.ts"
+    "rca:e2e": "tsx --env-file=.env scripts/rca-e2e.ts",
+    "rca:import": "tsx scripts/rca-import.ts"
   },
   "keywords": [],
   "author": "",

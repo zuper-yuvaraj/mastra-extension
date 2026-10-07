@@ -1,0 +1,1372 @@
+{
+    "workflow_execution": {
+        "execution_uid": "cfa2773d-f13d-41da-b024-c7827c4000b3",
+        "workflow_uid": "6a75105c-4af4-4b09-8359-d6264664f2f5",
+        "mode": "AUTOMATED",
+        "type": "LIVE",
+        "status": "FAILED",
+        "workflow_data": {
+            "workflow_id": 17126,
+            "workflow_uid": "6a75105c-4af4-4b09-8359-d6264664f2f5",
+            "workflow_name": "[Commercial] Create Inspection Job for each property when project is created",
+            "workflow_description": "",
+            "version": "-UW-kwi7kklogEEVNND7s",
+            "version_id": 144556,
+            "company_id": 1251102,
+            "created_by": 1272911,
+            "nodes": [
+                {
+                    "id": "loop_loop5046cdca-e164-4c33-ab34-b12addd7854c",
+                    "color": {
+                        "main": "#4682B4",
+                        "background": "#DFEFF9",
+                        "borderColor": "#E3E5E6",
+                        "iconBackground": "#C9DCE7"
+                    },
+                    "input": 2,
+                    "module": "",
+                    "output": 1,
+                    "node_uid": "8d17b786-8bac-4138-b8d5-9b884ff78f13",
+                    "position": {
+                        "x": 1081,
+                        "y": 12.5
+                    },
+                    "is_active": true,
+                    "node_icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/4d963bbb-f70b-4d68-a78b-7056f518e2d2.svg",
+                    "node_name": "loop",
+                    "action_key": "loop",
+                    "action_name": "Loop",
+                    "action_type": "ACTION",
+                    "credentials": {},
+                    "description": "Iterates logic based on iterators",
+                    "form_fields": {
+                        "input_data": {
+                            "value": "{{$.getLatestNodeData('Check for properties')['data']['data']['properties']}}"
+                        }
+                    },
+                    "node_category": "FLOW",
+                    "master_node_uid": "5f32d064-8d96-4a51-b553-7f8cf0794ae6",
+                    "_loopInputPicked": true,
+                    "execution_status": "NONE",
+                    "node_display_name": "Loop"
+                },
+                {
+                    "id": "code_code842f9550-7967-4520-a7de-b3dd2315fffe",
+                    "color": {
+                        "main": "#2E8B57",
+                        "background": "#E0F4EC",
+                        "borderColor": "#8ceac1",
+                        "iconBackground": "#BEEAD6"
+                    },
+                    "input": 1,
+                    "module": "",
+                    "output": 1,
+                    "node_uid": "2d301748-8418-4b10-ac6e-0b25c6d04e1a",
+                    "position": {
+                        "x": 1320,
+                        "y": 15
+                    },
+                    "is_active": true,
+                    "node_icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/7f22be08-936d-4e6b-a054-0c4a9a438913.svg",
+                    "node_name": "code",
+                    "action_key": "code",
+                    "action_name": "Payload for job",
+                    "action_type": "ACTION",
+                    "credentials": {},
+                    "description": "Run custom javascript code",
+                    "form_fields": {
+                        "code": "const moment = require(\"moment-timezone\");\n\nconst jobCategoryInput = $input.jobcategory;\nconst organization = $input.organizationuid;\nconst customer = $input.customer_uid;\nconst project = $input.projectuid;\nconst propertyData = $input.propertydata;\nconst jobMasterCf = $input.jobmastercf || [];\nconst jobMasterCat = $input.jobmastercategory || [];\n\n// --------------------------------------------------\n// GET PROPERTY  (Loop shape: data.property = current iteration)\n// --------------------------------------------------\nconst property =\n  propertyData?.data?.property ||\n  propertyData?.property ||\n  propertyData?.data?.data?.property ||\n  propertyData?.overall_data?.[propertyData?.current_iteration ?? 0]?.property ||\n  {};\n\nif (!property?.property_uid) {\n  throw new Error(\"Property could not be resolved from propertyData. Check the Loop node output shape.\");\n}\n\n// --------------------------------------------------\n// GET PROPERTY ADDRESS\n// --------------------------------------------------\nconst clean = v => (typeof v === \"string\" ? v.trim() : v);\nconst sourceAddress = property?.property_address || {};\n\nconst hasGeo =\n  Array.isArray(sourceAddress?.geo_cordinates) &&\n  sourceAddress.geo_cordinates.length === 2;\n\nconst propertyAddress = {\n  landmark: clean(sourceAddress?.landmark) || \"\",\n  city: clean(sourceAddress?.city) || \"\",\n  state: clean(sourceAddress?.state) || \"\",\n  street: clean(sourceAddress?.street) || clean(property?.property_name) || \"\",\n  country: clean(sourceAddress?.country) || \"United States\",\n  zip_code: clean(sourceAddress?.zip_code) || \"\",\n  first_name: clean(sourceAddress?.first_name) || \"\",\n  last_name: clean(sourceAddress?.last_name) || \"\",\n  phone_number: clean(sourceAddress?.phone_number) || \"\",\n  email: clean(sourceAddress?.email) || \"\",\n  // Only send coordinates as a valid pair; otherwise omit and let Zuper geocode.\n  ...(hasGeo && {\n    geo_cordinates: sourceAddress.geo_cordinates,\n    point_coordinates: {\n      type: \"Point\",\n      coordinates: [sourceAddress.geo_cordinates[1], sourceAddress.geo_cordinates[0]]\n    }\n  })\n};\n\n// --------------------------------------------------\n// CUSTOM FIELDS\n// --------------------------------------------------\nfunction transformCustomFields(masterCustomFields) {\n  return masterCustomFields.map(cf => ({\n    label: cf.field_name,\n    value: \"\",\n    hide_to_fe: cf.hide_to_fe,\n    hide_field: cf.hide_field,\n    read_only: cf.read_only,\n    ...(cf?.group?.group_uid &&\n      cf?.group?.group_name && {\n        group_uid: cf.group.group_uid,\n        group_name: cf.group.group_name\n      }),\n    type: cf?.field_type\n  }));\n}\nconst jobCf = transformCustomFields(jobMasterCf);\n\n// --------------------------------------------------\n// JOB CATEGORY\n// --------------------------------------------------\nconst jobCat =\n  typeof jobCategoryInput === \"string\"\n    ? jobCategoryInput\n    : jobCategoryInput?.jobCat || \"\";\n\nconst normalizedJobCat = String(jobCat).trim().toLowerCase();\n\nconst jobCategory = jobMasterCat.find(\n  c => String(c.category_name || \"\").trim().toLowerCase() === normalizedJobCat\n);\nconst jobCategoryUid = jobCategory?.category_uid;\n\nif (!jobCategoryUid) {\n  throw new Error(`Job category \"${jobCat}\" did not match any category in jobMasterCat.`);\n}\n\n// --------------------------------------------------\n// PAYLOAD\n// --------------------------------------------------\nconst payload = {\n  job: {\n    job_title: `Inspection for ${propertyAddress.street || property?.property_name || \"\"}`,\n    job_category: jobCategoryUid,\n    organization: organization,\n    customer: { customer_uid: customer},\n    customer_address: { ...propertyAddress },\n    customer_billing_address: { ...propertyAddress },\n    project: project,\n    property: property.property_uid,\n    due_date: moment().tz($.getVariable('ZUPER_COMPANY_TIMEZONE')).add(2, \"days\").format(\"YYYY-MM-DD hh:mm:ss\"),\n    due_date_dt: moment().tz($.getVariable('ZUPER_COMPANY_TIMEZONE')).add(2, \"days\").format(\"YYYY-MM-DD\"),\n    custom_fields: jobCf\n  }\n};\n\nreturn payload;",
+                        "inputs": {
+                            "type": "FIXED",
+                            "value": [
+                                {
+                                    "node": "Config",
+                                    "expression": "{{$.getLatestNodeData('Config')['data']['jobCat']}}",
+                                    "source_type": "NODE",
+                                    "variable_name": "jobcategory"
+                                },
+                                {
+                                    "node": "Get Project Details",
+                                    "expression": "{{$.getLatestNodeData('Get Project Details')['data']['data']['organization']['organization_uid']}}",
+                                    "source_type": "NODE",
+                                    "variable_name": "organizationuid"
+                                },
+                                {
+                                    "node": "New Project",
+                                    "expression": "{{$.getLatestNodeData('New Project')['data']['body']['project_uid']}}",
+                                    "source_type": "NODE",
+                                    "variable_name": "projectuid"
+                                },
+                                {
+                                    "node": "Loop",
+                                    "expression": "{{$.getLatestNodeData('Loop')['data']['property']['property_uid']}}",
+                                    "source_type": "NODE",
+                                    "variable_name": "propertyuid"
+                                },
+                                {
+                                    "node": "Get Job Master CF",
+                                    "expression": "{{$.getLatestNodeData('Get Job Master CF')['data']['data']}}",
+                                    "source_type": "NODE",
+                                    "variable_name": "jobmastercf"
+                                },
+                                {
+                                    "node": "Get Job Categories",
+                                    "expression": "{{$.getLatestNodeData('Get Job Categories')['data']['data']}}",
+                                    "source_type": "NODE",
+                                    "variable_name": "jobmastercategory"
+                                },
+                                {
+                                    "node": "Loop",
+                                    "expression": "{{$.getLatestNodeData('Loop')['data']}}",
+                                    "source_type": "NODE",
+                                    "variable_name": "propertydata"
+                                },
+                                {
+                                    "node": "Get Project Details",
+                                    "expression": "{{$.getLatestNodeData('Get Project Details')['data']['data']['customer']['customer_uid']}}",
+                                    "source_type": "NODE",
+                                    "variable_name": "customer_uid"
+                                }
+                            ]
+                        },
+                        "version": 2
+                    },
+                    "node_category": "FLOW",
+                    "master_node_uid": "d15fd095-70f3-4d53-9103-5786dfd52b37",
+                    "execution_status": "EXECUTED",
+                    "node_display_name": "Code"
+                },
+                {
+                    "id": "http_request_v2_http_request_v2034e116a-f910-4343-b62e-138c86d18788",
+                    "color": {
+                        "main": "#4682B4",
+                        "background": "#DFEFF9",
+                        "borderColor": "#E3E5E6",
+                        "iconBackground": "#C9DCE7"
+                    },
+                    "input": 1,
+                    "module": "",
+                    "output": 2,
+                    "node_uid": "92d15f66-8954-4e4f-ad48-4be2ff6a1451",
+                    "position": {
+                        "x": 1530,
+                        "y": 15
+                    },
+                    "is_active": true,
+                    "node_icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/14380500-c678-4798-b3b1-0abc9513abec.svg",
+                    "node_name": "http_request",
+                    "action_key": "http_request",
+                    "action_name": "Create Job",
+                    "action_type": "ACTION",
+                    "credentials": {},
+                    "description": "Make HTTP call and handle error response",
+                    "form_fields": {
+                        "url": {
+                            "type": "EXPRESSION",
+                            "value": "{{$.getVariable('BASE_URL')}}/jobs"
+                        },
+                        "method": {
+                            "type": "FIXED",
+                            "value": "POST"
+                        },
+                        "timeout": {
+                            "type": "FIXED",
+                            "value": 60
+                        },
+                        "password": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "username": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "json_body": {
+                            "type": "EXPRESSION",
+                            "value": "{{$.getLatestNodeData('Payload for job')['data']}}"
+                        },
+                        "send_body": {
+                            "type": "FIXED",
+                            "value": true
+                        },
+                        "ignore_ssl": {
+                            "type": "FIXED",
+                            "value": false
+                        },
+                        "max_retries": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "content_type": {
+                            "type": "FIXED",
+                            "value": "application/json"
+                        },
+                        "enable_retry": {
+                            "type": "FIXED",
+                            "value": false
+                        },
+                        "error_action": {
+                            "type": "FIXED",
+                            "value": "STOP"
+                        },
+                        "send_headers": {
+                            "type": "FIXED",
+                            "value": true
+                        },
+                        "raw_body_data": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "authentication": {
+                            "type": "FIXED",
+                            "value": "HEADER_AUTH"
+                        },
+                        "body_data_type": {
+                            "type": "FIXED",
+                            "value": "JSON"
+                        },
+                        "retry_interval": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "query_parameters": [],
+                        "send_query_param": {
+                            "type": "FIXED",
+                            "value": false
+                        },
+                        "body_content_type": {
+                            "type": "FIXED",
+                            "value": "JSON"
+                        },
+                        "header_parameters": [
+                            {
+                                "header_key": {
+                                    "type": "FIXED",
+                                    "value": "x-api-key"
+                                },
+                                "header_value": {
+                                    "type": "EXPRESSION",
+                                    "value": "{{$.getVariable('API_KEY')}}"
+                                }
+                            }
+                        ],
+                        "form_data_parameters": []
+                    },
+                    "node_version": "v2",
+                    "node_category": "HELPERS",
+                    "master_node_uid": "462a06a3-b66e-413f-a937-475a98f2a42d",
+                    "execution_status": "ERROR",
+                    "node_display_name": "HTTP Request"
+                },
+                {
+                    "id": "zuper_get_record_zuper_get_record272a4458-e16e-4882-9cfe-f21b9e316df0",
+                    "color": {
+                        "main": "#4682B4",
+                        "background": "#DFEFF9",
+                        "borderColor": "#E3E5E6",
+                        "iconBackground": "#C9DCE7"
+                    },
+                    "input": 1,
+                    "module": "",
+                    "output": 1,
+                    "node_uid": "f8a0509a-a745-405a-8f8f-f71103fd5701",
+                    "position": {
+                        "x": 327,
+                        "y": 64
+                    },
+                    "is_active": true,
+                    "node_icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/283a4296-e481-48b5-be1d-8c20de718d2d.svg",
+                    "node_name": "zuper_get_record",
+                    "action_key": "zuper_get_record",
+                    "action_name": "Get Project Details",
+                    "action_type": "ACTION",
+                    "credentials": {},
+                    "description": "Get a Record in Zuper",
+                    "form_fields": {
+                        "module": {
+                            "type": "FIXED",
+                            "value": "PROJECT"
+                        },
+                        "module_uid": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "status_uid": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "source_node": {
+                            "type": "FIXED",
+                            "value": "777bcc57-048f-4403-96d3-40dda345c288"
+                        },
+                        "source_type": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "category_uid": {
+                            "type": "FIXED",
+                            "value": ""
+                        }
+                    },
+                    "master_node_uid": "7bd69fec-sudhaid65-4eb8-a94b-3158c252921c",
+                    "execution_status": "ERROR",
+                    "node_display_name": "Edit Record"
+                },
+                {
+                    "id": "http_request_v2_http_request_v2d4b822bb-bda4-449d-a209-d5ee2408ed27",
+                    "color": {
+                        "main": "#4682B4",
+                        "background": "#DFEFF9",
+                        "borderColor": "#E3E5E6",
+                        "iconBackground": "#C9DCE7"
+                    },
+                    "input": 1,
+                    "module": "",
+                    "output": 2,
+                    "node_uid": "8040b527-8d49-486d-be78-e61e2b9dc584",
+                    "position": {
+                        "x": 690,
+                        "y": 60
+                    },
+                    "is_active": true,
+                    "node_icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/14380500-c678-4798-b3b1-0abc9513abec.svg",
+                    "node_name": "http_request",
+                    "action_key": "http_request",
+                    "action_name": "Get Job Categories",
+                    "action_type": "ACTION",
+                    "credentials": {},
+                    "description": "Make HTTP call and handle error response",
+                    "form_fields": {
+                        "url": {
+                            "type": "EXPRESSION",
+                            "value": "{{$.getVariable('BASE_URL')}}/jobs/category?populate_statuses=true"
+                        },
+                        "method": {
+                            "type": "FIXED",
+                            "value": "GET"
+                        },
+                        "timeout": {
+                            "type": "FIXED",
+                            "value": 60
+                        },
+                        "password": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "username": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "json_body": {
+                            "type": "EXPRESSION",
+                            "value": ""
+                        },
+                        "send_body": {
+                            "type": "FIXED",
+                            "value": false
+                        },
+                        "ignore_ssl": {
+                            "type": "FIXED",
+                            "value": false
+                        },
+                        "max_retries": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "content_type": {
+                            "type": "FIXED",
+                            "value": "application/json"
+                        },
+                        "enable_retry": {
+                            "type": "FIXED",
+                            "value": false
+                        },
+                        "error_action": {
+                            "type": "FIXED",
+                            "value": "STOP"
+                        },
+                        "send_headers": {
+                            "type": "FIXED",
+                            "value": true
+                        },
+                        "raw_body_data": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "authentication": {
+                            "type": "FIXED",
+                            "value": "HEADER_AUTH"
+                        },
+                        "body_data_type": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "retry_interval": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "query_parameters": [],
+                        "send_query_param": {
+                            "type": "FIXED",
+                            "value": false
+                        },
+                        "body_content_type": {
+                            "type": "FIXED",
+                            "value": "JSON"
+                        },
+                        "header_parameters": [
+                            {
+                                "header_key": {
+                                    "type": "FIXED",
+                                    "value": "x-api-key"
+                                },
+                                "header_value": {
+                                    "type": "EXPRESSION",
+                                    "value": "{{$.getVariable('API_KEY')}}"
+                                }
+                            }
+                        ],
+                        "form_data_parameters": []
+                    },
+                    "node_version": "v2",
+                    "node_category": "HELPERS",
+                    "master_node_uid": "462a06a3-b66e-413f-a937-475a98f2a42d",
+                    "execution_status": "ERROR",
+                    "node_display_name": "HTTP Request"
+                },
+                {
+                    "id": "http_request_v2_http_request_v2d9d852e9-709e-413d-8592-5f279c0f548e",
+                    "color": {
+                        "main": "#4682B4",
+                        "background": "#DFEFF9",
+                        "borderColor": "#E3E5E6",
+                        "iconBackground": "#C9DCE7"
+                    },
+                    "input": 1,
+                    "module": "",
+                    "output": 2,
+                    "node_uid": "d022a5ea-5e9d-4ada-92e1-77193cc73ba6",
+                    "position": {
+                        "x": 885,
+                        "y": 60
+                    },
+                    "is_active": true,
+                    "node_icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/14380500-c678-4798-b3b1-0abc9513abec.svg",
+                    "node_name": "http_request",
+                    "action_key": "http_request",
+                    "action_name": "Get Job Master CF",
+                    "action_type": "ACTION",
+                    "credentials": {},
+                    "description": "Make HTTP call and handle error response",
+                    "form_fields": {
+                        "url": {
+                            "type": "EXPRESSION",
+                            "value": "{{$.getVariable('BASE_URL')}}/settings/custom_fields?module_name=JOB&sort=ASC&sort_by=display_order"
+                        },
+                        "method": {
+                            "type": "FIXED",
+                            "value": "GET"
+                        },
+                        "timeout": {
+                            "type": "FIXED",
+                            "value": 60
+                        },
+                        "password": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "username": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "json_body": {
+                            "type": "EXPRESSION",
+                            "value": ""
+                        },
+                        "send_body": {
+                            "type": "FIXED",
+                            "value": false
+                        },
+                        "ignore_ssl": {
+                            "type": "FIXED",
+                            "value": false
+                        },
+                        "max_retries": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "content_type": {
+                            "type": "FIXED",
+                            "value": "application/json"
+                        },
+                        "enable_retry": {
+                            "type": "FIXED",
+                            "value": false
+                        },
+                        "error_action": {
+                            "type": "FIXED",
+                            "value": "STOP"
+                        },
+                        "send_headers": {
+                            "type": "FIXED",
+                            "value": true
+                        },
+                        "raw_body_data": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "authentication": {
+                            "type": "FIXED",
+                            "value": "HEADER_AUTH"
+                        },
+                        "body_data_type": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "retry_interval": {
+                            "type": "FIXED",
+                            "value": null
+                        },
+                        "query_parameters": [],
+                        "send_query_param": {
+                            "type": "FIXED",
+                            "value": false
+                        },
+                        "body_content_type": {
+                            "type": "FIXED",
+                            "value": "JSON"
+                        },
+                        "header_parameters": [
+                            {
+                                "header_key": {
+                                    "type": "FIXED",
+                                    "value": "x-api-key"
+                                },
+                                "header_value": {
+                                    "type": "EXPRESSION",
+                                    "value": "{{$.getVariable('API_KEY')}}"
+                                }
+                            }
+                        ],
+                        "form_data_parameters": []
+                    },
+                    "node_version": "v2",
+                    "node_category": "HELPERS",
+                    "master_node_uid": "462a06a3-b66e-413f-a937-475a98f2a42d",
+                    "execution_status": "NONE",
+                    "node_display_name": "HTTP Request"
+                },
+                {
+                    "id": "project.new",
+                    "input": 0,
+                    "module": "PROJECT",
+                    "output": 1,
+                    "node_uid": "777bcc57-048f-4403-96d3-40dda345c288",
+                    "position": {
+                        "x": 12,
+                        "y": 64.5
+                    },
+                    "is_pinned": true,
+                    "node_icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/283a4296-e481-48b5-be1d-8c20de718d2d.svg",
+                    "node_name": "zuper",
+                    "action_key": "project.new",
+                    "action_name": "New Project",
+                    "action_type": "TRIGGER",
+                    "credentials": {},
+                    "form_fields": {
+                        "trigger_rules": {
+                            "type": "FIXED",
+                            "value": ""
+                        },
+                        "loop_prevention": "ANY",
+                        "excluded_user_uids": {
+                            "type": "FIXED",
+                            "value": []
+                        },
+                        "filter_rule_operator": "AND",
+                        "loop_prevention_workflow_uids": []
+                    },
+                    "pinned_data": {
+                        "data": {
+                            "body": {
+                                "assets": [],
+                                "config": {
+                                    "product": {
+                                        "sync_to_project": false,
+                                        "restrict_to_project": false
+                                    },
+                                    "dependency": {
+                                        "day_shifting": "MAINTAIN",
+                                        "consider_weekend": true
+                                    }
+                                },
+                                "customer": "6ab3b53dd3fdafffa18ba7e8",
+                                "products": [],
+                                "company_id": 1251102,
+                                "created_by": 1272911,
+                                "milestones": [],
+                                "properties": [
+                                    {
+                                        "property": "6ab3b845076b89c59e213440"
+                                    },
+                                    {
+                                        "property": "6ab3b5d07633143958b04827"
+                                    },
+                                    {
+                                        "property": "6ab3b53dd3fdafffa18ba7f6"
+                                    }
+                                ],
+                                "attachments": [],
+                                "project_uid": "397de7e7-1be1-4547-ab0b-7ddce913a346",
+                                "organization": null,
+                                "project_name": "Johnny Fontaine",
+                                "project_tags": null,
+                                "service_task": null,
+                                "triggered_at": "2026-09-23T11:35:11.009Z",
+                                "triggered_by": {
+                                    "role": {
+                                        "role_key": "ADMIN",
+                                        "role_uid": "81479813-ead7-4074-a1b3-58dfc6ebe2d9",
+                                        "role_name": "Admin"
+                                    },
+                                    "email": "golden_roof@zuper.co",
+                                    "emp_code": "000",
+                                    "user_uid": "171bddf4-cf9a-4e0f-bbc3-d539e800cd20",
+                                    "last_name": "Roof",
+                                    "first_name": "Golden",
+                                    "designation": "DO NOT DELETE"
+                                },
+                                "custom_fields": [
+                                    {
+                                        "id": 1,
+                                        "type": "SINGLE_LINE",
+                                        "label": "Amount to be invoiced",
+                                        "value": "",
+                                        "read_only": false,
+                                        "hide_field": false,
+                                        "hide_to_fe": false,
+                                        "dependent_on": "",
+                                        "dependent_options": []
+                                    }
+                                ],
+                                "project_value": 0,
+                                "project_phases": [
+                                    {
+                                        "default": true,
+                                        "sequence": 1,
+                                        "phase_uid": "329383a1-d2a3-41cf-8054-d379cb9adfa5",
+                                        "created_at": 1790163310964,
+                                        "created_by": 1272911,
+                                        "phase_name": "No Phase",
+                                        "updated_at": 1790163310964,
+                                        "phase_color": "",
+                                        "phase_items": []
+                                    }
+                                ],
+                                "project_prefix": "",
+                                "project_status": [
+                                    {
+                                        "done_by": 1272911,
+                                        "project_status_uid": "d61935ac-9e26-4a5c-9dcb-f3484e690247",
+                                        "project_status_name": "Lead",
+                                        "project_status_type": "NEW",
+                                        "project_status_color": "#02B875"
+                                    }
+                                ],
+                                "project_category": "698da7c52df3dc1012d4a33b",
+                                "project_due_date": "2026-10-01 03:59:59",
+                                "project_priority": "LOW",
+                                "project_template": null,
+                                "workflow_builder": {
+                                    "workflow_uid": null,
+                                    "from_workflow_builder": false
+                                },
+                                "service_contracts": [],
+                                "project_assigned_to": [],
+                                "project_description": null,
+                                "secondary_customers": [],
+                                "progressive_invoicing": {
+                                    "is_enabled": false
+                                },
+                                "project_current_status": {
+                                    "project_status_uid": "d61935ac-9e26-4a5c-9dcb-f3484e690247",
+                                    "project_status_name": "Lead",
+                                    "project_status_type": "NEW",
+                                    "project_status_color": "#02B875"
+                                },
+                                "project_actual_duration": 0,
+                                "project_actual_end_date": null,
+                                "project_billing_address": {
+                                    "city": "Sacramento",
+                                    "email": "john.f@zuper.co",
+                                    "state": "California",
+                                    "street": "4860 Y Street",
+                                    "country": "",
+                                    "landmark": "",
+                                    "zip_code": "95817",
+                                    "last_name": "Fontaine",
+                                    "first_name": "Johnny",
+                                    "phone_number": "",
+                                    "geo_cordinates": [
+                                        38.552582,
+                                        -121.44947129999998
+                                    ]
+                                },
+                                "project_service_address": {
+                                    "city": "Sacramento ",
+                                    "email": "john.f@zuper.co",
+                                    "state": "California ",
+                                    "street": "2570 48th St, Sacramento, CA 95817, USA",
+                                    "country": "",
+                                    "landmark": "",
+                                    "zip_code": "95817",
+                                    "last_name": "Fontaine",
+                                    "first_name": "Johnny",
+                                    "phone_number": "",
+                                    "geo_cordinates": [
+                                        0,
+                                        0
+                                    ]
+                                },
+                                "project_actual_start_date": null
+                            },
+                            "event": "project.new",
+                            "company_id": 1251102
+                        },
+                        "node": {
+                            "node_key": "project.new",
+                            "node_uid": "777bcc57-048f-4403-96d3-40dda345c288",
+                            "node_name": "New Project",
+                            "is_trigger_node": true
+                        }
+                    },
+                    "master_node_uid": "721280c2-cf74-47fd-95f2-cdc4ad922c56",
+                    "execution_status": "NONE"
+                },
+                {
+                    "id": "code_codecbbd12fe-7a25-491f-8304-96734f06bd0b",
+                    "color": {
+                        "main": "#2E8B57",
+                        "background": "#E0F4EC",
+                        "borderColor": "#8ceac1",
+                        "iconBackground": "#BEEAD6"
+                    },
+                    "input": 1,
+                    "module": "",
+                    "output": 1,
+                    "node_uid": "4959472d-b1a5-45dd-b14a-f82120ef3871",
+                    "position": {
+                        "x": 128,
+                        "y": 64
+                    },
+                    "is_active": true,
+                    "node_icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/7f22be08-936d-4e6b-a054-0c4a9a438913.svg",
+                    "node_name": "code",
+                    "action_key": "code",
+                    "action_name": "Config",
+                    "action_type": "ACTION",
+                    "credentials": {},
+                    "description": "Run custom javascript code",
+                    "form_fields": {
+                        "code": "return {\n  baseUrl: $.getVariable('BASE_URL').split(\"/api\")[0],\n  apiKey: $.getVariable('API_KEY'),\n  timeZone: $.getVariable('ZUPER_COMPANY_TIMEZONE'),\n  jobCat: \"Replacement\"\n}",
+                        "inputs": {
+                            "type": "FIXED",
+                            "value": []
+                        },
+                        "version": 2
+                    },
+                    "node_category": "FLOW",
+                    "master_node_uid": "d15fd095-70f3-4d53-9103-5786dfd52b37",
+                    "execution_status": "NONE",
+                    "node_display_name": "Code"
+                },
+                {
+                    "id": "no_op_no_opf7d491ae-aad7-420b-8991-c9a02a56c10f",
+                    "color": {
+                        "main": "#4682B4",
+                        "background": "#DFEFF9",
+                        "borderColor": "#E3E5E6",
+                        "iconBackground": "#C9DCE7"
+                    },
+                    "input": 1,
+                    "module": "",
+                    "output": 0,
+                    "node_uid": "75d330f5-8aeb-422f-a1fa-b5993a1d6422",
+                    "position": {
+                        "x": 690,
+                        "y": 120
+                    },
+                    "is_active": true,
+                    "node_icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/d00b5202-9b28-49f6-96da-24ccc836dd86.svg",
+                    "node_name": "no_op",
+                    "action_key": "no_op",
+                    "action_name": "No OP",
+                    "action_type": "ACTION",
+                    "credentials": {},
+                    "description": "No operation, Sit back and relax",
+                    "form_fields": {},
+                    "node_category": "FLOW",
+                    "master_node_uid": "10092d00-c480-4096-8c1b-b1d040a2c3e1",
+                    "node_display_name": "No OP"
+                },
+                {
+                    "id": "if_else_if_else17a8d487-1ed8-410b-8649-0066c89349d5",
+                    "color": {
+                        "main": "#4682B4",
+                        "background": "#DFEFF9",
+                        "borderColor": "#E3E5E6",
+                        "iconBackground": "#C9DCE7"
+                    },
+                    "input": 1,
+                    "module": "",
+                    "output": 2,
+                    "node_uid": "20e7b742-3617-4e2c-b8cf-d8cd0b4eb715",
+                    "position": {
+                        "x": 480,
+                        "y": 60
+                    },
+                    "is_active": true,
+                    "node_icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/b5fc5141-079b-4d5e-b58e-c309f53d7663.svg",
+                    "node_name": "if_else",
+                    "action_key": "if_else",
+                    "action_name": "Check for properties",
+                    "action_type": "ACTION",
+                    "credentials": {},
+                    "description": "Route items to different branch",
+                    "form_fields": {
+                        "combine": {
+                            "type": "FIXED",
+                            "value": "AND"
+                        },
+                        "conditions": [
+                            {
+                                "value1": {
+                                    "type": "EXPRESSION",
+                                    "value": "{{$.getLatestNodeData('Get Project Details')['data']['data']['properties']}}"
+                                },
+                                "value2": {
+                                    "type": "FIXED",
+                                    "value": "1"
+                                },
+                                "field_key": "ARRAY",
+                                "operation": {
+                                    "type": "FIXED",
+                                    "value": "LENGTH_GREATER_THAN_EQUAL_TO"
+                                }
+                            }
+                        ]
+                    },
+                    "node_category": "FLOW",
+                    "master_node_uid": "19dd8b19-5974-4a2c-9735-a9ca36ac5a4d",
+                    "execution_status": "EXECUTED",
+                    "node_display_name": "If/Else"
+                }
+            ],
+            "connections": [
+                {
+                    "id": "reactflow__edge-code_code842f9550-7967-4520-a7de-b3dd2315fffe-http_request_v2_http_request_v2034e116a-f910-4343-b62e-138c86d18788a",
+                    "type": "buttonEdge",
+                    "source": "code_code842f9550-7967-4520-a7de-b3dd2315fffe",
+                    "target": "http_request_v2_http_request_v2034e116a-f910-4343-b62e-138c86d18788",
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "sourceHandle": "one-a",
+                    "targetHandle": "a"
+                },
+                {
+                    "id": "reactflow__edge-http_request_v2_http_request_v2034e116a-f910-4343-b62e-138c86d18788one-a-loop_loop5046cdca-e164-4c33-ab34-b12addd7854cb",
+                    "type": "loopEdge",
+                    "source": "http_request_v2_http_request_v2034e116a-f910-4343-b62e-138c86d18788",
+                    "target": "loop_loop5046cdca-e164-4c33-ab34-b12addd7854c",
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "sourceHandle": "one-a",
+                    "targetHandle": "b"
+                },
+                {
+                    "id": "reactflow__edge-loop_loop5046cdca-e164-4c33-ab34-b12addd7854ctwo-b-code_code842f9550-7967-4520-a7de-b3dd2315fffea",
+                    "type": "buttonEdge",
+                    "source": "loop_loop5046cdca-e164-4c33-ab34-b12addd7854c",
+                    "target": "code_code842f9550-7967-4520-a7de-b3dd2315fffe",
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "output_value": false,
+                    "sourceHandle": "two-b",
+                    "targetHandle": "a"
+                },
+                {
+                    "id": "reactflow__edge-http_request_v2_http_request_v2d9d852e9-709e-413d-8592-5f279c0f548eone-a-loop_loop5046cdca-e164-4c33-ab34-b12addd7854ca",
+                    "type": "buttonEdge",
+                    "source": "http_request_v2_http_request_v2d9d852e9-709e-413d-8592-5f279c0f548e",
+                    "target": "loop_loop5046cdca-e164-4c33-ab34-b12addd7854c",
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "sourceHandle": "one-a",
+                    "targetHandle": "a"
+                },
+                {
+                    "id": "reactflow__edge-http_request_v2_http_request_v2d4b822bb-bda4-449d-a209-d5ee2408ed27one-a-http_request_v2_http_request_v2d9d852e9-709e-413d-8592-5f279c0f548ea",
+                    "type": "buttonEdge",
+                    "source": "http_request_v2_http_request_v2d4b822bb-bda4-449d-a209-d5ee2408ed27",
+                    "target": "http_request_v2_http_request_v2d9d852e9-709e-413d-8592-5f279c0f548e",
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "sourceHandle": "one-a",
+                    "targetHandle": "a"
+                },
+                {
+                    "id": "reactflow__edge-code_codecbbd12fe-7a25-491f-8304-96734f06bd0bone-a-zuper_get_record_zuper_get_record272a4458-e16e-4882-9cfe-f21b9e316df0a",
+                    "type": "buttonEdge",
+                    "source": "code_codecbbd12fe-7a25-491f-8304-96734f06bd0b",
+                    "target": "zuper_get_record_zuper_get_record272a4458-e16e-4882-9cfe-f21b9e316df0",
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "sourceHandle": "one-a",
+                    "targetHandle": "a"
+                },
+                {
+                    "id": "reactflow__edge-project.newtrigger-a-code_codecbbd12fe-7a25-491f-8304-96734f06bd0ba",
+                    "type": "buttonEdge",
+                    "source": "project.new",
+                    "target": "code_codecbbd12fe-7a25-491f-8304-96734f06bd0b",
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "sourceHandle": "trigger-a",
+                    "targetHandle": "a"
+                },
+                {
+                    "id": "reactflow__edge-zuper_get_record_zuper_get_record272a4458-e16e-4882-9cfe-f21b9e316df0one-a-if_else_if_else17a8d487-1ed8-410b-8649-0066c89349d5a",
+                    "type": "buttonEdge",
+                    "source": "zuper_get_record_zuper_get_record272a4458-e16e-4882-9cfe-f21b9e316df0",
+                    "target": "if_else_if_else17a8d487-1ed8-410b-8649-0066c89349d5",
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "sourceHandle": "one-a",
+                    "targetHandle": "a"
+                },
+                {
+                    "id": "reactflow__edge-if_else_if_else17a8d487-1ed8-410b-8649-0066c89349d5two-a-http_request_v2_http_request_v2d4b822bb-bda4-449d-a209-d5ee2408ed27a",
+                    "type": "buttonEdge",
+                    "source": "if_else_if_else17a8d487-1ed8-410b-8649-0066c89349d5",
+                    "target": "http_request_v2_http_request_v2d4b822bb-bda4-449d-a209-d5ee2408ed27",
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "output_value": true,
+                    "sourceHandle": "two-a",
+                    "targetHandle": "a"
+                },
+                {
+                    "id": "reactflow__edge-if_else_if_else17a8d487-1ed8-410b-8649-0066c89349d5two-b-no_op_no_opf7d491ae-aad7-420b-8991-c9a02a56c10fa",
+                    "type": "buttonEdge",
+                    "source": "if_else_if_else17a8d487-1ed8-410b-8649-0066c89349d5",
+                    "target": "no_op_no_opf7d491ae-aad7-420b-8991-c9a02a56c10f",
+                    "markerEnd": {
+                        "type": "arrow"
+                    },
+                    "output_value": false,
+                    "sourceHandle": "two-b",
+                    "targetHandle": "a"
+                }
+            ],
+            "meta_data": {
+                "variables": {},
+                "total_nodes": 10,
+                "initial_nodes": [
+                    {
+                        "id": "project.new",
+                        "data": {
+                            "icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/283a4296-e481-48b5-be1d-8c20de718d2d.svg",
+                            "color": {
+                                "main": "#4682B4",
+                                "background": "#DFEFF9",
+                                "borderColor": "#E3E5E6",
+                                "iconBackground": "#C9DCE7"
+                            },
+                            "label": "New Project",
+                            "module": "PROJECT",
+                            "node_uid": "777bcc57-048f-4403-96d3-40dda345c288",
+                            "viewOnly": false,
+                            "node_name": "zuper",
+                            "action_key": "project.new",
+                            "action_name": "New Project",
+                            "action_type": "TRIGGER",
+                            "cyclic_actions": [],
+                            "master_node_uid": "721280c2-cf74-47fd-95f2-cdc4ad922c56",
+                            "warning_message": "",
+                            "workflow_status": "NONE",
+                            "execution_status": "EXECUTED"
+                        },
+                        "type": "triggerNode",
+                        "style": {
+                            "background": "#fff"
+                        },
+                        "width": 36,
+                        "height": 36,
+                        "position": {
+                            "x": 12,
+                            "y": 64.5
+                        },
+                        "positionAbsolute": {
+                            "x": 12,
+                            "y": 64.5
+                        }
+                    },
+                    {
+                        "id": "code_codecbbd12fe-7a25-491f-8304-96734f06bd0b",
+                        "data": {
+                            "icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/7f22be08-936d-4e6b-a054-0c4a9a438913.svg",
+                            "color": {
+                                "main": "#2E8B57",
+                                "background": "#E0F4EC",
+                                "borderColor": "#8ceac1",
+                                "iconBackground": "#BEEAD6"
+                            },
+                            "label": "Config",
+                            "module": "",
+                            "node_uid": "4959472d-b1a5-45dd-b14a-f82120ef3871",
+                            "viewOnly": false,
+                            "is_active": true,
+                            "node_name": "code",
+                            "action_key": "code",
+                            "action_name": "Config",
+                            "action_type": "ACTION",
+                            "description": "Run custom javascript code",
+                            "cyclic_actions": [],
+                            "master_node_uid": "d15fd095-70f3-4d53-9103-5786dfd52b37",
+                            "warning_message": "",
+                            "workflow_status": "NONE",
+                            "execution_status": "EXECUTED"
+                        },
+                        "type": "actionNodeOne",
+                        "style": {
+                            "background": "#fff"
+                        },
+                        "width": 120,
+                        "height": 39,
+                        "position": {
+                            "x": 128,
+                            "y": 64
+                        },
+                        "positionAbsolute": {
+                            "x": 128,
+                            "y": 64
+                        }
+                    },
+                    {
+                        "id": "zuper_get_record_zuper_get_record272a4458-e16e-4882-9cfe-f21b9e316df0",
+                        "data": {
+                            "icon": "https://s3.ap-south-1.amazonaws.com/staging.in.pro.zuper/attachments/6c287db0-ff7c-11e7-b3a8-29b417a4f3fa/283a4296-e481-48b5-be1d-8c20de718d2d.svg",
+                            "color": {
+                                "main": "#4682B4",
+                                "background": "#DFEFF9",
+                                "borderColor": "#E3E5E6",
+                                "iconBackground": "#C9DCE7"
+                            },
+                            "label": "Get Project Details",
+                            "module": "",
+                            "node_uid": "f8a0509a-a745-405a-8f8f-f71103fd5701",
+                            "viewOnly": false,
+                            "is_active": true,
+                            "node_name": "zuper_get_record",
+                            "action_key": "zuper_get_record",
+                            "action_name": "Get Project Details",
+                            "action_type": "ACTION",
+                            "description": "Get a Record in Zuper",
+                            "cyclic_actions": [],
+                            "master_node_uid": "7bd69fec-sudhaid65-4eb8-a94b-3158c252921c",
+                            "warning_message": "",
+                            "workflow_status": "NONE",
+                            "execution_status": "EXECUTED"
+                        },
+                        "type": "actionNodeOne",
+                        "style": {
+                            "background": "#fff"
+                        },
+                        "width": 115,
+                        "height": 39,
+                        "position": {
+                            "x": 327,
+                            "y": 64
+                        },
+                        "positionAbsolute": {
+                            "x": 327,
+                            "y": 64
+                        }
+                    }
+                ]
+            },
+            "internal_connections": {
+                "Loop": {
+                    "output_nodes": [
+                        {
+                            "action_name": "Payload for job",
+                            "node_uid": "2d301748-8418-4b10-ac6e-0b25c6d04e1a",
+                            "action_key": "code",
+                            "output_value": false
+                        }
+                    ],
+                    "input_nodes": [
+                        {
+                            "action_name": "Create Job",
+                            "node_uid": "92d15f66-8954-4e4f-ad48-4be2ff6a1451",
+                            "action_key": "http_request"
+                        },
+                        {
+                            "action_name": "Get Job Master CF",
+                            "node_uid": "d022a5ea-5e9d-4ada-92e1-77193cc73ba6",
+                            "action_key": "http_request"
+                        }
+                    ]
+                },
+                "Payload for job": {
+                    "input_nodes": [
+                        {
+                            "action_name": "Loop",
+                            "node_uid": "8d17b786-8bac-4138-b8d5-9b884ff78f13",
+                            "output_value": false,
+                            "action_key": "loop"
+                        }
+                    ],
+                    "output_nodes": [
+                        {
+                            "action_name": "Create Job",
+                            "node_uid": "92d15f66-8954-4e4f-ad48-4be2ff6a1451",
+                            "action_key": "http_request"
+                        }
+                    ]
+                },
+                "Create Job": {
+                    "input_nodes": [
+                        {
+                            "action_name": "Payload for job",
+                            "node_uid": "2d301748-8418-4b10-ac6e-0b25c6d04e1a",
+                            "action_key": "code"
+                        }
+                    ],
+                    "output_nodes": [
+                        {
+                            "action_name": "Loop",
+                            "node_uid": "8d17b786-8bac-4138-b8d5-9b884ff78f13",
+                            "action_key": "loop"
+                        }
+                    ]
+                },
+                "Get Project Details": {
+                    "output_nodes": [
+                        {
+                            "action_name": "Check for properties",
+                            "node_uid": "20e7b742-3617-4e2c-b8cf-d8cd0b4eb715",
+                            "action_key": "if_else"
+                        }
+                    ],
+                    "input_nodes": [
+                        {
+                            "action_name": "Config",
+                            "node_uid": "4959472d-b1a5-45dd-b14a-f82120ef3871",
+                            "action_key": "code"
+                        }
+                    ]
+                },
+                "Check for properties": {
+                    "input_nodes": [
+                        {
+                            "action_name": "Get Project Details",
+                            "node_uid": "f8a0509a-a745-405a-8f8f-f71103fd5701",
+                            "action_key": "zuper_get_record"
+                        }
+                    ],
+                    "output_nodes": [
+                        {
+                            "action_name": "Get Job Categories",
+                            "node_uid": "8040b527-8d49-486d-be78-e61e2b9dc584",
+                            "action_key": "http_request",
+                            "output_value": true
+                        },
+                        {
+                            "action_name": "No OP",
+                            "node_uid": "75d330f5-8aeb-422f-a1fa-b5993a1d6422",
+                            "action_key": "no_op",
+                            "output_value": false
+                        }
+                    ]
+                },
+                "Get Job Categories": {
+                    "output_nodes": [
+                        {
+                            "action_name": "Get Job Master CF",
+                            "node_uid": "d022a5ea-5e9d-4ada-92e1-77193cc73ba6",
+                            "action_key": "http_request"
+                        }
+                    ],
+                    "input_nodes": [
+                        {
+                            "action_name": "Check for properties",
+                            "node_uid": "20e7b742-3617-4e2c-b8cf-d8cd0b4eb715",
+                            "output_value": true,
+                            "action_key": "if_else"
+                        }
+                    ]
+                },
+                "Get Job Master CF": {
+                    "input_nodes": [
+                        {
+                            "action_name": "Get Job Categories",
+                            "node_uid": "8040b527-8d49-486d-be78-e61e2b9dc584",
+                            "action_key": "http_request"
+                        }
+                    ],
+                    "output_nodes": [
+                        {
+                            "action_name": "Loop",
+                            "node_uid": "8d17b786-8bac-4138-b8d5-9b884ff78f13",
+                            "action_key": "loop"
+                        }
+                    ]
+                },
+                "New Project": {
+                    "output_nodes": [
+                        {
+                            "action_name": "Config",
+                            "node_uid": "4959472d-b1a5-45dd-b14a-f82120ef3871",
+                            "action_key": "code"
+                        }
+                    ]
+                },
+                "Config": {
+                    "input_nodes": [
+                        {
+                            "action_name": "New Project",
+                            "node_uid": "777bcc57-048f-4403-96d3-40dda345c288",
+                            "action_key": "project.new"
+                        }
+                    ],
+                    "output_nodes": [
+                        {
+                            "action_name": "Get Project Details",
+                            "node_uid": "f8a0509a-a745-405a-8f8f-f71103fd5701",
+                            "action_key": "zuper_get_record"
+                        }
+                    ]
+                },
+                "No OP": {
+                    "output_nodes": [],
+                    "input_nodes": [
+                        {
+                            "action_name": "Check for properties",
+                            "node_uid": "20e7b742-3617-4e2c-b8cf-d8cd0b4eb715",
+                            "output_value": false,
+                            "action_key": "if_else"
+                        }
+                    ]
+                }
+            },
+            "loop_connections": {
+                "Loop": [
+                    {
+                        "action_name": "Payload for job",
+                        "node_uid": "2d301748-8418-4b10-ac6e-0b25c6d04e1a",
+                        "action_key": "code",
+                        "output_value": false
+                    },
+                    {
+                        "action_name": "Create Job",
+                        "node_uid": "92d15f66-8954-4e4f-ad48-4be2ff6a1451",
+                        "action_key": "http_request"
+                    }
+                ]
+            }
+        },
+        "version_details": {
+            "revision_uid": "1b1c0dfe-5025-4423-a572-ee35dc5ca90b",
+            "type": "LIVE",
+            "version": "-UW-kwi7kklogEEVNND7s",
+            "created_at": "2026-09-23T11:59:07.000Z"
+        },
+        "error_message": "Either customer or organization data is required",
+        "error_code": "unknown_error",
+        "failed_node_uid": "92d15f66-8954-4e4f-ad48-4be2ff6a1451"
+    },
+    "node_execution": [
+        {
+            "node_uid": "777bcc57-048f-4403-96d3-40dda345c288",
+            "status": "COMPLETED",
+            "current_iteration": null,
+            "total_iterations": null,
+            "output_value": null,
+            "is_loop": false
+        },
+        {
+            "node_uid": "4959472d-b1a5-45dd-b14a-f82120ef3871",
+            "status": "COMPLETED",
+            "current_iteration": null,
+            "total_iterations": null,
+            "output_value": null,
+            "is_loop": false
+        },
+        {
+            "node_uid": "f8a0509a-a745-405a-8f8f-f71103fd5701",
+            "status": "COMPLETED",
+            "current_iteration": null,
+            "total_iterations": null,
+            "output_value": null,
+            "is_loop": false
+        },
+        {
+            "node_uid": "20e7b742-3617-4e2c-b8cf-d8cd0b4eb715",
+            "status": "COMPLETED",
+            "current_iteration": null,
+            "total_iterations": null,
+            "output_value": true,
+            "is_loop": false
+        },
+        {
+            "node_uid": "8040b527-8d49-486d-be78-e61e2b9dc584",
+            "status": "COMPLETED",
+            "current_iteration": null,
+            "total_iterations": null,
+            "output_value": true,
+            "is_loop": false
+        },
+        {
+            "node_uid": "d022a5ea-5e9d-4ada-92e1-77193cc73ba6",
+            "status": "COMPLETED",
+            "current_iteration": null,
+            "total_iterations": null,
+            "output_value": true,
+            "is_loop": false
+        },
+        {
+            "node_uid": "8d17b786-8bac-4138-b8d5-9b884ff78f13",
+            "status": "COMPLETED",
+            "current_iteration": 0,
+            "total_iterations": 2,
+            "output_value": null,
+            "is_loop": true
+        },
+        {
+            "node_uid": "2d301748-8418-4b10-ac6e-0b25c6d04e1a",
+            "status": "COMPLETED",
+            "current_iteration": 0,
+            "total_iterations": 2,
+            "output_value": null,
+            "is_loop": false
+        },
+        {
+            "node_uid": "92d15f66-8954-4e4f-ad48-4be2ff6a1451",
+            "status": "FAILED",
+            "current_iteration": 0,
+            "total_iterations": 2,
+            "output_value": false,
+            "is_loop": false
+        }
+    ]
+}

@@ -1,10 +1,15 @@
-// Usage: npm run rca:run -- [--fixture fixtures/rca/<name>.json] [--question "why did it go to else?"]
+// Usage: npm run rca:run -- [--fixture fixtures/rca/<name>.json | --summary samples/<execution summary>.json]
+//                          [--question "why did it go to else?"]
+// --summary takes a raw execution-summary response (no node data): node data is then unavailable, as if
+// every node-data fetch had failed, which tests how the agent behaves with only definitions and the error.
 // Runs the real investigator agent over a captured execution (or the built-in synthetic one) with no
 // token and no Zuper network access, through the same investigate() a live request uses. Needs
 // OPENAI_API_KEY. Prints the verdict, what was verified, and how much work it took.
 
 import { assembleContext } from '../src/mastra/lib/orchestrator';
 import { rcaInvestigatorAgent } from '../src/mastra/agents/rcaInvestigatorAgent';
+import { readFileSync } from 'node:fs';
+import { createExecutionContext, type ExecutionSummaryResponse } from '../src/mastra/lib/zuperExecutionApi';
 import { executionContextFromFixture, loadFixture } from '../src/mastra/rca/fixture';
 import { investigate } from '../src/mastra/rca/investigate';
 import { fakeExecution } from '../src/mastra/rca/__tests__/fakeExecution';
@@ -15,11 +20,24 @@ function arg(name: string): string | undefined {
 }
 
 const fixturePath = arg('fixture');
+const summaryPath = arg('summary');
 const fixture = fixturePath ? loadFixture(fixturePath) : null;
-const executionContext = fixture ? executionContextFromFixture(fixture) : fakeExecution(true);
+const executionContext = summaryPath
+  ? createExecutionContext(JSON.parse(readFileSync(summaryPath, 'utf8')) as ExecutionSummaryResponse, async () => {
+      throw new Error('FETCH_FAILED');
+    })
+  : fixture
+    ? executionContextFromFixture(fixture)
+    : fakeExecution(true);
 assembleContext(executionContext, null); // fail fast on a malformed fixture
 
-console.log(fixture ? `fixture: ${fixture.name}` : 'fixture: built-in synthetic (customer is null -> Send Email fails)');
+console.log(
+  summaryPath
+    ? `summary only (no node data): ${summaryPath}`
+    : fixture
+      ? `fixture: ${fixture.name}`
+      : 'fixture: built-in synthetic (customer is null -> Send Email fails)',
+);
 if (fixture?.expected) console.log('expected:', JSON.stringify(fixture.expected));
 
 const started = Date.now();

@@ -6,7 +6,8 @@ import type { ChatContext } from '../lib/chatContext';
 import { getExecutionWorkflowGraph, traceLineage } from '../lib/workflowGraph';
 import type { ExecutionContext } from '../lib/zuperExecutionApi';
 import { RCA_SEED_HOPS } from './config';
-import { preview, resolveNodeInputs, type ResolvedInput, type ResolverEnv } from './resolveInput';
+import { describeNodeRuntime, type NodeRuntime } from './nodeData';
+import { fetchFailure, preview, resolveNodeInputs, type ResolvedInput, type ResolverEnv } from './resolveInput';
 
 export type RcaMode = 'EXECUTION_FAILED' | 'BRANCH_QUESTION' | 'NO_FAILURE' | 'RUNNING' | 'NO_EXECUTION';
 
@@ -43,8 +44,87 @@ export function makeResolverEnv(executionContext: ExecutionContext): ResolverEnv
     nameByUid: (uid) => executionContext.findNode(uid)?.action_name,
     previousNodeUid: (uid) => upstreamChain(uid, 1),
     recentNodeUid: (uid, n) => upstreamChain(uid, n),
-    getNodeExecutionData: (uid) => executionContext.getNodeExecutionData(uid),
+    getNodeExecutionData: (uid, iteration) => executionContext.getNodeExecutionData(uid, iteration),
+    iterationsOf: (uid) => executionContext.iterationsOf(uid),
   };
+}
+
+export interface ExecutedNodeSummary {
+  order: number;
+  uid: string;
+  name: string;
+  type: string;
+  /** FAILED if any run failed, otherwise the last run's status. */
+  status: string;
+  /** How many times the node ran (more than 1 inside a loop). */
+  runs: number;
+  /** For a loop node, how many iterations it was asked to make. */
+  total_iterations: number | null;
+  is_loop: boolean;
+  /** Loop iterations in which the node failed. */
+  failed_iterations: number[];
+}
+
+/** The executed nodes in execution order, one entry per node. The execution summary has one entry per
+ * node *run* (a 12-iteration loop contributes 13 entries for the loop and 12 for each body node), which
+ * would bury the structure; the counts are kept so "which iteration failed" is still answerable. */
+export function summarizeExecutedNodes(executionContext: ExecutionContext): ExecutedNodeSummary[] {
+  const byUid = new Map<string, ExecutedNodeSummary>();
+  for (const entry of executionContext.summary.node_execution ?? []) {
+    let node = byUid.get(entry.node_uid);
+    if (!node) {
+      const definition = executionContext.findNode(entry.node_uid);
+      node = {
+        order: byUid.size + 1,
+        uid: entry.node_uid,
+        name: definition?.action_name ?? '(name unavailable)',
+        type: definition?.node_name ?? '(type unavailable)',
+        status: entry.status,
+        runs: 0,
+        total_iterations: null,
+        is_loop: false,
+        failed_iterations: [],
+      };
+      byUid.set(entry.node_uid, node);
+    }
+    node.runs += 1;
+    if (entry.is_loop) {
+      node.is_loop = true;
+      node.total_iterations = entry.total_iterations ?? node.total_iterations;
+    }
+    if (entry.status === 'FAILED') {
+      node.status = 'FAILED';
+      if (entry.current_iteration !== null) node.failed_iterations.push(entry.current_iteration);
+    } else if (node.status !== 'FAILED') {
+      node.status = entry.status;
+    }
+  }
+  return [...byUid.values()];
+}
+
+async function loadRuntime(executionContext: ExecutionContext, nodeUid: string): Promise<NodeRuntime | { unavailable: string } | null> {
+  const pending = executionContext.getNodeExecutionData(nodeUid, defaultIteration(executionContext, nodeUid));
+  if (!pending) return null;
+  const raw = await pending;
+  const failure = fetchFailure(raw);
+  return failure ? { unavailable: failure } : describeNodeRuntime(raw);
+}
+
+/** Which loop iteration the failed node failed in, when it ran inside a loop. */
+function failedIteration(executionContext: ExecutionContext, nodeUid: string): { iteration: number | null; total_iterations: number | null } {
+  const entry = (executionContext.summary.node_execution ?? []).find((e) => e.node_uid === nodeUid && e.status === 'FAILED');
+  return { iteration: entry?.current_iteration ?? null, total_iterations: entry?.total_iterations ?? null };
+}
+
+/** The iteration to look at for a node inside a loop: the one it failed in, else its last. Undefined for a
+ * node that ran once outside any loop. */
+export function defaultIteration(executionContext: ExecutionContext, nodeUid: string): number | undefined {
+  const iterations = executionContext.iterationsOf(nodeUid);
+  if (iterations.length === 0) return undefined;
+  const failed = (executionContext.summary.node_execution ?? []).find(
+    (e) => e.node_uid === nodeUid && e.status === 'FAILED' && e.current_iteration !== null,
+  );
+  return failed?.current_iteration ?? iterations[iterations.length - 1];
 }
 
 export interface SeedHop {
@@ -59,15 +139,28 @@ export interface SeedHop {
 
 export interface RcaSeed {
   mode: RcaMode;
-  execution: { uid: string | null; status: string | null; error_message: string | null; error_code: string | null };
-  failed_node: { uid: string | null; name: string | null; type: string | null } | null;
+  execution: {
+    uid: string | null;
+    status: string | null;
+    error_message: string | null;
+    error_code: string | null;
+    /** AUTOMATED or MANUAL, and LIVE or DRAFT: a draft test run executed an unpublished version. */
+    mode: string | null;
+    type: string | null;
+    /** When the workflow version that actually ran was saved. */
+    version_created_at: string | null;
+  };
+  failed_node: { uid: string | null; name: string | null; type: string | null; iteration: number | null; total_iterations: number | null } | null;
+  /** What the failed node did at runtime: its OWN error and HTTP status (the execution-level message can be
+   * empty), the fields it ran with after evaluation, and the node that fed it. */
+  failed_node_runtime: NodeRuntime | { unavailable: string } | null;
   /** What the failed node's expressions resolved to, from this run's real data. */
   failed_node_inputs: ResolvedInput[];
   /** Nodes the failed node depends on, nearest first, with their status and error. */
   upstream_chain: SeedHop[];
   branch_decisions: ChatContext['branchDecisions'];
   /** Executed nodes in order. */
-  executed_nodes: Array<{ order: number; uid: string; name: string; type: string; status: string }>;
+  executed_nodes: ExecutedNodeSummary[];
 }
 
 export async function buildSeed(
@@ -79,8 +172,9 @@ export async function buildSeed(
   if (!executionContext) {
     return {
       mode,
-      execution: { uid: null, status: null, error_message: null, error_code: null },
+      execution: { uid: null, status: null, error_message: null, error_code: null, mode: null, type: null, version_created_at: null },
       failed_node: null,
+      failed_node_runtime: null,
       failed_node_inputs: [],
       upstream_chain: [],
       branch_decisions: [],
@@ -94,8 +188,11 @@ export async function buildSeed(
   const failedDefinition = failedUid ? executionContext.findNode(failedUid) : undefined;
 
   const env = makeResolverEnv(executionContext);
-  const [inputs, hops] = await Promise.all([
-    failedUid && failedDefinition ? resolveNodeInputs(failedUid, failedDefinition.form_fields, env) : Promise.resolve([]),
+  const [runtime, inputs, hops] = await Promise.all([
+    failedUid ? loadRuntime(executionContext, failedUid) : Promise.resolve(null),
+    failedUid && failedDefinition
+      ? resolveNodeInputs(failedUid, failedDefinition.form_fields, env, defaultIteration(executionContext, failedUid))
+      : Promise.resolve([]),
     failedUid
       ? traceLineage(failedUid, chatContext.lineage, executionContext, 'upstream', RCA_SEED_HOPS).catch(() => [])
       : Promise.resolve([]),
@@ -108,10 +205,20 @@ export async function buildSeed(
       status: wf?.status ?? null,
       error_message: wf?.error_message ?? null,
       error_code: wf?.error_code ?? null,
+      mode: wf?.mode ?? null,
+      type: wf?.type ?? null,
+      version_created_at: wf?.version_details?.created_at ?? null,
     },
     failed_node: failedUid
-      ? { uid: failedUid, name: failure?.name ?? null, type: failedDefinition?.node_name ?? failedDefinition?.action_type ?? null }
+      ? {
+          uid: failedUid,
+          name: failure?.name ?? null,
+          type: failedDefinition?.node_name ?? failedDefinition?.action_type ?? null,
+          // Inside a loop the failure belongs to one iteration; the node data differs per iteration.
+          ...failedIteration(executionContext, failedUid),
+        }
       : null,
+    failed_node_runtime: runtime,
     failed_node_inputs: inputs,
     upstream_chain: hops.map((hop) => ({
       distance: hop.distance,
@@ -123,12 +230,6 @@ export async function buildSeed(
       via: hop.via.map((v) => v.rawExpression),
     })),
     branch_decisions: chatContext.branchDecisions,
-    executed_nodes: executionContext.executedNodes.map((n) => ({
-      order: n.order,
-      uid: n.node_uid,
-      name: n.name,
-      type: n.type,
-      status: n.status,
-    })),
+    executed_nodes: summarizeExecutedNodes(executionContext),
   };
 }

@@ -1,10 +1,24 @@
 import type { ExecutedWorkflowNode, ExecutionContext } from '../../lib/zuperExecutionApi';
 
-// A synthetic run, shaped from the documented behaviour (expressions_reference.json): every node's
-// execution data is a {node, data} wrapper, Get Record keeps the API body under .data.data.
+// A synthetic run in the REAL node-data shape (confirmed on a captured execution, see rca/nodeData.ts):
+// GET .../nodes/{uid} returns { node_execution: { status, input_data, execution_data, ... } } where
+// execution_data is the {node, data} wrapper and input_data is the previous node's wrapper.
 // Flow: On Webhook -> Get Job -> Send Email. Get Job returns a job whose customer is null, so Send
-// Email fails reading the customer's email. Real captured executions replace this in the eval set.
+// Email fails reading the customer's email.
 const wrap = (name: string, data: unknown) => ({ node: { node_name: name }, data });
+const envelope = (uid: string, status: string, input: unknown, executionData: unknown) => ({
+  node_execution: {
+    node_uid: uid,
+    status,
+    input_data: input,
+    execution_data: executionData,
+    current_iteration: null,
+    total_iterations: null,
+    remarks: null,
+  },
+});
+const hookOut = wrap('On Webhook', { body: { job_uid: 'job-1' } });
+const jobOut = wrap('Get Job', { data: { job_uid: 'job-1', customer: null }, status: 200 });
 
 export const nodes: ExecutedWorkflowNode[] = [
   { node_uid: 'u-hook', action_name: 'On Webhook', node_name: 'webhook', form_fields: {} },
@@ -26,9 +40,9 @@ export const nodes: ExecutedWorkflowNode[] = [
 ];
 
 export const nodeData: Record<string, unknown> = {
-  'u-hook': wrap('webhook', { body: { job_uid: 'job-1' } }),
-  'u-job': wrap('zuper_get_record', { data: { job_uid: 'job-1', customer: null } }),
-  'u-mail': { status: 'FAILED', error: 'recipient is required' },
+  'u-hook': envelope('u-hook', 'COMPLETED', null, hookOut),
+  'u-job': envelope('u-job', 'COMPLETED', hookOut, jobOut),
+  'u-mail': envelope('u-mail', 'FAILED', jobOut, { node: { node_name: 'Send Email' }, error: 'recipient is required' }),
 };
 
 export function fakeExecution(failure: boolean): ExecutionContext {
@@ -71,6 +85,7 @@ export function fakeExecution(failure: boolean): ExecutionContext {
     })),
     failure: failure ? { node_uid: 'u-mail', name: 'Send Email', error_message: 'recipient is required', error_code: null } : null,
     findNode: (key) => byUid.get(key) ?? nodes.find((n) => n.action_name?.toLowerCase() === key.toLowerCase()),
+    iterationsOf: () => [],
     getNodeExecutionData: (key) => {
       const node = byUid.get(key) ?? nodes.find((n) => n.action_name?.toLowerCase() === key.toLowerCase());
       return node ? Promise.resolve(nodeData[node.node_uid]) : undefined;

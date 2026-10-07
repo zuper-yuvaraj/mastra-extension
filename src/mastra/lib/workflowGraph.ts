@@ -4,7 +4,7 @@ import { extractReferences, renderSegments } from '../rca/references';
 
 const GRAPH_CACHE_TTL_MS = 10 * 60 * 1000;
 
-export type BranchType = 'IF_ELSE' | 'SPLIT';
+export type BranchType = 'IF_ELSE' | 'SPLIT' | 'LOOP';
 
 export interface WorkflowGraph {
   /** node key (node_uid, or id when node_uid is unavailable) -> its direct upstream/downstream node keys. */
@@ -17,8 +17,16 @@ export interface WorkflowGraph {
 export interface BranchDecision {
   node_uid: string;
   name: string;
+  /** The condition's result for this run. */
+  output_value: boolean;
+  branch: 'TRUE' | 'FALSE';
+  /** Name of the node the taken output leads to, or null when nothing is connected to it. */
   took: string | null;
   notTaken: string[];
+  /** True when the taken output has no node connected, so the workflow ended at this node. */
+  flow_ended: boolean;
+  /** Loop iteration this decision was made in, for a conditional node inside a loop. */
+  iteration: number | null;
 }
 
 export interface NodeReference {
@@ -54,8 +62,11 @@ type RawConnection = WorkflowConnection | Record<string, unknown>;
 
 interface GraphNode {
   key: string;
+  /** Every identifier a connection may use for this node: its `id` and its `node_uid`. */
+  aliases: string[];
   name: string;
   formFields: Record<string, unknown>;
+  isLoop: boolean;
 }
 
 interface GraphEdge {
@@ -80,21 +91,33 @@ function toGraphNodes(nodes: RawNode[]): GraphNode[] {
     const id = typeof record.id === 'string' ? record.id : undefined;
     return {
       key: uid ?? id ?? '',
+      aliases: [id, uid].filter((a): a is string => Boolean(a)),
       name: typeof record.action_name === 'string' ? record.action_name : '',
       formFields: (record.form_fields as Record<string, unknown>) ?? {},
+      isLoop: record.node_name === 'loop' || record.action_key === 'loop',
     };
   });
 }
 
-function toGraphEdges(connections: RawConnection[]): GraphEdge[] {
-  return connections.map((connection) => {
-    const record = connection as Record<string, unknown>;
-    return {
-      source: typeof record.source === 'string' ? record.source : '',
-      target: typeof record.target === 'string' ? record.target : '',
-      outputValue: typeof record.output_value === 'boolean' ? record.output_value : undefined,
-    };
-  });
+/** Connections name their endpoints by the node's `id` (e.g. `zuper_update_zuper_update18ab…`, or
+ * `job.status_update` for a trigger), while everything else here is keyed by `node_uid`. Translate, or
+ * no edge ever matches a node. Self-edges (a loop's marker edge) are dropped; edges to nodes that no
+ * longer exist are left unresolved and filtered out by the callers. */
+function toGraphEdges(connections: RawConnection[], nodes: RawNode[]): GraphEdge[] {
+  const keyByAlias = new Map<string, string>();
+  for (const node of toGraphNodes(nodes)) for (const alias of node.aliases) keyByAlias.set(alias, node.key);
+  const resolve = (value: unknown): string => (typeof value === 'string' ? (keyByAlias.get(value) ?? value) : '');
+
+  return connections
+    .map((connection) => {
+      const record = connection as Record<string, unknown>;
+      return {
+        source: resolve(record.source),
+        target: resolve(record.target),
+        outputValue: typeof record.output_value === 'boolean' ? record.output_value : undefined,
+      };
+    })
+    .filter((edge) => edge.source !== edge.target);
 }
 
 function groupBySource(edges: GraphEdge[]): Map<string, GraphEdge[]> {
@@ -107,13 +130,20 @@ function groupBySource(edges: GraphEdge[]): Map<string, GraphEdge[]> {
 }
 
 /** A node with >1 outgoing connection is IF_ELSE when its edges carry a boolean output_value
- * (a condition result), or SPLIT when they fan out with no output_value (unconditional branches). */
+ * (a condition result), or SPLIT when they fan out with no output_value (unconditional branches).
+ * A loop is its own thing: its two outputs mean "loop body" and "done", not a branch decision. */
 export function classifyBranches(nodes: RawNode[], connections: RawConnection[]): Map<string, BranchType> {
-  const validKeys = new Set(toGraphNodes(nodes).map((n) => n.key).filter(Boolean));
-  const edges = toGraphEdges(connections).filter((e) => validKeys.has(e.source) && validKeys.has(e.target));
+  const graphNodes = toGraphNodes(nodes);
+  const validKeys = new Set(graphNodes.map((n) => n.key).filter(Boolean));
+  const loops = new Set(graphNodes.filter((n) => n.isLoop).map((n) => n.key));
+  const edges = toGraphEdges(connections, nodes).filter((e) => validKeys.has(e.source) && validKeys.has(e.target));
 
   const branchType = new Map<string, BranchType>();
   for (const [source, outgoing] of groupBySource(edges)) {
+    if (loops.has(source)) {
+      branchType.set(source, 'LOOP');
+      continue;
+    }
     if (outgoing.length < 2) continue;
     const hasOutputValue = outgoing.some((e) => typeof e.outputValue === 'boolean');
     branchType.set(source, hasOutputValue ? 'IF_ELSE' : 'SPLIT');
@@ -123,7 +153,7 @@ export function classifyBranches(nodes: RawNode[], connections: RawConnection[])
 
 export function buildWorkflowGraph(nodes: RawNode[], connections: RawConnection[]): WorkflowGraph {
   const validKeys = new Set(toGraphNodes(nodes).map((n) => n.key).filter(Boolean));
-  const edges = toGraphEdges(connections).filter((e) => validKeys.has(e.source) && validKeys.has(e.target));
+  const edges = toGraphEdges(connections, nodes).filter((e) => validKeys.has(e.source) && validKeys.has(e.target));
 
   const upstream = new Map<string, string[]>();
   const downstream = new Map<string, string[]>();
@@ -135,9 +165,14 @@ export function buildWorkflowGraph(nodes: RawNode[], connections: RawConnection[
   return { upstream, downstream, branchType: classifyBranches(nodes, connections) };
 }
 
-/** For each executed node whose output_value marks it as a taken/not-taken branch decision, match
- * it against the connection it actually took. Answers "expected Flow B, got Flow A" deterministically —
- * without this, only the model's reading of raw output_value/connections could answer it. */
+/** For each executed conditional node (If/Else), match its output_value against the connection it
+ * actually took. Answers "expected Flow B, got Flow A" deterministically — without this, only the
+ * model's reading of raw output_value/connections could answer it.
+ *
+ * Runs once per iteration for a node inside a loop (`iteration` says which). A conditional node with
+ * only one of its two outputs connected still yields a decision: when the value selects the
+ * unconnected output the flow simply ends there (`flow_ended: true`), a silent and common cause of
+ * "why didn't the rest of the workflow run". Loops are not branches and are skipped. */
 export function computeBranchDecisions(
   nodes: RawNode[],
   nodeExecution: NodeExecutionStatus[],
@@ -145,27 +180,29 @@ export function computeBranchDecisions(
 ): BranchDecision[] {
   // Names come from the full node list, not just executed ones — the whole point of a branch
   // decision is naming the NOT-taken target too, and by definition it never executed.
-  const nameByUid = new Map(
-    toGraphNodes(nodes)
-      .filter((n) => n.key)
-      .map((n): [string, string] => [n.key, n.name]),
-  );
-  const validKeys = new Set(nameByUid.keys());
-  const edges = toGraphEdges(connections).filter((e) => validKeys.has(e.source));
+  const graphNodes = toGraphNodes(nodes).filter((n) => n.key);
+  const nameByUid = new Map(graphNodes.map((n): [string, string] => [n.key, n.name]));
+  const loops = new Set(graphNodes.filter((n) => n.isLoop).map((n) => n.key));
+  const edges = toGraphEdges(connections, nodes).filter((e) => nameByUid.has(e.source));
   const bySource = groupBySource(edges);
 
   const decisions: BranchDecision[] = [];
   for (const status of nodeExecution) {
-    if (status.output_value === null) continue;
+    if (status.output_value === null || status.is_loop || loops.has(status.node_uid)) continue;
     const outgoing = bySource.get(status.node_uid);
-    if (!outgoing || outgoing.length < 2) continue;
+    // Only nodes whose outputs are conditional (edges tagged true/false) make branch decisions.
+    if (!outgoing?.some((e) => typeof e.outputValue === 'boolean')) continue;
 
     const taken = outgoing.find((e) => e.outputValue === status.output_value);
     decisions.push({
       node_uid: status.node_uid,
       name: nameByUid.get(status.node_uid) ?? status.node_uid,
-      took: taken ? nameByUid.get(taken.target) ?? taken.target : null,
+      output_value: status.output_value,
+      branch: status.output_value ? 'TRUE' : 'FALSE',
+      took: taken ? (nameByUid.get(taken.target) ?? taken.target) : null,
       notTaken: outgoing.filter((e) => e !== taken).map((e) => nameByUid.get(e.target) ?? e.target),
+      flow_ended: !taken,
+      iteration: status.current_iteration,
     });
   }
   return decisions;
@@ -179,15 +216,19 @@ export function computeBranchDecisions(
 export function extractNodeReferences(node: RawNode): NodeReference[] {
   const record = node as unknown as Record<string, unknown>;
   return extractReferences(record.form_fields ?? {})
-    .filter((ref) => (ref.kind === 'latest' || ref.kind === 'all_runs') && ref.targetName)
-    .map((ref) => ({ targetName: ref.targetName!, path: renderSegments(ref.path), rawExpression: ref.raw }));
+    .filter((ref) => (ref.kind === 'latest' || ref.kind === 'all_runs' || ref.kind === 'source_node') && (ref.targetName ?? ref.targetUid))
+    // a source_node reference names its target by uid; buildLineageGraph resolves uids as well as names
+    .map((ref) => ({ targetName: (ref.targetName ?? ref.targetUid)!, path: renderSegments(ref.path), rawExpression: ref.raw }));
 }
 
 export function buildLineageGraph(nodes: RawNode[]): LineageGraph {
   const graphNodes = toGraphNodes(nodes);
-  const keyByName = new Map(
-    graphNodes.filter((n) => n.key && n.name).map((n) => [normalizeName(n.name), n.key]),
-  );
+  // References name their target by display name (`$.getLatestNodeData('X')`) or, for a native node's
+  // record source, by uid; both resolve to the node's key.
+  const keyByName = new Map<string, string>([
+    ...graphNodes.filter((n) => n.key && n.name).map((n): [string, string] => [normalizeName(n.name), n.key]),
+    ...graphNodes.filter((n) => n.key).map((n): [string, string] => [normalizeName(n.key), n.key]),
+  ]);
 
   const references = new Map<string, ResolvedReference[]>();
   const referencedBy = new Map<string, string[]>();

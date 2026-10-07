@@ -35,16 +35,30 @@ export const verdictSchema = z.object({
     .object({
       node_uid: z.string().describe('The node where the problem STARTS — often upstream of the node that errored.'),
       name: z.string(),
-      category: z.enum(ROOT_CAUSE_CATEGORIES),
+      category: z
+        .enum(ROOT_CAUSE_CATEGORIES)
+        .describe(
+          'Choose by WHERE the fault is, at the root-cause node. ' +
+            'CODE_ERROR: the root-cause node is a Code node (or other user-written logic) and its own code produced the wrong value, even though the symptom shows up later at another node. ' +
+            'WRONG_EXPRESSION_PATH: the node reads a path that does not exist in the data it was given (a missing .data, a wrong key). ' +
+            'BAD_UPSTREAM_DATA: the producing node did its job as configured but the record or response it returned holds wrong or empty values. ' +
+            'MISSING_DATA: a record or field the workflow depends on does not exist in the account. ' +
+            'EXTERNAL_API_ERROR: a call to Zuper or another service failed for a reason on the service side (rejected request, rule, outage). ' +
+            'CONFIGURATION: a native node is set up in a way that cannot work (wrong module, operation, field mapping). ' +
+            'BRANCH_CONDITION: an If/Else condition or trigger filter evaluated differently than intended. ' +
+            'PERMISSION: the user or API key is not allowed to do it. OTHER: none of these.',
+        ),
       explanation: z.string(),
     })
     .nullable(),
-  evidence_chain: z.array(evidenceItemSchema).describe('Ordered from the failed node back to the root cause.'),
+  evidence_chain: z
+    .array(evidenceItemSchema)
+    .describe('Ordered from the failed node back to the root cause. Only data read from this execution (nodes or the execution itself); documentation belongs in knowledge_used, never here.'),
   fix: z
     .object({
       description: z.string(),
       node_uid: z.string().nullable().describe('The uid of an EXISTING node in this execution to change, copied from the seed or tool results; null if the change is a new node or is not tied to one node.'),
-      suggested_change: z.string().nullable().describe('Concrete change, e.g. the corrected expression or code line.'),
+      suggested_change: z.string().nullable().describe('Concrete change, e.g. the corrected expression or code line. Use only fields and values seen in the evidence; if it assumes anything unseen, say so inside the text.'),
     })
     .nullable(),
   confidence: z.enum(['high', 'medium', 'low']),
