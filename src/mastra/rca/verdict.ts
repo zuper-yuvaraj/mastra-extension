@@ -27,9 +27,21 @@ const evidenceItemSchema = z.object({
 
 export const verdictSchema = z.object({
   status: z
-    .enum(['failed', 'unexpected_branch', 'no_issue', 'insufficient_evidence'])
-    .describe('failed: the execution errored. unexpected_branch: it ran but took a path the user did not expect. no_issue: nothing wrong found. insufficient_evidence: the data does not establish a cause.'),
-  summary: z.string().describe('One or two plain sentences: what went wrong and why. Zuper terminology, no node ids.'),
+    .enum(['failed', 'unexpected_branch', 'no_issue', 'insufficient_evidence', 'answered'])
+    .describe(
+      'failed: the execution errored. unexpected_branch: it ran but took a path the user did not expect. no_issue: nothing wrong found. insufficient_evidence: the data does not establish a cause or the answer. answered: the user asked an informational question (what a node does, what value a field held, how the workflow is built) and it is answered from the data; there is no failure to diagnose.',
+    ),
+  workflow_purpose: z
+    .string()
+    .describe('What this workflow does for the business, in at most two short lines (about 25 words), read from the node flow, e.g. "Receives a call webhook, fetches the call details and logs them against the customer." Empty string for a follow-up question, or when the purpose cannot be told from the nodes. Never guess.'),
+  headline: z
+    .string()
+    .describe('A short header (under 15 words) in the shape "While <the activity the failed node was performing>, <node name> failed", e.g. "While fetching the call details, Get Call details failed". For an unexpected branch: "While deciding <what>, <node name> took the <TRUE/FALSE> path". Empty string when nothing failed or the user asked an informational question. No ids.'),
+  summary: z
+    .string()
+    .describe(
+      'The body under the headline: at most TWO plain sentences, about 50 words, that DIRECTLY answer the question asked. For a failure: why that node failed (its own error, in words) and whether a preceding node caused it (name it and what it produced) or that the preceding nodes were checked and are fine. Do not repeat the workflow purpose or the headline here. Zuper terminology. NEVER include a uuid, uid or other identifier; refer to nodes by name. For a follow-up, answer the follow-up, not the original question again.',
+    ),
   failed_node: z
     .object({ uid: z.string().nullable(), name: z.string().nullable(), error: z.string().nullable() })
     .nullable(),
@@ -64,6 +76,10 @@ export const verdictSchema = z.object({
     })
     .nullable(),
   confidence: z.enum(['high', 'medium', 'low']),
+  references: z
+    .array(z.object({ title: z.string(), url: z.string() }))
+    .max(3)
+    .describe('Documentation pages the conclusion relied on, for the reader to open: title and the exact source_url copied from a knowledge tool result. Only pages you actually used; never invent or edit a URL. Empty if none.'),
   knowledge_used: z
     .array(z.object({ tool: z.string(), id: z.string() }))
     .describe('Only KNOWLEDGE lookups the conclusion relied on (search_knowledge, get_node_info, get_node_output_shape, get_expression_rules, get_code_runtime, get_api_endpoint, ...) with the id or topic asked for. Not runtime inspection tools. Empty if none were used.'),
@@ -74,12 +90,15 @@ export type RcaVerdict = z.infer<typeof verdictSchema>;
 /** Used when the model produces nothing usable, so the caller still gets a well-formed answer. */
 export const INSUFFICIENT_VERDICT: RcaVerdict = {
   status: 'insufficient_evidence',
+  workflow_purpose: '',
+  headline: '',
   summary: 'The investigation could not reach a conclusion from the available data.',
   failed_node: null,
   root_cause: null,
   evidence_chain: [],
   fix: null,
   confidence: 'low',
+  references: [],
   knowledge_used: [],
 };
 
@@ -87,6 +106,7 @@ export const INSUFFICIENT_VERDICT: RcaVerdict = {
 export const verifiedVerdictSchema = verdictSchema.omit({ evidence_chain: true }).extend({
   evidence_chain: z.array(evidenceItemSchema.extend({ verified: z.boolean() })),
   issues: z.array(z.string()),
+  adjustments: z.array(z.string()).optional(),
 });
 
 export interface VerifiedEvidence {
@@ -100,12 +120,20 @@ export interface VerifiedEvidence {
 
 export interface VerifiedVerdict extends Omit<RcaVerdict, 'evidence_chain'> {
   evidence_chain: VerifiedEvidence[];
+  /** Changes the verifier made to the model's answer (e.g. a category corrected from the node type). */
+  adjustments?: string[];
   /** Problems found by verification (unknown nodes, unverifiable quotes). Empty when clean. */
   issues: string[];
 }
 
-function esc(text: string): string {
+export function esc(text: string): string {
   return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+/** The documentation the answer relied on, last in every reply. Plain text: the chat renders no links. */
+export function renderReferences(references: ReadonlyArray<{ title: string; url: string }>): string {
+  if (references.length === 0) return '';
+  return `<p><strong>Reference</strong></p><ul>${references.map((r) => `<li>${esc(r.title)}: ${esc(r.url)}</li>`).join('')}</ul>`;
 }
 
 const STATUS_TITLE: Record<RcaVerdict['status'], string> = {
@@ -113,6 +141,7 @@ const STATUS_TITLE: Record<RcaVerdict['status'], string> = {
   unexpected_branch: 'Unexpected path taken',
   no_issue: 'No issue found',
   insufficient_evidence: 'Not enough evidence to determine a cause',
+  answered: 'Answer',
 };
 
 /** HTML for the UI, generated from the verdict rather than written by the model. Tags limited to
@@ -155,5 +184,6 @@ export function renderVerdictHtml(verdict: VerifiedVerdict): string {
   if (verdict.issues.length > 0) {
     parts.push(`<p><em>Verification notes: ${esc(verdict.issues.join('; '))}</em></p>`);
   }
+  parts.push(renderReferences(verdict.references));
   return parts.join('');
 }

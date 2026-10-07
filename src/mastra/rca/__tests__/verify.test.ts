@@ -16,6 +16,9 @@ function verdict(overrides: Partial<RcaVerdict> = {}): RcaVerdict {
     fix: { description: 'Guard for a missing customer', node_uid: 'n2', suggested_change: null },
     confidence: 'high',
     knowledge_used: [],
+    references: [],
+    workflow_purpose: '',
+    headline: '',
     ...overrides,
   };
 }
@@ -191,4 +194,22 @@ test('mostly unverified evidence, or none at the root-cause node, is still low',
     { nodeUids, ledger },
   );
   assert.equal(mostlyWrong.confidence, 'low', 'more than a third unverified');
+});
+
+test('a cause in a Code node is always CODE_ERROR, and the change is recorded', () => {
+  const ledger = ledgerWith('{"data":{"customer":null}}');
+  const nodeTypes = new Map([['n1', 'code']]);
+  const v = verifyVerdict(verdict(), { nodeUids, ledger, nodeTypes });
+  assert.equal(v.root_cause?.category, 'CODE_ERROR');
+  assert.match(v.adjustments?.[0] ?? '', /MISSING_DATA to CODE_ERROR/);
+
+  const api = verifyVerdict(
+    verdict({ root_cause: { node_uid: 'n1', name: 'Get Job', category: 'EXTERNAL_API_ERROR', explanation: 'x' } }),
+    { nodeUids, ledger, nodeTypes },
+  );
+  assert.equal(api.root_cause?.category, 'EXTERNAL_API_ERROR', 'an outside cause is left as the model said');
+
+  const http = verifyVerdict(verdict(), { nodeUids, ledger, nodeTypes: new Map([['n1', 'http_request']]) });
+  assert.equal(http.root_cause?.category, 'MISSING_DATA');
+  assert.equal(http.adjustments, undefined);
 });

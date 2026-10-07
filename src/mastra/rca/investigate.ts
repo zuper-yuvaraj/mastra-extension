@@ -8,7 +8,9 @@ import type { WorkflowDetail } from '../lib/zuperWorkflowApi';
 import type { ExecutionContext } from '../lib/zuperExecutionApi';
 import { ZUPER_CHAT_CONTEXT_KEY } from '../tools/zuperChatTools';
 import { RCA_MAX_STEPS, RCA_MODEL, RCA_REASONING_EFFORT, RCA_STRUCTURING_MODEL } from './config';
+import { MAX_EVIDENCE_CHARS } from './conversation';
 import { EvidenceLedger, RCA_LEDGER_KEY } from './ledger';
+import { progressText, type ProgressEvent } from './progress';
 import { buildSeed, type RcaMode, type RcaSeed } from './seed';
 import {
   INSUFFICIENT_VERDICT,
@@ -33,6 +35,19 @@ export interface InvestigationInput {
   question?: string;
   zuperToken: string;
   zuperApiUrl: string;
+  /** Earlier turns of the same chat; absent for a one-shot analysis. */
+  conversation?: {
+    /** The earlier turns as text (see historyForPrompt). */
+    history: string;
+    /** What was already verified in this conversation (see findingsForPrompt). */
+    findings: string | null;
+    /** Everything the investigator was shown earlier, so earlier quotes still verify. */
+    priorEvidence: string[];
+  };
+  /** Called as the investigator works, one line per tool call. */
+  onProgress?: (event: ProgressEvent) => void;
+  /** Aborts the model call when the client goes away. */
+  abortSignal?: AbortSignal;
 }
 
 export interface RcaResult {
@@ -46,6 +61,8 @@ export interface RcaResult {
     tool_calls: number;
     model: string | null;
   };
+  /** What the investigator was shown this turn (plus carried-over evidence), to carry into the next turn. */
+  evidence: string[];
 }
 
 function staticVerdict(status: RcaVerdict['status'], summary: string): VerifiedVerdict {
@@ -75,21 +92,36 @@ function seedForPrompt(seed: RcaSeed): string {
   let text = JSON.stringify(trimmed);
   for (const limit of [80, 40, 20]) {
     if (text.length <= MAX_SEED_CHARS) break;
-    trimmed = { ...trimmed, executed_nodes: trimmed.executed_nodes.slice(0, limit), upstream_chain: trimmed.upstream_chain.slice(0, limit) };
+    trimmed = {
+      ...trimmed,
+      executed_nodes: trimmed.executed_nodes.slice(0, limit),
+      upstream_chain: trimmed.upstream_chain.slice(0, limit),
+      ...(trimmed.workflow_outline
+        ? { workflow_outline: { ...trimmed.workflow_outline, nodes: trimmed.workflow_outline.nodes.slice(0, limit), connections: trimmed.workflow_outline.connections.slice(0, limit * 2) } }
+        : {}),
+    };
     text = JSON.stringify(trimmed);
   }
   return text.length <= MAX_SEED_CHARS ? text : `${text.slice(0, MAX_SEED_CHARS)}…(seed truncated)`;
 }
 
-export function buildUserMessage(seed: RcaSeed, question?: string): string {
+export function buildUserMessage(seed: RcaSeed, question?: string, conversation?: InvestigationInput['conversation']): string {
   const ask =
     question?.trim() ||
     (seed.mode === 'EXECUTION_FAILED' ? 'Why did this execution fail? Find the root cause.' : 'Explain what happened in this execution.');
-  return [`MODE: ${seed.mode}`, `QUESTION: ${ask}`, '', 'SEED EVIDENCE (JSON):', seedForPrompt(seed)].join('\n');
+  return [
+    `MODE: ${seed.mode}`,
+    `QUESTION: ${ask}`,
+    ...(conversation?.history ? ['', 'CONVERSATION SO FAR:', conversation.history] : []),
+    ...(conversation?.findings ? ['', 'ALREADY ESTABLISHED (verified earlier in this conversation, JSON):', conversation.findings] : []),
+    '',
+    'SEED EVIDENCE (JSON):',
+    seedForPrompt(seed),
+  ].join('\n');
 }
 
 export async function investigate(input: InvestigationInput): Promise<RcaResult> {
-  const { agent, executionContext, liveWorkflow, question, zuperToken, zuperApiUrl } = input;
+  const { agent, executionContext, liveWorkflow, question, zuperToken, zuperApiUrl, conversation, onProgress, abortSignal } = input;
 
   const chatContext = assembleContext(executionContext, liveWorkflow ?? null);
   const seed = await buildSeed(executionContext, chatContext, question);
@@ -97,12 +129,19 @@ export async function investigate(input: InvestigationInput): Promise<RcaResult>
 
   const direct = answerWithoutAgent(seed);
   if (direct) {
-    return { verdict: direct, html: renderVerdictHtml(direct), meta: { ...baseMeta, steps: 0, tool_calls: 0, model: null } };
+    return {
+      verdict: direct,
+      html: renderVerdictHtml(direct),
+      meta: { ...baseMeta, steps: 0, tool_calls: 0, model: null },
+      evidence: conversation?.priorEvidence ?? [],
+    };
   }
 
   // The ledger holds everything the agent is shown. Quotes in its verdict are checked against it.
   const ledger = new EvidenceLedger();
+  ledger.preload(conversation?.priorEvidence ?? []);
   ledger.record('seed', 'seed', seed);
+  if (onProgress) ledger.onToolResult((entry) => onProgress({ text: progressText(entry.tool, entry.label) }));
 
   // A fresh request context, not the workflow's: it carries live closures and the bearer token, which
   // must not end up in anything the workflow persists.
@@ -110,8 +149,9 @@ export async function investigate(input: InvestigationInput): Promise<RcaResult>
   requestContext.setRaw(ZUPER_CHAT_CONTEXT_KEY, { zuperToken, zuperApiUrl, executionContext, liveWorkflow: liveWorkflow ?? null, chatContext });
   requestContext.setRaw(RCA_LEDGER_KEY, ledger);
 
-  const response = await agent.generate([{ role: 'user', content: buildUserMessage(seed, question) }], {
+  const response = await agent.generate([{ role: 'user', content: buildUserMessage(seed, question, conversation) }], {
     requestContext,
+    ...(abortSignal ? { abortSignal } : {}),
     maxSteps: RCA_MAX_STEPS,
     providerOptions: { openai: { reasoningEffort: RCA_REASONING_EFFORT } },
     structuredOutput: {
@@ -134,11 +174,14 @@ export async function investigate(input: InvestigationInput): Promise<RcaResult>
     ...((executionContext?.workflowData?.nodes ?? []).map((n) => n.node_uid).filter((uid): uid is string => Boolean(uid))),
   ]);
   // fetch_failed anywhere in what the agent was shown means some node data was never readable.
-  const verdict = verifyVerdict(raw, { nodeUids, ledger, executionUid, dataGaps: ledger.contains('fetch_failed') });
+  const nodeTypes = new Map<string, string>();
+  for (const node of executionContext?.workflowData?.nodes ?? []) if (node.node_uid && node.node_name) nodeTypes.set(node.node_uid, node.node_name);
+  const verdict = verifyVerdict(raw, { nodeUids, ledger, executionUid, dataGaps: ledger.contains('fetch_failed'), nodeTypes, kbHints: seed.kb_hints });
 
   return {
     verdict,
     html: renderVerdictHtml(verdict),
     meta: { ...baseMeta, steps: response.steps?.length ?? 0, tool_calls: ledger.toolCalls(), model: RCA_MODEL },
+    evidence: ledger.exportTexts(MAX_EVIDENCE_CHARS),
   };
 }

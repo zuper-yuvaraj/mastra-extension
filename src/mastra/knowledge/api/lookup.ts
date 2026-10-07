@@ -4,6 +4,7 @@
 import { listChunks } from '../search';
 import type { ApiEndpointRecord } from './distill';
 import { loadRecords } from './records';
+import { apiDocUrl } from './urls';
 
 const MAX_RESULT_CHARS = 14000;
 
@@ -102,7 +103,8 @@ export function getApiEndpoint(query: ApiEndpointQuery) {
       matches: matches.map((r) => ({ id: r.id, title: r.title, method: r.method, path: r.path })),
     };
   }
-  return { found: true, endpoint: capRecord(matches[0]!) };
+  const url = apiDocUrl(matches[0]!.sourceFile);
+  return { found: true, endpoint: capRecord(matches[0]!), ...(url ? { source_url: url } : {}) };
 }
 
 const MONTHS = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];

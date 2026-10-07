@@ -6,20 +6,48 @@ import type { ChatContext } from '../lib/chatContext';
 import { getExecutionWorkflowGraph, traceLineage } from '../lib/workflowGraph';
 import type { ExecutionContext } from '../lib/zuperExecutionApi';
 import { RCA_SEED_HOPS } from './config';
+import { kbHints, type KbHint } from './kbHints';
 import { describeNodeRuntime, type NodeRuntime } from './nodeData';
 import { fetchFailure, preview, resolveNodeInputs, type ResolvedInput, type ResolverEnv } from './resolveInput';
 
-export type RcaMode = 'EXECUTION_FAILED' | 'BRANCH_QUESTION' | 'NO_FAILURE' | 'RUNNING' | 'NO_EXECUTION';
+export type RcaMode =
+  | 'EXECUTION_FAILED'
+  | 'BRANCH_QUESTION'
+  /** A run with no failure, asked something specific about it (what a node received, where a value came from). */
+  | 'QUESTION'
+  /** No run at all, only the live workflow definition: structure and configuration questions. */
+  | 'WORKFLOW_QUESTION'
+  | 'NO_FAILURE'
+  | 'RUNNING'
+  | 'NO_EXECUTION';
 
 const BRANCH_QUESTION = /\b(branch|path|route|flow|went|go(?:ing)? to|instead|expected|else|condition|skipped|didn'?t (?:run|trigger))\b/i;
+/** "Did it work?", "any errors?", "what happened?": answerable from the status alone, no investigation. */
+const HEALTH_QUESTION =
+  /^(?:so\s+)?(?:(?:did|does|has|is|was|were|are)\s+(?:it|this|that|everything|the (?:execution|run|workflow))\s+(?:\w+\s+)?(?:fail|failed|work|worked|run|ran|succeed|succeeded|ok|okay|fine|good|complete|completed|finish|finished)|(?:any|are there (?:any )?|were there (?:any )?)\s*(?:errors?|issues?|problems?|failures?)|what happened|what went wrong|explain (?:this|the) (?:execution|run)|how did it go|status)\b/i;
 const TERMINAL_OK = new Set(['COMPLETED', 'SUCCESS', 'SUCCEEDED']);
+
+function mentionsNode(executionContext: ExecutionContext, question: string): boolean {
+  const text = question.toLowerCase();
+  return (executionContext.workflowData?.nodes ?? []).some((node) => {
+    const name = node.action_name?.trim().toLowerCase();
+    return Boolean(name && text.includes(name));
+  });
+}
 
 export function triage(executionContext: ExecutionContext | null, question?: string): RcaMode {
   if (!executionContext) return 'NO_EXECUTION';
+  if (executionContext.definitionOnly) return 'WORKFLOW_QUESTION';
   if (executionContext.failure) return 'EXECUTION_FAILED';
-  if (question && BRANCH_QUESTION.test(question)) return 'BRANCH_QUESTION';
+  const asked = question?.trim();
+  if (asked && BRANCH_QUESTION.test(asked)) return 'BRANCH_QUESTION';
   const status = executionContext.summary.workflow_execution?.status?.trim().toUpperCase();
-  if (status && TERMINAL_OK.has(status)) return 'NO_FAILURE';
+  if (status && TERMINAL_OK.has(status)) {
+    // A specific question about a healthy run (naming a node, or anything beyond "did it work?") is
+    // answered from the run's data, not with a stock "completed without errors".
+    const generic = !asked || (HEALTH_QUESTION.test(asked) && !mentionsNode(executionContext, asked));
+    return generic ? 'NO_FAILURE' : 'QUESTION';
+  }
   return 'RUNNING';
 }
 
@@ -137,8 +165,45 @@ export interface SeedHop {
   via: string[];
 }
 
+export interface WorkflowOutline {
+  name: string | null;
+  /** What the workflow's author said it is for, when they wrote it. */
+  description?: string;
+  nodes: Array<{ uid: string; name: string; type: string }>;
+  /** Connections by node name; `when` is the If/Else result (true/false) the edge is taken on. */
+  connections: Array<{ from: string; to: string; when?: boolean }>;
+}
+
+/** The workflow's structure, for a question with no run behind it. Connections name their endpoints by
+ * node `id`, not `node_uid`, so both are indexed. */
+export function buildWorkflowOutline(executionContext: ExecutionContext): WorkflowOutline {
+  const nodes = executionContext.workflowData?.nodes ?? [];
+  const nameByKey = new Map<string, string>();
+  for (const node of nodes) {
+    const name = node.action_name ?? node.node_uid;
+    for (const key of [node.node_uid, typeof node.id === 'string' ? node.id : undefined]) if (key) nameByKey.set(key, name);
+  }
+  const label = (value: unknown): string => (typeof value === 'string' ? (nameByKey.get(value) ?? value) : '(unknown)');
+  return {
+    name: executionContext.workflowData?.workflow_name ?? null,
+    ...(typeof executionContext.workflowData?.workflow_description === 'string' && executionContext.workflowData.workflow_description.trim()
+      ? { description: executionContext.workflowData.workflow_description.trim().slice(0, 500) }
+      : {}),
+    nodes: nodes.map((node) => ({ uid: node.node_uid, name: node.action_name ?? node.node_uid, type: node.node_name ?? node.action_type ?? '(unknown)' })),
+    connections: (executionContext.workflowData?.connections ?? [])
+      .map((c) => ({
+        from: label(c.source),
+        to: label(c.target),
+        ...(typeof c.output_value === 'boolean' ? { when: c.output_value } : {}),
+      }))
+      .filter((c) => c.from !== c.to),
+  };
+}
+
 export interface RcaSeed {
   mode: RcaMode;
+  /** The workflow's structure: what it is for and how its nodes connect. Always present when there is a workflow. */
+  workflow_outline?: WorkflowOutline;
   execution: {
     uid: string | null;
     status: string | null;
@@ -161,6 +226,8 @@ export interface RcaSeed {
   branch_decisions: ChatContext['branchDecisions'];
   /** Executed nodes in order. */
   executed_nodes: ExecutedNodeSummary[];
+  /** Documentation worth reading for this failure (see kbHints.ts); `strong` ones should not be skipped. */
+  kb_hints?: KbHint[];
 }
 
 export async function buildSeed(
@@ -172,6 +239,20 @@ export async function buildSeed(
   if (!executionContext) {
     return {
       mode,
+      execution: { uid: null, status: null, error_message: null, error_code: null, mode: null, type: null, version_created_at: null },
+      failed_node: null,
+      failed_node_runtime: null,
+      failed_node_inputs: [],
+      upstream_chain: [],
+      branch_decisions: [],
+      executed_nodes: [],
+    };
+  }
+
+  if (mode === 'WORKFLOW_QUESTION') {
+    return {
+      mode,
+      workflow_outline: buildWorkflowOutline(executionContext),
       execution: { uid: null, status: null, error_message: null, error_code: null, mode: null, type: null, version_created_at: null },
       failed_node: null,
       failed_node_runtime: null,
@@ -231,5 +312,7 @@ export async function buildSeed(
     })),
     branch_decisions: chatContext.branchDecisions,
     executed_nodes: summarizeExecutedNodes(executionContext),
+    workflow_outline: buildWorkflowOutline(executionContext),
+    ...(failedUid ? { kb_hints: kbHints({ nodeKey: typeof failedDefinition?.action_key === 'string' ? failedDefinition.action_key : null, runtime }) } : {}),
   };
 }

@@ -21,6 +21,9 @@ function verdict(overrides: Partial<RcaVerdict> = {}): RcaVerdict {
     fix: { description: 'Guard against a missing customer', node_uid: 'u-mail', suggested_change: null },
     confidence: 'high',
     knowledge_used: [],
+    references: [],
+    workflow_purpose: '',
+    headline: '',
     ...overrides,
   };
 }

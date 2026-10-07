@@ -103,6 +103,9 @@ export interface ExecutionContext {
    * iteration; see `iterationsOf` for which exist.
    */
   getNodeExecutionData: (nameOrUid: string, iteration?: number) => Promise<unknown> | undefined;
+  /** True for a context built from the live workflow definition with no run behind it: definitions and
+   * structure can be read, but there is no runtime data (see rca/definitionContext.ts). */
+  definitionOnly?: boolean;
   /** The loop iterations a node ran in (ascending), from the execution summary. Empty for a node that
    * ran once outside any loop. A loop node itself has one more (the final "done" pass) than its body. */
   iterationsOf: (nameOrUid: string) => number[];

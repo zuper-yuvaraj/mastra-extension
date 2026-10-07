@@ -17,10 +17,13 @@ function result(overrides: Partial<VerifiedVerdict> = {}, steps = 4, tool_calls 
     fix: null,
     confidence: 'high',
     knowledge_used: [],
+    references: [],
+    workflow_purpose: '',
+    headline: '',
     issues: [],
     ...overrides,
   };
-  return { verdict, html: '', meta: { mode: 'EXECUTION_FAILED', execution_status: 'FAILED', steps, tool_calls, model: 'm' } };
+  return { verdict, html: '', meta: { mode: 'EXECUTION_FAILED', execution_status: 'FAILED', steps, tool_calls, model: 'm' }, evidence: [] };
 }
 
 test('a correct answer scores on status, node and category', () => {

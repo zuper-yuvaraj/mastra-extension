@@ -170,3 +170,24 @@ Cases built on `samples/` skip themselves when that folder is absent.
 - Answers vary between runs (the same failure was once categorised as `MISSING_DATA`, once as
   `BAD_UPSTREAM_DATA`); the root-cause node was the same. Measure on real fixtures before trusting categories.
 - Latency was 20-35 s per run at `low` reasoning effort (54-78 s at the default), on one fixture.
+
+## Conversational chat (`POST /zuper/chat`)
+
+The extension chat is served by the same investigator. Enable it with `ZUPER_CHAT_ENGINE=rca` (unset keeps the
+legacy orchestrator, so rolling back is a config change).
+
+- **One agent for everything.** Modes: `EXECUTION_FAILED`, `BRANCH_QUESTION`, `QUESTION` (a specific question
+  about a healthy run), `WORKFLOW_QUESTION` (no run: answered from the live definition via
+  `definitionContext.ts`; runtime tools say plainly that nothing ran). Generic "did it fail?" on a healthy run
+  is answered from the status, with no model call.
+- **Stateless client, short server memory.** The extension resends the turns; the server keeps, per
+  account + workflow + execution for 15 minutes in process memory, the last verified verdict and the evidence
+  the investigator was shown (`conversation.ts`), so earlier quotes still verify and follow-ups build on
+  checked facts.
+- **Crisp first.** The reply is the summary (plus one honest caveat when confidence is not high). The chips
+  "Explain in detail" / "Give me the fix" re-render the stored verdict (`views.ts`) with no model call.
+- **Streaming.** With `stream: true` the response is NDJSON: `progress` lines (one per tool call, derived from
+  the evidence ledger), then `result` or `error`. Closing the connection aborts the investigation. Without it,
+  the response is the legacy `{ok, data:{reply, suggestions}}`.
+- **Limits.** Hosts are checked against the Zuper allow-list; 20 investigations/minute and 2 concurrent per
+  account (`limits.ts`), answered with 429 `RATE_LIMITED` / `TOO_MANY_INVESTIGATIONS`.

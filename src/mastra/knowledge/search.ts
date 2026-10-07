@@ -1,3 +1,4 @@
+import { apiDocUrl } from './api/urls';
 import { EMBEDDING_DIMENSION, KB_INDEX, embedTexts, ensureKbIndex, getKbVector } from './vector';
 
 export interface KnowledgeHit {
@@ -26,6 +27,13 @@ export interface SearchOptions {
 }
 
 export const DEFAULT_MIN_SCORE = 0.3;
+
+/** Business docs carry their page URL; API chunks are mapped to theirs through the docs manifest. */
+function sourceUrlOf(metadata: Record<string, unknown> | undefined): string | undefined {
+  if (metadata?.source_url) return String(metadata.source_url).replace(/\.md$/, '');
+  if (metadata?.kind === 'api' && typeof metadata.source_file === 'string') return apiDocUrl(metadata.source_file);
+  return undefined;
+}
 
 export async function searchKnowledge(query: string, options: SearchOptions = {}): Promise<KnowledgeHit[]> {
   const { kind, topic, area, module, topK = 5, minScore = DEFAULT_MIN_SCORE } = options;
@@ -56,7 +64,7 @@ export async function searchKnowledge(query: string, options: SearchOptions = {}
     lookup: r.metadata?.lookup ? String(r.metadata.lookup) : undefined,
     area: r.metadata?.area ? String(r.metadata.area) : undefined,
     module: r.metadata?.module ? String(r.metadata.module) : undefined,
-    source_url: r.metadata?.source_url ? String(r.metadata.source_url) : undefined,
+    source_url: sourceUrlOf(r.metadata),
   }));
 }
 

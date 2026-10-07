@@ -14,6 +14,15 @@ const NO_EXECUTION = {
   message: 'No execution is active for this workflow, so there is no runtime data to inspect.',
 };
 
+/** Said by every runtime-data tool when the chat has the workflow open but no run: definitions are readable,
+ * values are not. Deliberately not worded as a fetch failure (that would flag a data gap in the verdict). */
+const NO_RUN = {
+  found: true,
+  ran: false,
+  no_run: true,
+  message: 'There is no execution here, only the workflow definition. Runtime values do not exist; answer from the node definitions and connections, and do not state what any node received or returned.',
+};
+
 /** Cosmetic fields a definition read does not need (mirrors tools/zuperChatTools.ts). */
 const DROP_FIELDS = new Set(['pinned_data', 'credentials', 'color', 'node_icon', 'is_pinned', 'is_active']);
 
@@ -29,6 +38,13 @@ export function capResult<T>(value: T, limit = RCA_TOOL_RESULT_CHARS): T | { tru
 
 export function getExecutionOverview(executionContext: ExecutionContext | null, chatContext: ChatContext) {
   if (!executionContext) return NO_EXECUTION;
+  if (executionContext.definitionOnly) {
+    return {
+      ...NO_RUN,
+      nodes: (executionContext.workflowData?.nodes ?? []).map((n) => n.action_name),
+      note: 'The workflow outline (nodes and connections) is in the seed. Use get_node_definition for any node.',
+    };
+  }
   const wf = executionContext.summary.workflow_execution;
   return {
     found: true,
@@ -53,7 +69,10 @@ function notFound(nameOrUid: string, executionContext: ExecutionContext) {
   return {
     found: false,
     message: `No node "${nameOrUid}" in the workflow version that ran.`,
-    available_nodes: executionContext.executedNodes.map((n) => n.name).slice(0, 60),
+    available_nodes: (executionContext.definitionOnly
+      ? (executionContext.workflowData?.nodes ?? []).map((n) => n.action_name)
+      : executionContext.executedNodes.map((n) => n.name)
+    ).slice(0, 60),
   };
 }
 
@@ -84,6 +103,7 @@ export async function getNodeInput(executionContext: ExecutionContext | null, na
   if (!node?.node_uid) return notFound(nameOrUid, executionContext);
 
   const identity = { uid: node.node_uid, name: node.action_name ?? null, type: node.node_name ?? null };
+  if (executionContext.definitionOnly) return { ...NO_RUN, node: identity, form_fields: node.form_fields ?? {} };
   const wrongIteration = iterationProblem(executionContext, node.node_uid, iteration, identity);
   if (wrongIteration) return wrongIteration;
   const at = iteration ?? defaultIteration(executionContext, node.node_uid);
@@ -130,6 +150,7 @@ export async function getNodeData(
   if (!node?.node_uid) return notFound(nameOrUid, executionContext);
 
   const identity = { uid: node.node_uid, name: node.action_name ?? null, type: node.node_name ?? null };
+  if (executionContext.definitionOnly) return { ...NO_RUN, node: identity };
   const wrongIteration = iterationProblem(executionContext, node.node_uid, requested, identity);
   if (wrongIteration) return wrongIteration;
   const iteration = requested ?? defaultIteration(executionContext, node.node_uid);

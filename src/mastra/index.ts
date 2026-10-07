@@ -18,6 +18,11 @@ import { knowledgeTools } from './tools/knowledgeTools';
 import { handleZuperChat } from './routes/zuperChatRoute';
 import { handleZuperExplain } from './routes/zuperExplainRoute';
 import { handleZuperRca } from './routes/zuperRcaRoute';
+import { handleRcaChat } from './routes/zuperRcaChatRoute';
+
+// ZUPER_CHAT_ENGINE=rca serves /zuper/chat with the RCA investigator (conversational, one agent for every
+// question). Unset keeps the legacy orchestrator, so the switch is reversible by configuration alone.
+const chatHandler = process.env.ZUPER_CHAT_ENGINE === 'rca' ? handleRcaChat : handleZuperChat;
 
 export const mastra = new Mastra({
   bundler: {
@@ -31,7 +36,7 @@ export const mastra = new Mastra({
       // No Mastra-managed auth provider is configured (server.auth) — these routes do their own
       // bearer-token relay from the Zuper Toolkit extension (see routes/zuperChatRoute.ts), so
       // Mastra's own auth gate is explicitly bypassed rather than left to its unconfigured default.
-      { path: '/zuper/chat', method: 'POST', handler: handleZuperChat, requiresAuth: false },
+      { path: '/zuper/chat', method: 'POST', handler: chatHandler, requiresAuth: false },
       { path: '/zuper/explain', method: 'POST', handler: handleZuperExplain, requiresAuth: false },
       { path: '/zuper/rca', method: 'POST', handler: handleZuperRca, requiresAuth: false },
     ],

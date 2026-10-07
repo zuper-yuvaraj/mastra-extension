@@ -12,7 +12,8 @@ interface ToolLike {
   execute?: (input: any, context: any) => Promise<unknown>;
 }
 
-export function withEvidence<T extends ToolLike>(tool: T) {
+/** `knowledge` marks a documentation tool: its results are shown to the agent but never count as evidence. */
+export function withEvidence<T extends ToolLike>(tool: T, kind: 'evidence' | 'knowledge' = 'evidence') {
   if (!tool.execute) throw new Error(`tool ${tool.id} has no execute function`);
   const run = tool.execute;
   return createTool({
@@ -22,7 +23,8 @@ export function withEvidence<T extends ToolLike>(tool: T) {
     execute: async (input: any, context: any) => {
       const result = capResult(await run(input, context));
       const ledger = context?.requestContext?.getRaw?.(RCA_LEDGER_KEY) as EvidenceLedger | undefined;
-      ledger?.record(tool.id, JSON.stringify(input), result);
+      if (kind === 'knowledge') ledger?.recordKnowledge(tool.id, JSON.stringify(input), result);
+      else ledger?.record(tool.id, JSON.stringify(input), result);
       return result;
     },
   });

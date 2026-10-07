@@ -88,7 +88,7 @@ const nodeDataTool = createTool({
 });
 
 const knowledge = Object.fromEntries(
-  Object.entries(knowledgeTools).map(([name, tool]) => [name, withEvidence(tool as never)]),
+  Object.entries(knowledgeTools).map(([name, tool]) => [name, withEvidence(tool as never, 'knowledge')]),
 );
 
 export const rcaTools = {
