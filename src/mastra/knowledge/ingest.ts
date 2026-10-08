@@ -3,7 +3,7 @@
 // re-embedded, and chunks whose source disappeared are deleted.
 
 import { createHash } from 'node:crypto';
-import { EMBEDDING_DIMENSION, KB_INDEX, embedTexts, ensureKbIndex, getKbVector } from './vector';
+import { EMBEDDING_DIMENSION, KB_INDEX, cleanForPostgres, embedTexts, ensureKbIndex, getKbVector } from './vector';
 
 export interface KbChunkMetadata {
   kind: string;
@@ -87,7 +87,7 @@ export async function syncChunks(kind: string, chunks: KbChunk[], options: { dry
       indexName: KB_INDEX,
       ids: toWrite.map((c) => c.id),
       vectors,
-      metadata: toWrite.map((c) => ({ ...c.metadata, text: c.text })),
+      metadata: toWrite.map((c) => cleanForPostgres({ ...c.metadata, text: c.text })),
     });
   }
   if (removed.length > 0) {

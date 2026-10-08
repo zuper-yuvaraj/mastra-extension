@@ -17,7 +17,9 @@
     "rca:run": "tsx --env-file=.env scripts/rca-run.ts",
     "rca:e2e": "tsx --env-file=.env scripts/rca-e2e.ts",
     "rca:import": "tsx scripts/rca-import.ts",
-    "rca:eval": "tsx --env-file=.env scripts/rca-eval.ts"
+    "rca:eval": "tsx --env-file=.env scripts/rca-eval.ts",
+    "build:vercel": "mastra build && node scripts/vercel-postbuild.mjs",
+    "kb:migrate-pg": "tsx --env-file=.env scripts/kb-migrate-pg.ts"
   },
   "keywords": [],
   "author": "",
@@ -27,12 +29,11 @@
     "node": ">=22.13.0"
   },
   "dependencies": {
-    "@libsql/client": "^0.18.0",
     "@mastra/core": "1.70.0",
-    "@mastra/duckdb": "1.11.0",
-    "@mastra/libsql": "1.23.2",
+    "@mastra/deployer-vercel": "^1.2.34",
     "@mastra/memory": "1.32.0",
     "@mastra/observability": "1.18.0",
+    "@mastra/pg": "^1.30.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
