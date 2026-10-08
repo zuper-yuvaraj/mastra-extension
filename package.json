@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "dev": "mastra dev",
-    "build": "mastra build",
+    "build": "mastra build && node scripts/vercel-postbuild.mjs",
     "start": "mastra start",
     "kb:distill": "tsx scripts/kb-distill.ts",
     "kb:sync": "tsx --env-file=.env scripts/kb-sync.ts",
@@ -18,7 +18,6 @@
     "rca:e2e": "tsx --env-file=.env scripts/rca-e2e.ts",
     "rca:import": "tsx scripts/rca-import.ts",
     "rca:eval": "tsx --env-file=.env scripts/rca-eval.ts",
-    "build:vercel": "mastra build && node scripts/vercel-postbuild.mjs",
     "kb:migrate-pg": "tsx --env-file=.env scripts/kb-migrate-pg.ts"
   },
   "keywords": [],
