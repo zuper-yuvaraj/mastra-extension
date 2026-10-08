@@ -130,10 +130,13 @@ export function esc(text: string): string {
   return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-/** The documentation the answer relied on, last in every reply. Plain text: the chat renders no links. */
+/** The documentation the answer relied on, last in every reply, as links the reader can open. Only https
+ * addresses become links (the chat also refuses any other host); anything else is shown as plain text. */
 export function renderReferences(references: ReadonlyArray<{ title: string; url: string }>): string {
   if (references.length === 0) return '';
-  return `<p><strong>Reference</strong></p><ul>${references.map((r) => `<li>${esc(r.title)}: ${esc(r.url)}</li>`).join('')}</ul>`;
+  const item = (r: { title: string; url: string }): string =>
+    /^https:\/\//i.test(r.url) ? `<li><a href="${esc(r.url)}">${esc(r.title)}</a></li>` : `<li>${esc(r.title)}: ${esc(r.url)}</li>`;
+  return `<p><strong>Reference</strong></p><ul>${references.map(item).join('')}</ul>`;
 }
 
 const STATUS_TITLE: Record<RcaVerdict['status'], string> = {

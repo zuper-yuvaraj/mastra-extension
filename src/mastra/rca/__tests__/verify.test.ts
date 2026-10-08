@@ -213,3 +213,12 @@ test('a cause in a Code node is always CODE_ERROR, and the change is recorded', 
   assert.equal(http.root_cause?.category, 'MISSING_DATA');
   assert.equal(http.adjustments, undefined);
 });
+
+test('a quote may abbreviate a long value with an ellipsis, but every piece must be verbatim', () => {
+  const ledger = ledgerWith('{"appointment_update_payload":{"url":"https://x/api/appointments","payload":{"appointment":{"job_uid":"j1","title":"Visit"}}}}');
+  assert.equal(ledger.contains('"appointment_update_payload":{"url":"https://x/api/appointments","payload":{"appointment":{...}}}'), true);
+  assert.equal(ledger.contains('"url":"https://x/api/appointments" ... "title":"Visit"'), true);
+  assert.equal(ledger.contains('"url":"https://x/api/appointments/invented" ... "title":"Visit"'), false, 'one invented piece sinks it');
+  assert.equal(ledger.contains('... ...'), false, 'an ellipsis alone proves nothing');
+  assert.equal(ledger.contains('ab ... cd'), false, 'tiny pieces prove nothing');
+});

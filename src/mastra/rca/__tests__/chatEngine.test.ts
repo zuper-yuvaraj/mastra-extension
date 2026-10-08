@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { converse } from '../chatEngine';
+import { runPipeline } from '../pipeline';
 import { ConversationStore, conversationKey, type ChatTurn } from '../conversation';
 import { RCA_LEDGER_KEY, type EvidenceLedger } from '../ledger';
 import type { InvestigatorAgent } from '../investigate';
@@ -61,7 +62,10 @@ test('first turn investigates, answers crisply and offers the chips', async () =
   const agent = scripted(diagnosis);
   const r = await converse(base(s, agent, [user('why did it fail?')]));
   assert.equal(agent.calls, 1);
-  assert.match(r.reply, /^<p>The email had no recipient because the job has no customer\.<\/p><p><strong>Confidence: High<\/strong>/);
+  assert.match(
+    r.reply,
+    /^<p>The email had no recipient because the job has no customer\.<\/p><p><strong>Detailed RCA<\/strong><\/p><ul><li><strong>Send Email<\/strong>: the execution error<\/li><\/ul><p><strong>Confidence: High<\/strong>/,
+  );
   assert.deepEqual(r.suggestions, [CHIP_DETAIL, CHIP_FIX]);
   assert.equal(r.fromCache, false);
 });
@@ -145,4 +149,21 @@ test('progress is reported for each tool result during the turn', async () => {
   };
   await converse({ ...base(s, agent, [user('why?')]), onProgress: (e) => seen.push(e.text) });
   assert.deepEqual(seen, ['Reading what Get Job returned']);
+});
+
+test('with an analyst, only the first question runs the pipeline; a follow-up uses the tool-using agent', async () => {
+  const s = setup();
+  const legacy = scripted({ ...diagnosis, status: 'answered', summary: 'It was the Send Email node.', root_cause: null, fix: null, evidence_chain: [] });
+  const analyst = { calls: 0, generate: async () => ({ object: diagnosis, steps: [{}] }) };
+  const analystCalls = { n: 0 };
+  const counting: InvestigatorAgent = { generate: async (...args: Parameters<typeof analyst.generate>) => { analystCalls.n++; return analyst.generate(...args); } };
+  const first = await converse({ ...base(s, legacy, [user('why did it fail?')]), pipeline: (i) => runPipeline({ ...i, analyst: counting }) });
+  assert.equal(analystCalls.n, 1);
+  assert.equal(legacy.calls, 0);
+  assert.match(first.reply, /Detailed RCA/);
+
+  const followUp = await converse({ ...base(s, legacy, [user('why did it fail?'), bot('<p>x</p>'), user('which node was that?')]), pipeline: (i) => runPipeline({ ...i, analyst: counting }) });
+  assert.equal(analystCalls.n, 1, 'no second full analysis');
+  assert.equal(legacy.calls, 1);
+  assert.equal(followUp.verdict.status, 'answered');
 });

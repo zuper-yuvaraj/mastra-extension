@@ -112,6 +112,6 @@ test('only references whose URL a documentation lookup returned survive, and the
   assert.deepEqual(v.references.map((r) => r.title), ['Create a Job']);
   assert.match(v.adjustments?.join(' ') ?? '', /1 reference/);
   const html = renderCrisp(v);
-  assert.ok(html.endsWith('Create a Job: https://developers.zuper.co/reference/create-job</li></ul>'), html);
+  assert.ok(html.endsWith('<li><a href="https://developers.zuper.co/reference/create-job">Create a Job</a></li></ul>'), html);
   assert.ok(renderFix({ ...v, fix: { description: 'd', node_uid: null, suggested_change: null } }).endsWith('</ul>'));
 });

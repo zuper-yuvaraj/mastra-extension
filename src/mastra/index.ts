@@ -12,7 +12,9 @@ import { startScheduleTool, stopScheduleTool } from './tools/schedule-tools';
 import { zuperClassifierAgent } from './agents/zuperClassifierAgent';
 import { zuperChatAgent } from './agents/zuperChatAgent';
 import { rcaInvestigatorAgent } from './agents/rcaInvestigatorAgent';
+import { rcaAnalystAgent } from './agents/rcaAnalystAgent';
 import { rcaWorkflow } from './workflows/rcaWorkflow';
+import { rcaPipelineWorkflow } from './workflows/rcaPipelineWorkflow';
 import { knowledgeTools } from './tools/knowledgeTools';
 import { handleZuperChat } from './routes/zuperChatRoute';
 import { handleZuperExplain } from './routes/zuperExplainRoute';
@@ -30,8 +32,8 @@ export const mastra = new Mastra({
   // A chat investigation takes 30-50 s of model time; the function must be allowed to run that long.
   deployer: new VercelDeployer({ maxDuration: 120, studio: false }),
   // The starter agent has a local shell and file workspace, which has no place on a public server.
-  agents: { ...(onVercel ? {} : { agent }), zuperClassifierAgent, zuperChatAgent, rcaInvestigatorAgent },
-  workflows: { rcaWorkflow },
+  agents: { ...(onVercel ? {} : { agent }), zuperClassifierAgent, zuperChatAgent, rcaInvestigatorAgent, rcaAnalystAgent },
+  workflows: { rcaWorkflow, rcaPipelineWorkflow },
   tools: { ...(onVercel ? {} : { startScheduleTool, stopScheduleTool }), ...knowledgeTools },
   server: {
     // Mastra's own /api routes (run any agent or workflow with our model key) have no auth here. On the

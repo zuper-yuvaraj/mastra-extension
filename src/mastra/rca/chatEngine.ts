@@ -8,13 +8,17 @@
 import type { WorkflowDetail } from '../lib/zuperWorkflowApi';
 import type { ExecutionContext } from '../lib/zuperExecutionApi';
 import { ConversationStore, findingsForPrompt, historyForPrompt, type ChatTurn } from './conversation';
-import { investigate, type InvestigatorAgent } from './investigate';
+import { investigate, type InvestigationInput, type InvestigatorAgent, type RcaResult } from './investigate';
 import type { ProgressEvent } from './progress';
 import type { VerifiedVerdict } from './verdict';
 import { CHIP_DETAIL, CHIP_FIX, chipsFor, classifyChipRequest, renderCrisp, renderView, withoutIds, type ChatView } from './views';
 
 export interface ConverseInput {
   agent: InvestigatorAgent;
+  /** When set, the FIRST question of a conversation (no assistant reply yet) runs the evidence-complete
+   * pipeline through this function. Follow-ups use `agent` with the evidence already gathered, and never
+   * repeat the full analysis, even if the server lost its stored state. */
+  pipeline?: (input: InvestigationInput) => Promise<RcaResult>;
   store: ConversationStore;
   /** See conversationKey: account + workflow + execution. */
   key: string;
@@ -62,7 +66,9 @@ export async function converse(input: ConverseInput): Promise<ConverseResult> {
     };
   }
 
-  const result = await investigate({
+  const firstQuestion = !turns.some((t) => t.role === 'assistant');
+  const run = input.pipeline && firstQuestion ? input.pipeline : investigate;
+  const result = await run({
     agent: input.agent,
     executionContext: input.executionContext,
     liveWorkflow: input.liveWorkflow,

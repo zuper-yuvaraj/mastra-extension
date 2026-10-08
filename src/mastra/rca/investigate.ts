@@ -60,6 +60,10 @@ export interface RcaResult {
     steps: number;
     tool_calls: number;
     model: string | null;
+    /** Which engine produced the answer; the pipeline also reports how much it traced. */
+    engine?: 'agent' | 'pipeline';
+    trace_nodes?: number;
+    trace_capped?: boolean;
   };
   /** What the investigator was shown this turn (plus carried-over evidence), to carry into the next turn. */
   evidence: string[];
@@ -70,7 +74,7 @@ function staticVerdict(status: RcaVerdict['status'], summary: string): VerifiedV
 }
 
 /** Modes that need no investigation: answered deterministically, without spending an LLM call. */
-function answerWithoutAgent(seed: RcaSeed): VerifiedVerdict | null {
+export function answerWithoutAgent(seed: { mode: RcaMode; execution: { status: string | null } }): VerifiedVerdict | null {
   switch (seed.mode) {
     case 'NO_EXECUTION':
       return { ...staticVerdict('insufficient_evidence', 'No execution was found for this request, so there is nothing to analyse. Open or run an execution and try again.'), confidence: 'low' };

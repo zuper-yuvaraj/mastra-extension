@@ -27,6 +27,7 @@ test('crisp is laid out under headers: purpose, headline, body, confidence, refe
     '<p><strong>What this workflow does</strong></p><p>Creates a job and fills its custom fields.</p>' +
       '<p><strong>While creating the job, Create Job failed</strong></p>' +
       '<p>Create Job failed because the payload had no customer.</p>' +
+      '<p><strong>Detailed RCA</strong></p><ul><li><strong>Payload for job</strong>: no customer key</li></ul>' +
       '<p><strong>Confidence: High</strong></p><p>Every supporting detail was checked against the execution data.</p>',
   );
 });
@@ -87,7 +88,7 @@ test('chips only offer what has something to show', () => {
 });
 
 test('typed or clicked chip requests are recognised; real questions are not', () => {
-  for (const m of ['Explain in detail', 'explain it in detail', 'more detail', 'Walk me through it', 'show the evidence', 'How did you conclude that?']) {
+  for (const m of ['Show evidence', 'Explain in detail', 'explain it in detail', 'more detail', 'Walk me through it', 'show the evidence', 'How did you conclude that?']) {
     assert.equal(classifyChipRequest(m), 'detail', m);
   }
   for (const m of ['Give me the fix', 'how do I fix it?', 'what is the fix', 'fix it', "what's the fix?"]) {
@@ -110,4 +111,32 @@ test('ids are removed from replies unless the user asked for them', async () => 
   assert.equal(withoutIds(`<p>Create Job (${id}) failed for job ${id}.</p>`, 'why did it fail?'), '<p>Create Job failed for job.</p>');
   assert.equal(withoutIds(`<p>job ${id}</p>`, 'what is the job uuid?'), `<p>job ${id}</p>`);
   assert.equal(withoutIds('<p>order 1234 failed</p>', 'why'), '<p>order 1234 failed</p>');
+});
+
+test('lines about our reader failing are limits on the analysis, not findings, so they are not shown as RCA', () => {
+  const html = renderCrisp(
+    verdict({
+      evidence_chain: [
+        { node_uid: 'n1', name: 'Get Job', observation: 'its data could not be loaded', quote: '"unavailable":"FETCH_FAILED"', verified: true },
+        { node_uid: 'n1', name: 'If/Else', observation: 'the condition checks the category', quote: 'category', verified: true },
+      ],
+    }),
+  );
+  assert.ok(!html.includes('could not be loaded'));
+  assert.match(html, /<strong>If\/Else<\/strong>: the condition checks the category/);
+});
+
+test('references are links, escaped, and only https addresses become links', async () => {
+  const { renderReferences } = await import('../verdict');
+  assert.equal(
+    renderReferences([{ title: 'Update a Job (PUT /jobs)', url: 'https://developers.zuper.co/reference/update-job' }]),
+    '<p><strong>Reference</strong></p><ul><li><a href="https://developers.zuper.co/reference/update-job">Update a Job (PUT /jobs)</a></li></ul>',
+  );
+  const odd = renderReferences([
+    { title: 'x', url: 'javascript:alert(1)' },
+    { title: 'Q"uote', url: 'https://docs.zuper.co/a"onmouseover="x' },
+  ]);
+  assert.ok(!odd.includes('<a href="javascript'), 'a non-https address is never a link');
+  assert.ok(!odd.includes('"onmouseover="'), 'quotes in an address cannot break out of the attribute');
+  assert.equal(renderReferences([]), '');
 });

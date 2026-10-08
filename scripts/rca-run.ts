@@ -1,5 +1,7 @@
 // Usage: npm run rca:run -- [--fixture fixtures/rca/<name>.json | --summary samples/<execution summary>.json]
-//                          [--question "why did it go to else?"]
+//                          [--question "why did it go to else?"] [--engine agent|pipeline]
+// --engine pipeline runs the evidence-complete pipeline (full backtrace, one analysis call) and prints the
+// answer exactly as the chat shows it.
 // --summary takes a raw execution-summary response (no node data): node data is then unavailable, as if
 // every node-data fetch had failed, which tests how the agent behaves with only definitions and the error.
 // Runs the real investigator agent over a captured execution (or the built-in synthetic one) with no
@@ -12,6 +14,9 @@ import { readFileSync } from 'node:fs';
 import { createExecutionContext, type ExecutionSummaryResponse } from '../src/mastra/lib/zuperExecutionApi';
 import { executionContextFromFixture, loadFixture } from '../src/mastra/rca/fixture';
 import { investigate } from '../src/mastra/rca/investigate';
+import { rcaAnalystAgent } from '../src/mastra/agents/rcaAnalystAgent';
+import { runPipeline } from '../src/mastra/rca/pipeline';
+import { renderCrisp } from '../src/mastra/rca/views';
 import { fakeExecution } from '../src/mastra/rca/__tests__/fakeExecution';
 
 function arg(name: string): string | undefined {
@@ -41,13 +46,17 @@ console.log(
 if (fixture?.expected) console.log('expected:', JSON.stringify(fixture.expected));
 
 const started = Date.now();
-const result = await investigate({
+const base = {
   agent: rcaInvestigatorAgent,
   executionContext,
   question: arg('question'),
   zuperToken: 'offline',
   zuperApiUrl: 'https://offline.invalid',
-});
+};
+const pipeline = arg('engine') === 'pipeline';
+const result = pipeline
+  ? await runPipeline({ ...base, analyst: rcaAnalystAgent, onProgress: (e) => console.log(`  … ${e.text}`) })
+  : await investigate(base);
 
 const v = result.verdict;
 console.log('\n=== VERDICT ===');

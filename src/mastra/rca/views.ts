@@ -6,7 +6,7 @@ import { renderReferences, renderVerdictHtml, type VerifiedVerdict } from './ver
 
 export type ChatView = 'crisp' | 'detail' | 'fix';
 
-export const CHIP_DETAIL = 'Explain in detail';
+export const CHIP_DETAIL = 'Show evidence';
 export const CHIP_FIX = 'Give me the fix';
 
 function esc(text: string): string {
@@ -28,6 +28,18 @@ const DIAGNOSTIC = new Set<VerifiedVerdict['status']>(['failed', 'unexpected_bra
 const LEVEL = { high: 'High', medium: 'Medium', low: 'Low' } as const;
 
 const heading = (text: string): string => `<p><strong>${esc(text)}</strong></p>`;
+const MAX_RCA_LINES = 4;
+/** A line about OUR reader failing is a limit on the analysis, not a finding about the run. */
+const READER_LIMIT = /fetch_failed|could not be loaded|"unavailable"/i;
+
+/** The backtrace in words, one line per node, failure first and the origin last. Only lines whose quote was
+ * checked against the data are shown as findings. */
+function renderDetailedRca(v: VerifiedVerdict): string {
+  if (v.status !== 'failed' && v.status !== 'unexpected_branch') return '';
+  const lines = v.evidence_chain.filter((e) => e.verified && !READER_LIMIT.test(e.quote)).slice(0, MAX_RCA_LINES);
+  if (lines.length === 0) return '';
+  return heading('Detailed RCA') + `<ul>${lines.map((e) => `<li><strong>${esc(e.name)}</strong>: ${esc(e.observation)}</li>`).join('')}</ul>`;
+}
 
 /** The default chat answer, under plain headers: what the workflow does, what failed and why, how sure we
  * are, and the documentation relied on. Sections with nothing to say are left out. */
@@ -40,6 +52,8 @@ export function renderCrisp(v: VerifiedVerdict): string {
   // An answer that is not confirmed still shows the hypothesis, clearly labelled, so it is not lost.
   const hypothesis = v.issues.find((i) => i.startsWith('Possible cause (not confirmed)') || i.startsWith('Unconfirmed hypothesis'));
   if (hypothesis) parts.push(`<p><em>${esc(hypothesis)}</em></p>`);
+
+  parts.push(renderDetailedRca(v));
 
   // Confidence is always stated for a diagnosis; for other answers only when it is not high.
   // Canned answers (no execution, still running) have no analysis behind them, so they state none.
@@ -88,7 +102,7 @@ export function chipsFor(v: VerifiedVerdict): string[] {
 }
 
 const DETAIL_REQUEST =
-  /^\s*(explain(\s+it|\s+this)?(\s+in\s+detail)?|more\s+detail(s)?|in\s+detail|walk\s+me\s+through(\s+it)?|show\s+(me\s+)?the\s+evidence|how\s+did\s+you\s+(get|reach|conclude)\s+(that|this))\s*[.?!]*\s*$/i;
+  /^\s*(explain(\s+it|\s+this)?(\s+in\s+detail)?|more\s+detail(s)?|in\s+detail|walk\s+me\s+through(\s+it)?|show\s+(me\s+)?(the\s+)?evidence|how\s+did\s+you\s+(get|reach|conclude)\s+(that|this))\s*[.?!]*\s*$/i;
 const FIX_REQUEST =
   /^\s*(give\s+me\s+the\s+fix|(what('s|\s+is)\s+)?the\s+fix|how\s+(do|can|should)\s+i\s+fix(\s+it|\s+this)?|fix(\s+it|\s+this)?)\s*[.?!]*\s*$/i;
 

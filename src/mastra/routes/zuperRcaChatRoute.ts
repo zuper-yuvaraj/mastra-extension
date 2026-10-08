@@ -1,12 +1,13 @@
 import type { Context } from 'hono';
 import { getExecutionContext } from '../lib/zuperExecutionApi';
 import { getWorkflowDetail } from '../lib/zuperWorkflowApi';
-import { converse, type ConverseResult } from '../rca/chatEngine';
+import { converse, type ConverseInput, type ConverseResult } from '../rca/chatEngine';
 import { parseChatRequest, type ChatRequest } from '../rca/chatRequest';
 import { accountKey, ConversationStore, conversationKey } from '../rca/conversation';
 import { definitionOnlyContext } from '../rca/definitionContext';
 import { AccountLimiter, RateLimitError } from '../rca/limits';
 import { extractBearerToken, httpFailure } from '../rca/request';
+import { runPipelineViaWorkflow } from '../workflows/rcaPipelineWorkflow';
 
 const store = new ConversationStore();
 const limiter = new AccountLimiter();
@@ -46,9 +47,23 @@ export async function handleRcaChat(c: Context): Promise<Response> {
     throw error;
   }
 
+  // The server only aborts a request when the client's connection closes before the answer was sent. Say so
+  // in the log, with how long it had been running, so a cancelled request is not mistaken for a model failure.
+  const startedAt = Date.now();
+  c.req.raw.signal.addEventListener(
+    'abort',
+    () => console.warn(`[chat] client connection closed after ${((Date.now() - startedAt) / 1000).toFixed(1)}s, before the answer was sent: ${String(c.req.raw.signal.reason ?? 'no reason given')}`),
+    { once: true },
+  );
+
   const mastra = c.get('mastra');
+  // RCA_ENGINE=pipeline: the first question of a chat runs the evidence-complete workflow (rcaPipelineWorkflow).
+  const pipeline: ConverseInput['pipeline'] =
+    process.env.RCA_ENGINE === 'pipeline'
+      ? (i) => runPipelineViaWorkflow(mastra, { ...i, analyst: mastra.getAgent('rcaAnalystAgent') })
+      : undefined;
   const run = (onProgress: ((text: string) => void) | undefined, signal: AbortSignal) =>
-    answer(mastra.getAgent('rcaInvestigatorAgent'), request, token, onProgress, signal);
+    answer(mastra.getAgent('rcaInvestigatorAgent'), pipeline, request, token, onProgress, signal);
 
   if (!request.stream) {
     try {
@@ -101,6 +116,7 @@ function publicData(result: ConverseResult) {
 
 async function answer(
   agent: Parameters<typeof converse>[0]['agent'],
+  pipeline: ConverseInput['pipeline'],
   request: ChatRequest,
   token: string,
   onProgress: ((text: string) => void) | undefined,
@@ -114,6 +130,7 @@ async function answer(
 
   return converse({
     agent,
+    pipeline,
     store,
     key: conversationKey(token, request.workflowUid, request.executionUid),
     turns: request.turns,
