@@ -10,6 +10,10 @@ export interface LedgerEntry {
   kind?: 'evidence' | 'knowledge';
 }
 
+/** Smallest piece of an abbreviated quote that is checked, and the length one piece must reach. */
+const MIN_PIECE_CHARS = 6;
+const MIN_ANCHOR_CHARS = 16;
+
 /** Whitespace-insensitive so JSON re-indentation or line wrapping cannot hide a real match. */
 function normalize(text: string): string {
   return text.replace(/\s+/g, ' ').trim();
@@ -21,6 +25,8 @@ export class EvidenceLedger {
   /** The same text with JSON string escaping removed: a value shown inside a JSON string (`\"job-1\"`) is
    * quoted by readers as plain `"job-1"`, and that is still a verbatim quote of the value. */
   private unescaped = '';
+  /** Unescaped twice: run data is often JSON inside JSON (a string field holding a JSON document). */
+  private unescapedTwice = '';
 
   private listener: ((entry: LedgerEntry) => void) | null = null;
 
@@ -59,7 +65,19 @@ export class EvidenceLedger {
   /** True when `quote` appears verbatim (modulo whitespace) in any recorded result. */
   contains(quote: string): boolean {
     const needle = normalize(quote);
-    return needle.length > 0 && (this.haystack.includes(needle) || this.unescaped.includes(needle));
+    if (needle.length === 0) return false;
+    const has = (piece: string): boolean => this.haystack.includes(piece) || this.unescaped.includes(piece) || this.unescapedTwice.includes(piece);
+    if (has(needle)) return true;
+
+    // A quote may abbreviate a long value with an ellipsis ("{...}", "..."). It still counts only if every
+    // piece between the ellipses is verbatim in the data, and the pieces together are substantial.
+    const pieces = needle
+      .split(/\.{3}|…/)
+      .map((piece) => normalize(piece))
+      .filter((piece) => piece.replace(/[\s{}\[\]",:]/g, '').length >= MIN_PIECE_CHARS);
+    if (pieces.length === 0 || needle.split(/\.{3}|…/).length < 2) return false;
+    if (!pieces.some((piece) => piece.length >= MIN_ANCHOR_CHARS)) return false;
+    return pieces.every(has);
   }
 
   get size(): number {

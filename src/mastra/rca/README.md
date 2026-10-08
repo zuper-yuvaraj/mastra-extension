@@ -191,3 +191,34 @@ legacy orchestrator, so rolling back is a config change).
   the response is the legacy `{ok, data:{reply, suggestions}}`.
 - **Limits.** Hosts are checked against the Zuper allow-list; 20 investigations/minute and 2 concurrent per
   account (`limits.ts`), answered with 429 `RATE_LIMITED` / `TOO_MANY_INVESTIGATIONS`.
+
+## Evidence-complete pipeline (`RCA_ENGINE=pipeline`)
+
+The tool-using investigator chose what to fetch and, on workflows with 20+ nodes, saw only a few nodes. The
+pipeline moves all retrieval into code and calls the model once, to explain a complete evidence pack.
+
+```
+prepare    kbStep.ts   documentation for the workflow's modules (exact lookups first, vector search for the rest)
+           target.ts   where to start: the failed node, a node the question names, or - for something that
+                       did not happen - the If/Else, Loop or filter that blocked it, found from recorded decisions
+backtrace  backtrace.ts  follow EVERY reference back from the target to its origin (transitively, per loop
+                       iteration), fetch all that node data in parallel, resolve every input to its real value,
+                       flag the nodes that produced bad output from good input (origin_candidates) and the
+                       nodes that fed the failed node (feeds_failed); HTTP calls to a documented endpoint
+                       get a doc_check (documented fields not sent)
+analyse    analyse.ts  ONE model call (rcaAnalystAgent, no tools) over the pack: execution, workflow, target,
+                       trace, docs
+finish     verify.ts   every quote must be verbatim in the trace; documentation text never counts as evidence;
+                       an upstream node whose own data could not be read is never confirmed as the cause;
+                       reference links come from the knowledge-base step, never from the model
+```
+
+- `pipeline.ts` holds the stages; `workflows/rcaPipelineWorkflow.ts` runs them as a Mastra workflow so each
+  shows in traces. Steps pass only an opaque run key: Mastra stores every step's input and output, and the
+  trace contains the customer's data, which stays in process memory for the run.
+- The first question of a chat runs the pipeline; follow-ups use the tool-using agent with the stored
+  evidence (never a second full analysis). Anything the pipeline cannot place falls back to the agent.
+- The answer is laid out as: what the workflow does, a "While X, node failed" headline and cause, Detailed
+  RCA (verified lines), confidence, and reference links. Chips: "Show evidence", "Give me the fix".
+- Compare engines with `npm run rca:eval -- --engine pipeline` and without `--engine`; try one case with
+  `npm run rca:run -- --fixture <file> --engine pipeline`.

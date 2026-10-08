@@ -19,6 +19,8 @@ import { RCA_MAX_STEPS, RCA_MODEL, RCA_REASONING_EFFORT } from '../src/mastra/rc
 import { DEFAULT_THRESHOLDS, evaluate, scoreRun, summarize, type Expected, type RunScore } from '../src/mastra/rca/evalScore';
 import { FIXTURE_DIR, executionContextFromFixture, loadFixture } from '../src/mastra/rca/fixture';
 import { investigate } from '../src/mastra/rca/investigate';
+import { rcaAnalystAgent } from '../src/mastra/agents/rcaAnalystAgent';
+import { runPipeline } from '../src/mastra/rca/pipeline';
 import { fakeExecution } from '../src/mastra/rca/__tests__/fakeExecution';
 
 interface EvalCase {
@@ -36,6 +38,8 @@ function arg(name: string): string | undefined {
 }
 
 const runs = Number(arg('runs') ?? 3);
+// --engine pipeline evaluates the evidence-complete pipeline; the default is the tool-using agent.
+const usePipeline = arg('engine') === 'pipeline';
 const only = arg('case');
 const cases = (JSON.parse(readFileSync(path.join(FIXTURE_DIR, 'eval-cases.json'), 'utf8')) as EvalCase[]).filter(
   (c) => !only || c.id.includes(only),
@@ -61,7 +65,7 @@ function load(c: EvalCase): ExecutionContext | string {
 const pct = (v: number | null) => (v === null ? '  - ' : `${String(Math.round(v * 100)).padStart(3)}%`);
 const out: Array<{ id: string; scores: RunScore[]; answers: string[] }> = [];
 
-console.log(`model ${RCA_MODEL}, reasoning effort ${RCA_REASONING_EFFORT}, max steps ${RCA_MAX_STEPS}, ${runs} run(s) per case\n`);
+console.log(`engine ${usePipeline ? 'pipeline' : 'agent'}, model ${RCA_MODEL}, reasoning effort ${RCA_REASONING_EFFORT}, max steps ${RCA_MAX_STEPS}, ${runs} run(s) per case\n`);
 
 for (const c of cases) {
   const execution = load(c);
@@ -73,13 +77,14 @@ for (const c of cases) {
   const answers: string[] = [];
   for (let i = 0; i < runs; i++) {
     const started = Date.now();
-    const result = await investigate({
+    const input = {
       agent: rcaInvestigatorAgent,
       executionContext: execution,
       question: c.question,
       zuperToken: 'offline',
       zuperApiUrl: 'https://offline.invalid',
-    });
+    };
+    const result = usePipeline ? await runPipeline({ ...input, analyst: rcaAnalystAgent }) : await investigate(input);
     scores.push(scoreRun(c.expected, result, Date.now() - started));
     const v = result.verdict;
     answers.push(`${v.status}/${v.confidence} cause=${v.root_cause ? `${v.root_cause.name} [${v.root_cause.category}]` : '-'} unverified=${v.evidence_chain.filter((e) => !e.verified).length}`);
@@ -107,7 +112,7 @@ console.log(verdict.pass ? 'EVAL PASSED' : `EVAL FAILED: ${verdict.failures.join
 
 const jsonOut = arg('json');
 if (jsonOut) {
-  writeFileSync(jsonOut, JSON.stringify({ model: RCA_MODEL, reasoning_effort: RCA_REASONING_EFFORT, runs, cases: out.map((o) => ({ id: o.id, summary: summarize(o.scores), scores: o.scores, answers: o.answers })), verdict }, null, 2));
+  writeFileSync(jsonOut, JSON.stringify({ engine: usePipeline ? 'pipeline' : 'agent', model: RCA_MODEL, reasoning_effort: RCA_REASONING_EFFORT, runs, cases: out.map((o) => ({ id: o.id, summary: summarize(o.scores), scores: o.scores, answers: o.answers })), verdict }, null, 2));
   console.log(`wrote ${jsonOut}`);
 }
 process.exit(verdict.pass || process.argv.includes('--no-fail') ? 0 : 1);
