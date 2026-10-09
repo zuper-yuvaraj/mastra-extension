@@ -22,9 +22,9 @@ import { handleZuperRca } from './routes/zuperRcaRoute';
 import { handleRcaChat } from './routes/zuperRcaChatRoute';
 import { PG_SCHEMA, POOL_OPTIONS, postgresUrl } from './lib/postgres';
 
-// ZUPER_CHAT_ENGINE=rca serves /zuper/chat with the RCA investigator (conversational, one agent for every
-// question). Unset keeps the legacy orchestrator, so the switch is reversible by configuration alone.
-const chatHandler = process.env.ZUPER_CHAT_ENGINE === 'rca' ? handleRcaChat : handleZuperChat;
+// ZUPER_CHAT_ENGINE=rca (the default) serves /zuper/chat with the RCA investigator (conversational, one
+// agent for every question). Set it to 'legacy' to fall back to the old orchestrator if needed.
+const chatHandler = process.env.ZUPER_CHAT_ENGINE === 'legacy' ? handleZuperChat : handleRcaChat;
 
 const onVercel = Boolean(process.env.VERCEL);
 

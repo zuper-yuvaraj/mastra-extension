@@ -57,11 +57,12 @@ export async function handleRcaChat(c: Context): Promise<Response> {
   );
 
   const mastra = c.get('mastra');
-  // RCA_ENGINE=pipeline: the first question of a chat runs the evidence-complete workflow (rcaPipelineWorkflow).
+  // RCA_ENGINE=pipeline (the default): the first question of a chat runs the evidence-complete workflow
+  // (rcaPipelineWorkflow). Set it to anything else to skip the pipeline and go straight to the investigator.
   const pipeline: ConverseInput['pipeline'] =
-    process.env.RCA_ENGINE === 'pipeline'
-      ? (i) => runPipelineViaWorkflow(mastra, { ...i, analyst: mastra.getAgent('rcaAnalystAgent') })
-      : undefined;
+    process.env.RCA_ENGINE && process.env.RCA_ENGINE !== 'pipeline'
+      ? undefined
+      : (i) => runPipelineViaWorkflow(mastra, { ...i, analyst: mastra.getAgent('rcaAnalystAgent') });
   const run = (onProgress: ((text: string) => void) | undefined, signal: AbortSignal) =>
     answer(mastra.getAgent('rcaInvestigatorAgent'), pipeline, request, token, onProgress, signal);
 
