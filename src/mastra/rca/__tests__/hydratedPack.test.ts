@@ -83,6 +83,15 @@ test('documentation excerpts are added when there are any', () => {
   assert.deepEqual(section(message, 'DOCS'), [{ title: 'Get Job', about: ['A'], text: 'how it works' }]);
 });
 
+test('the evidence text is the data only: no question, no conversation, no documentation', () => {
+  const docs = [{ title: 'Get Job', url: 'https://docs.test/x', text: 'DOC-ONLY-SENTENCE', forNodes: ['A'], via: 'endpoint' as const }];
+  const pack = buildPack({ hydrated: execution([node('A')]), understanding, question: 'ASKED-THING', history: 'EARLIER-TURN', docs });
+  assert.ok(pack.message.includes('DOC-ONLY-SENTENCE') && pack.message.includes('ASKED-THING') && pack.message.includes('EARLIER-TURN'));
+  for (const left of ['DOC-ONLY-SENTENCE', 'ASKED-THING', 'EARLIER-TURN', 'QUESTION:', 'CONVERSATION SO FAR']) assert.ok(!pack.evidence.includes(left), `${left} is not evidence`);
+  assert.match(pack.evidence, /^WORKFLOW UNDERSTANDING \(JSON\):/);
+  assert.match(pack.evidence, /HYDRATED WORKFLOW \(JSON\):/);
+});
+
 test('the editor’s cosmetics are dropped; the configuration and the run data are not', () => {
   const messy = node('A', { [GET('B')]: { value: { ok: true }, from: 'B' } }, {
     position: { x: 1, y: 2 },

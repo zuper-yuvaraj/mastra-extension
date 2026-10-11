@@ -132,8 +132,11 @@ export interface PackReport {
 }
 
 export interface Pack {
-  /** What the model reads, and what the evidence ledger must record. */
+  /** What the model reads. */
   message: string;
+  /** What the evidence ledger must record: the message without the question, the conversation and the
+   * documentation, so a quote can only be verified against data from this execution. */
+  evidence: string;
   report: PackReport;
 }
 
@@ -166,11 +169,14 @@ export function buildPack(input: PackInput): Pack {
     `QUESTION: ${input.question.trim() || 'Why did this execution fail? Find the root cause.'}`,
     ...(input.history ? ['', 'CONVERSATION SO FAR:', input.history] : []),
   ];
+  const evidence: string[] = [];
   for (const [title, body] of sections) {
     const text = typeof body === 'string' ? body : JSON.stringify(body);
     sizes[title] = text.length;
-    parts.push('', `${title}${typeof body === 'string' ? ':' : ' (JSON):'}`, text);
+    const block = ['', `${title}${typeof body === 'string' ? ':' : ' (JSON):'}`, text];
+    parts.push(...block);
+    if (title !== 'DOCS') evidence.push(...block);
   }
   const message = parts.join('\n');
-  return { message, report: { chars: message.length, sections: sizes, repeats, trim } };
+  return { message, evidence: evidence.join('\n').trimStart(), report: { chars: message.length, sections: sizes, repeats, trim } };
 }

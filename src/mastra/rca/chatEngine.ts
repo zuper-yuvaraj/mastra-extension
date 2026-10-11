@@ -19,6 +19,9 @@ export interface ConverseInput {
    * pipeline through this function. Follow-ups use `agent` with the evidence already gathered, and never
    * repeat the full analysis, even if the server lost its stored state. */
   pipeline?: (input: InvestigationInput) => Promise<RcaResult>;
+  /** When set, follow-up questions run through this instead of `agent` (the hydrated engine answers them from
+   * the same cached pack, so a follow-up is as well grounded as the first answer). */
+  followUp?: (input: InvestigationInput) => Promise<RcaResult>;
   store: ConversationStore;
   /** See conversationKey: account + workflow + execution. */
   key: string;
@@ -67,7 +70,7 @@ export async function converse(input: ConverseInput): Promise<ConverseResult> {
   }
 
   const firstQuestion = !turns.some((t) => t.role === 'assistant');
-  const run = input.pipeline && firstQuestion ? input.pipeline : investigate;
+  const run = (firstQuestion ? input.pipeline : input.followUp) ?? investigate;
   const result = await run({
     agent: input.agent,
     executionContext: input.executionContext,

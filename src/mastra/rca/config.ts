@@ -47,3 +47,20 @@ export const RCA_TRIM_CRITICAL_FACTOR = Number(process.env.RCA_TRIM_CRITICAL_FAC
 
 /** Budget for the whole hydrated execution (about 40k tokens at the default). */
 export const RCA_PACK_CHARS = Number(process.env.RCA_PACK_CHARS ?? 160000);
+
+/** Stage 5 of the hydrated engine (rca/hydratedPipeline.ts): the model that reads the pack and answers. */
+export const RCA_ANALYSIS_MODEL = process.env.RCA_ANALYSIS_MODEL ?? 'openai/gpt-5.1';
+
+export const RCA_ANALYSIS_EFFORT = process.env.RCA_ANALYSIS_EFFORT ?? 'medium';
+
+/** Turns the analysis text into the structured verdict: a formatting job, so it thinks little. */
+export const RCA_STRUCTURING_EFFORT = process.env.RCA_STRUCTURING_EFFORT ?? 'low';
+
+/** Model steps the analysis may take, counting the final answer: at most this minus one rounds of get_node_data
+ * calls. On the last step the tool is switched off, so the model always has to answer. */
+export const RCA_EVIDENCE_MAX_STEPS = Number(process.env.RCA_EVIDENCE_MAX_STEPS ?? 6);
+
+/** Extra rounds, after the first answer, in which the model is shown the quotes that failed verification and
+ * asks to replace them with exact excerpts. Each costs one more model call, and only happens when a quote
+ * failed. 0 turns it off. */
+export const RCA_QUOTE_REPAIRS = Number(process.env.RCA_QUOTE_REPAIRS ?? 1);

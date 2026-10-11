@@ -62,7 +62,7 @@ export interface RcaResult {
     tool_calls: number;
     model: string | null;
     /** Which engine produced the answer; the pipeline also reports how much it traced. */
-    engine?: 'agent' | 'pipeline';
+    engine?: 'agent' | 'pipeline' | 'hydrated';
     trace_nodes?: number;
     trace_capped?: boolean;
   };

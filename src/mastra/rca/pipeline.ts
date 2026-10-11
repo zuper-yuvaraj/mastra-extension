@@ -49,7 +49,7 @@ export const newRun = (input: PipelineInput): PipelineRun => ({ input });
 
 const say = (run: PipelineRun, text: string) => run.input.onProgress?.({ text });
 
-function kbNodes(ctx: ExecutionContext): KbNode[] {
+export function kbNodes(ctx: ExecutionContext): KbNode[] {
   return (ctx.workflowData?.nodes ?? []).map((n) => ({
     name: n.action_name ?? n.node_uid,
     key: String(n.action_key ?? n.node_name ?? ''),

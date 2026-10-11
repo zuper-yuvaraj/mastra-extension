@@ -167,3 +167,22 @@ test('with an analyst, only the first question runs the pipeline; a follow-up us
   assert.equal(legacy.calls, 1);
   assert.equal(followUp.verdict.status, 'answered');
 });
+
+test('a follow-up runs through followUp when one is given, the first question through pipeline, and the investigator otherwise', async () => {
+  const s = setup();
+  const investigator = scripted(diagnosis);
+  const ran: string[] = [];
+  const engine = (name: string) => async (input: Parameters<NonNullable<Parameters<typeof converse>[0]['pipeline']>>[0]) => {
+    ran.push(`${name}:${input.question}`);
+    return { verdict: { ...diagnosis, issues: [], evidence_chain: [] }, html: '', meta: { mode: 'EXECUTION_FAILED' as const, execution_status: null, steps: 0, tool_calls: 0, model: 'm' }, evidence: [] };
+  };
+
+  await converse({ ...base(s, investigator, [user('why did it fail?')]), pipeline: engine('pipeline'), followUp: engine('followUp') });
+  await converse({ ...base(s, investigator, [user('why did it fail?'), bot('Because.'), user('and the loop?')]), pipeline: engine('pipeline'), followUp: engine('followUp') });
+  assert.deepEqual(ran, ['pipeline:why did it fail?', 'followUp:and the loop?']);
+  assert.equal(investigator.calls, 0);
+
+  // without followUp, a follow-up goes to the investigator as before
+  await converse({ ...base(s, investigator, [user('why did it fail?'), bot('Because.'), user('and the loop?')]), pipeline: engine('pipeline') });
+  assert.equal(investigator.calls, 1);
+});
