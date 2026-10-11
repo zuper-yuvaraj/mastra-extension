@@ -26,3 +26,41 @@ export const RCA_VALUE_PREVIEW_CHARS = 300;
 
 /** How long a finished RCA verdict is reused for a terminal execution. */
 export const RCA_RESULT_TTL_MS = 10 * 60 * 1000;
+
+/** Stage 1 of the hydrated engine: one definition-only call that says what a workflow version is for and
+ * how its nodes group into activities. Cached per version, so a long TTL is safe. */
+export const RCA_UNDERSTAND_MODEL = process.env.RCA_UNDERSTAND_MODEL ?? 'openai/gpt-5.1';
+
+export const RCA_UNDERSTAND_EFFORT = process.env.RCA_UNDERSTAND_EFFORT ?? 'low';
+
+/** A workflow version never changes once it has run, so its understanding can be kept for a day. */
+export const RCA_UNDERSTAND_TTL_MS = Number(process.env.RCA_UNDERSTAND_TTL_MS ?? 24 * 60 * 60 * 1000);
+
+/** Node-data fetches in flight at once while hydrating an execution (stage 2 of the hydrated engine). */
+export const RCA_HYDRATE_CONCURRENCY = Number(process.env.RCA_HYDRATE_CONCURRENCY ?? 6);
+
+/** Stage 3 of the hydrated engine (rca/trim.ts): serialised-size budget for the data one node read or produced. */
+export const RCA_TRIM_NODE_CHARS = Number(process.env.RCA_TRIM_NODE_CHARS ?? 16000);
+
+/** The failed node's data may be this many times larger: it is the evidence the answer rests on. */
+export const RCA_TRIM_CRITICAL_FACTOR = Number(process.env.RCA_TRIM_CRITICAL_FACTOR ?? 3);
+
+/** Budget for the whole hydrated execution (about 40k tokens at the default). */
+export const RCA_PACK_CHARS = Number(process.env.RCA_PACK_CHARS ?? 160000);
+
+/** Stage 5 of the hydrated engine (rca/hydratedPipeline.ts): the model that reads the pack and answers. */
+export const RCA_ANALYSIS_MODEL = process.env.RCA_ANALYSIS_MODEL ?? 'openai/gpt-5.1';
+
+export const RCA_ANALYSIS_EFFORT = process.env.RCA_ANALYSIS_EFFORT ?? 'medium';
+
+/** Turns the analysis text into the structured verdict: a formatting job, so it thinks little. */
+export const RCA_STRUCTURING_EFFORT = process.env.RCA_STRUCTURING_EFFORT ?? 'low';
+
+/** Model steps the analysis may take, counting the final answer: at most this minus one rounds of get_node_data
+ * calls. On the last step the tool is switched off, so the model always has to answer. */
+export const RCA_EVIDENCE_MAX_STEPS = Number(process.env.RCA_EVIDENCE_MAX_STEPS ?? 6);
+
+/** Extra rounds, after the first answer, in which the model is shown the quotes that failed verification and
+ * asks to replace them with exact excerpts. Each costs one more model call, and only happens when a quote
+ * failed. 0 turns it off. */
+export const RCA_QUOTE_REPAIRS = Number(process.env.RCA_QUOTE_REPAIRS ?? 1);

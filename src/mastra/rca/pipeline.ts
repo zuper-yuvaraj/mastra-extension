@@ -20,6 +20,7 @@ import { answerWithoutAgent, investigate, type InvestigationInput, type Investig
 import { docsForNodes, kbStep, referenceLinks, type KbDoc, type KbNode, type KbStepDeps, type KbStepResult } from './kbStep';
 import { EvidenceLedger } from './ledger';
 import { buildWorkflowOutline, triage, type RcaMode } from './seed';
+import { redactSecrets } from './sanitize';
 import { locateTarget, type Target, type TargetDeps } from './target';
 import { renderVerdictHtml, type RcaVerdict } from './verdict';
 import { verifyVerdict } from './verify';
@@ -48,7 +49,7 @@ export const newRun = (input: PipelineInput): PipelineRun => ({ input });
 
 const say = (run: PipelineRun, text: string) => run.input.onProgress?.({ text });
 
-function kbNodes(ctx: ExecutionContext): KbNode[] {
+export function kbNodes(ctx: ExecutionContext): KbNode[] {
   return (ctx.workflowData?.nodes ?? []).map((n) => ({
     name: n.action_name ?? n.node_uid,
     key: String(n.action_key ?? n.node_name ?? ''),
@@ -96,7 +97,8 @@ export async function stagePrepare(run: PipelineRun): Promise<void> {
 export async function stageBacktrace(run: PipelineRun): Promise<void> {
   if (run.result || !run.target || run.target.kind === 'none' || !run.input.executionContext) return;
   say(run, 'Tracing the data back through every node it depends on');
-  run.trace = await buildBacktrace(run.input.executionContext, { uid: run.target.uid, iteration: run.target.iteration });
+  // Redacted once here: the analysis message and the evidence ledger are both built from this trace.
+  run.trace = redactSecrets(await buildBacktrace(run.input.executionContext, { uid: run.target.uid, iteration: run.target.iteration }));
   run.docs = docsForNodes(run.kb ?? { docs: [] }, run.trace.nodes.map((n) => n.name));
 }
 

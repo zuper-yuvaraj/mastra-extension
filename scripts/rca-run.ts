@@ -1,7 +1,8 @@
 // Usage: npm run rca:run -- [--fixture fixtures/rca/<name>.json | --summary samples/<execution summary>.json]
-//                          [--question "why did it go to else?"] [--engine agent|pipeline]
+//                          [--question "why did it go to else?"] [--engine agent|pipeline|hydrated]
 // --engine pipeline runs the evidence-complete pipeline (full backtrace, one analysis call) and prints the
-// answer exactly as the chat shows it.
+// answer exactly as the chat shows it. --engine hydrated runs the hydrated engine: a workflow summary, every
+// reference dereferenced into one pack, one analysis call with a bounded get_node_data loop (gpt-5.1 by default).
 // --summary takes a raw execution-summary response (no node data): node data is then unavailable, as if
 // every node-data fetch had failed, which tests how the agent behaves with only definitions and the error.
 // Runs the real investigator agent over a captured execution (or the built-in synthetic one) with no
@@ -15,6 +16,9 @@ import { createExecutionContext, type ExecutionSummaryResponse } from '../src/ma
 import { executionContextFromFixture, loadFixture } from '../src/mastra/rca/fixture';
 import { investigate } from '../src/mastra/rca/investigate';
 import { rcaAnalystAgent } from '../src/mastra/agents/rcaAnalystAgent';
+import { rcaEvidenceAgent } from '../src/mastra/agents/rcaEvidenceAgent';
+import { rcaUnderstandAgent } from '../src/mastra/agents/rcaUnderstandAgent';
+import { runHydrated } from '../src/mastra/rca/hydratedPipeline';
 import { runPipeline } from '../src/mastra/rca/pipeline';
 import { renderCrisp } from '../src/mastra/rca/views';
 import { fakeExecution } from '../src/mastra/rca/__tests__/fakeExecution';
@@ -53,10 +57,14 @@ const base = {
   zuperToken: 'offline',
   zuperApiUrl: 'https://offline.invalid',
 };
-const pipeline = arg('engine') === 'pipeline';
-const result = pipeline
-  ? await runPipeline({ ...base, analyst: rcaAnalystAgent, onProgress: (e) => console.log(`  … ${e.text}`) })
-  : await investigate(base);
+const engine = arg('engine');
+const onProgress = (e: { text: string }) => console.log(`  … ${e.text}`);
+const result =
+  engine === 'hydrated'
+    ? await runHydrated({ ...base, analyst: rcaEvidenceAgent, understander: rcaUnderstandAgent, onProgress })
+    : engine === 'pipeline'
+      ? await runPipeline({ ...base, analyst: rcaAnalystAgent, onProgress })
+      : await investigate(base);
 
 const v = result.verdict;
 console.log('\n=== VERDICT ===');

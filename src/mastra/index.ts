@@ -13,6 +13,8 @@ import { zuperClassifierAgent } from './agents/zuperClassifierAgent';
 import { zuperChatAgent } from './agents/zuperChatAgent';
 import { rcaInvestigatorAgent } from './agents/rcaInvestigatorAgent';
 import { rcaAnalystAgent } from './agents/rcaAnalystAgent';
+import { rcaUnderstandAgent } from './agents/rcaUnderstandAgent';
+import { rcaEvidenceAgent } from './agents/rcaEvidenceAgent';
 import { rcaWorkflow } from './workflows/rcaWorkflow';
 import { rcaPipelineWorkflow } from './workflows/rcaPipelineWorkflow';
 import { knowledgeTools } from './tools/knowledgeTools';
@@ -32,7 +34,7 @@ export const mastra = new Mastra({
   // A chat investigation takes 30-50 s of model time; the function must be allowed to run that long.
   deployer: new VercelDeployer({ maxDuration: 120, studio: false }),
   // The starter agent has a local shell and file workspace, which has no place on a public server.
-  agents: { ...(onVercel ? {} : { agent }), zuperClassifierAgent, zuperChatAgent, rcaInvestigatorAgent, rcaAnalystAgent },
+  agents: { ...(onVercel ? {} : { agent }), zuperClassifierAgent, zuperChatAgent, rcaInvestigatorAgent, rcaAnalystAgent, rcaUnderstandAgent, rcaEvidenceAgent },
   workflows: { rcaWorkflow, rcaPipelineWorkflow },
   tools: { ...(onVercel ? {} : { startScheduleTool, stopScheduleTool }), ...knowledgeTools },
   server: {

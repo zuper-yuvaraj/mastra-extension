@@ -14,6 +14,7 @@ import type { ApiEndpointRecord } from '../knowledge/api/distill';
 import { loadRecords } from '../knowledge/api/records';
 import { matchApiEndpoint } from './kbHints';
 import { describeNodeRuntime, parseNodeExecution, type NodeRuntime } from './nodeData';
+import { redactSecrets } from './sanitize';
 import { fetchFailure, preview, resolveNodeInputs, toWrapper, type InputStatus, type ResolvedInput } from './resolveInput';
 import { defaultIteration, makeResolverEnv } from './seed';
 
@@ -43,14 +44,16 @@ const FIELD_CHARS = 300;
 
 /** What the node is configured to do: a Code node's source, the expressions and literals of its other
  * fields. Empty defaults are left out. This is what lets the analysis say what the node was trying to do. */
-function configOf(formFields: unknown): Record<string, string> {
+export function configOf(formFields: unknown): Record<string, string> {
   const out: Record<string, string> = {};
   if (!formFields || typeof formFields !== 'object') return out;
   for (const [name, field] of Object.entries(formFields as Record<string, unknown>)) {
     const value = field && typeof field === 'object' && 'value' in field ? (field as { value: unknown }).value : field;
     const empty = value === '' || value === null || value === undefined || value === false || (Array.isArray(value) && value.length === 0) || (typeof value === 'object' && value !== null && !Array.isArray(value) && Object.keys(value).length === 0);
     if (empty) continue;
-    const text = typeof value === 'string' ? value : JSON.stringify(value);
+    // Redacted by field name too: a hard-coded `password` or `api_key` field is a bare string with no key of its own.
+    const safe = redactSecrets({ [name]: value })[name];
+    const text = typeof safe === 'string' ? safe : JSON.stringify(safe);
     const limit = name === 'code' ? CODE_CHARS : FIELD_CHARS;
     out[name] = text.length > limit ? `${text.slice(0, limit)}…(${text.length} chars)` : text;
   }

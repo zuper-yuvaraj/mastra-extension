@@ -34,8 +34,8 @@ Each item also needs: node_uid (copied from the trace node's "uid" field, NOT it
 
 THE ANSWER FIELDS
 - workflow_purpose: what this workflow does for the business, at most two short lines (about 25 words), read from the WORKFLOW. Empty for a follow-up question, or if it cannot be told.
-- headline: "While <the activity the target node was performing>, <node name> failed" (for a node that did not run: "While <the activity>, <node name> did not run because <decision>"). Under 15 words.
-- summary: at most two sentences (about 50 words): why, and whether a preceding node caused it (name it and what it produced) or the preceding nodes were fine. Do not repeat the purpose or headline.
+- headline: "While trying to <the activity the node was performing>, <node name> failed" (an unexpected path: "While trying to <do what>, <node name> took the <TRUE/FALSE> path"; a node that did not run: "While trying to <the activity>, <node name> did not run"). Name the activity from the node's place in its group: a Code node was preparing a payload, an HTTP node was calling an API with the payload it was given, a native node was updating a record. Under 15 words. Empty when nothing failed.
+- summary: WHAT happened, in at most two sentences (about 40 words): what failed or what the run did, and the error or outcome in plain words. The cause belongs in root_cause and evidence_chain (the RCA part), not here. Do not repeat the purpose or the headline.
 - root_cause: the origin node, with a category; fix: the corrected expression, code or setting when the pack supports one.
 - confidence: high only when the origin is named by origin_candidates or by a verbatim quote and nothing relevant is in data_gaps.
 - references: always empty (the system adds documentation links).

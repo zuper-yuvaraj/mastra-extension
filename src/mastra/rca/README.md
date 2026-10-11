@@ -67,6 +67,9 @@ HOST_NOT_ALLOWED`, upstream `401/403/404` passed through, `502` other upstream f
 npm test                 # unit tests (extractor, resolver, verifier, tools, route helpers, cache, secrets)
 npm run rca:run          # run the real agent offline on the synthetic fixture, or --fixture <file>
 npm run rca:e2e          # in-process end to end: request -> route -> workflow -> real agent; Zuper API stubbed
+npm run rca:chat-e2e     # the same for POST /zuper/chat on the hydrated engine: first question, chips, follow-up, streaming
+npm run rca:hydrate      # offline: hydrate a captured execution, --trim to see the cuts, --pack to see what the model is sent
+npm run rca:understand   # offline: the workflow summary (stage 1) with the real model, run twice to show the cache
 npm run rca:capture      # save a real execution (token from ZUPER_TOKEN) to fixtures/rca/<name>.json
 npm run rca:import       # same, from requests copied out of the browser network tab (no token needed)
 npm run rca:eval         # the accuracy eval: real model over fixtures/rca/eval-cases.json, N runs per case
@@ -218,7 +221,61 @@ finish     verify.ts   every quote must be verbatim in the trace; documentation 
   trace contains the customer's data, which stays in process memory for the run.
 - The first question of a chat runs the pipeline; follow-ups use the tool-using agent with the stored
   evidence (never a second full analysis). Anything the pipeline cannot place falls back to the agent.
-- The answer is laid out as: what the workflow does, a "While X, node failed" headline and cause, Detailed
-  RCA (verified lines), confidence, and reference links. Chips: "Show evidence", "Give me the fix".
+- The answer is laid out as three parts: what the workflow does; "While trying to X, node failed" and what
+  happened; the RCA (the root cause in words, then the verified lines that led to it); then confidence and
+  reference links. Chips: "Show evidence", "Give me the fix".
 - Compare engines with `npm run rca:eval -- --engine pipeline` and without `--engine`; try one case with
   `npm run rca:run -- --fixture <file> --engine pipeline`.
+
+## Hydrated engine (`RCA_ENGINE=hydrated`)
+
+The pipeline above follows references back from one target node. The hydrated engine gives the model the
+WHOLE workflow instead, with every node's references already dereferenced, so a question about any node,
+branch or value is answered from the same evidence, and nothing depends on a "target" being found first.
+Code builds everything; the model is called once, with a small bounded tool for data that was cut for size.
+
+```
+1 understand  understand.ts      one small call (rcaUnderstandAgent): what the workflow is for, and which nodes
+                                 work together on one activity. Definition only, cached per workflow version.
+2 hydrate     hydrate.ts         every executed node gets `references_node_data` (each expression it reads ->
+                                 the real value, from which node and loop iteration, or why it did not resolve)
+                                 and `execution` (status, HTTP status, error, the fields it ran with, what the
+                                 failed node received). Variables never get a value. Credentials are redacted.
+3 trim        trim.ts            data over budget is cut, largest array first: the first item stays, then a
+                                 "// 12 more objects removed (13 in total) ..." comment with an index of what
+                                 was removed and the exact get_node_data call that fetches one item. Data that
+                                 fits is never touched; definitions, errors and statuses are never cut.
+4 pack        hydratedPack.ts    repeats become pointers (`same_as`), cosmetics are dropped, and the message is
+                                 laid out in sections. PACK_LEGEND (how to read it) is shared with the instructions.
+5 analyse     hydratedPipeline.ts one call (rcaEvidenceAgent, gpt-5.1) with ONE tool, get_node_data; on its last
+                                 step the tool is switched off, so it always ends with an answer.
+              verify.ts          every quote must be verbatim in the pack or a tool result; documentation never
+                                 counts as evidence; a quote that fails is sent back to the model ONCE with
+                                 exactly what is wrong (RCA_QUOTE_REPAIRS), then the verdict stands, marked.
+```
+
+- A node with a recorded branch decision is a confirmed cause even when its own data could not be read (the
+  decision comes from the execution summary); any other upstream node whose data could not be read is not.
+- Follow-up questions use the same engine from the cached pack: no new Zuper calls, no second summary.
+- Anything it cannot place (no execution, a definition-only chat, a pack that cannot be built) goes to the
+  investigator or the older pipeline, as before.
+- Try it: `npm run rca:run -- --fixture fixtures/rca/update-appointment-404.json --engine hydrated`; see exactly
+  what the model is sent with `npm run rca:hydrate -- --fixture <file> --pack --out pack.txt`; compare with
+  `npm run rca:eval -- --engine hydrated`; run the whole chat route offline with `npm run rca:chat-e2e`.
+
+| Variable | Default | |
+|---|---|---|
+| `RCA_ENGINE` | `pipeline` | set `hydrated` to serve chat with this engine |
+| `RCA_ANALYSIS_MODEL` | `openai/gpt-5.1` | the model that reads the pack |
+| `RCA_ANALYSIS_EFFORT` | `medium` | its reasoning effort |
+| `RCA_EVIDENCE_MAX_STEPS` | `6` | model steps, counting the answer: at most this minus one tool rounds |
+| `RCA_QUOTE_REPAIRS` | `1` | times a bad quote may be sent back to the model (0 = off) |
+| `RCA_UNDERSTAND_MODEL` / `_EFFORT` / `_TTL_MS` | `openai/gpt-5.1` / `low` / 24 h | the workflow summary |
+| `RCA_TRIM_NODE_CHARS` | `16000` | budget for the data one node read or produced |
+| `RCA_TRIM_CRITICAL_FACTOR` | `3` | the failed node's data may be this many times larger |
+| `RCA_PACK_CHARS` | `160000` | budget for the whole pack (about 40k tokens) |
+| `RCA_HYDRATE_CONCURRENCY` | `6` | node-data fetches in flight at once |
+
+Known limits: only two real executions with node data have been captured, so failed Code nodes, native Zuper
+node failures and failures inside loops are unseen; a run takes 30 to 50 s (the older pipeline about 18 s); the
+budgets above are starting points, to be tuned from `rca:eval` on real executions.

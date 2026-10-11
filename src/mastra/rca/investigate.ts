@@ -11,6 +11,7 @@ import { RCA_MAX_STEPS, RCA_MODEL, RCA_REASONING_EFFORT, RCA_STRUCTURING_MODEL }
 import { MAX_EVIDENCE_CHARS } from './conversation';
 import { EvidenceLedger, RCA_LEDGER_KEY } from './ledger';
 import { progressText, type ProgressEvent } from './progress';
+import { redactSecrets } from './sanitize';
 import { buildSeed, type RcaMode, type RcaSeed } from './seed';
 import {
   INSUFFICIENT_VERDICT,
@@ -61,7 +62,7 @@ export interface RcaResult {
     tool_calls: number;
     model: string | null;
     /** Which engine produced the answer; the pipeline also reports how much it traced. */
-    engine?: 'agent' | 'pipeline';
+    engine?: 'agent' | 'pipeline' | 'hydrated';
     trace_nodes?: number;
     trace_capped?: boolean;
   };
@@ -128,7 +129,8 @@ export async function investigate(input: InvestigationInput): Promise<RcaResult>
   const { agent, executionContext, liveWorkflow, question, zuperToken, zuperApiUrl, conversation, onProgress, abortSignal } = input;
 
   const chatContext = assembleContext(executionContext, liveWorkflow ?? null);
-  const seed = await buildSeed(executionContext, chatContext, question);
+  // Redacted once here: the prompt and the evidence ledger are both built from this seed.
+  const seed = redactSecrets(await buildSeed(executionContext, chatContext, question));
   const baseMeta = { mode: seed.mode, execution_status: seed.execution.status };
 
   const direct = answerWithoutAgent(seed);
