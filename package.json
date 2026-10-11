@@ -17,6 +17,7 @@
     "rca:understand": "tsx --env-file=.env scripts/rca-understand.ts",
     "rca:hydrate": "tsx scripts/rca-hydrate.ts",
     "rca:run": "tsx --env-file=.env scripts/rca-run.ts",
+    "rca:chat-e2e": "tsx --env-file=.env scripts/rca-chat-e2e.ts",
     "rca:e2e": "tsx --env-file=.env scripts/rca-e2e.ts",
     "rca:import": "tsx scripts/rca-import.ts",
     "rca:eval": "tsx --env-file=.env scripts/rca-eval.ts",

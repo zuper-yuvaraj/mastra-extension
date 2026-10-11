@@ -64,7 +64,7 @@ test('first turn investigates, answers crisply and offers the chips', async () =
   assert.equal(agent.calls, 1);
   assert.match(
     r.reply,
-    /^<p>The email had no recipient because the job has no customer\.<\/p><p><strong>Detailed RCA<\/strong><\/p><ul><li><strong>Send Email<\/strong>: the execution error<\/li><\/ul><p><strong>Confidence: High<\/strong>/,
+    /^<p>The email had no recipient because the job has no customer\.<\/p><p><strong>RCA<\/strong><\/p><p><strong>Root cause:<\/strong> Get Job \(bad upstream data\) — customer is null<\/p><ul><li><strong>Send Email<\/strong>: the execution error<\/li><\/ul><p><strong>Confidence: High<\/strong>/,
   );
   assert.deepEqual(r.suggestions, [CHIP_DETAIL, CHIP_FIX]);
   assert.equal(r.fromCache, false);
@@ -160,7 +160,7 @@ test('with an analyst, only the first question runs the pipeline; a follow-up us
   const first = await converse({ ...base(s, legacy, [user('why did it fail?')]), pipeline: (i) => runPipeline({ ...i, analyst: counting }) });
   assert.equal(analystCalls.n, 1);
   assert.equal(legacy.calls, 0);
-  assert.match(first.reply, /Detailed RCA/);
+  assert.match(first.reply, /<strong>RCA<\/strong>/);
 
   const followUp = await converse({ ...base(s, legacy, [user('why did it fail?'), bot('<p>x</p>'), user('which node was that?')]), pipeline: (i) => runPipeline({ ...i, analyst: counting }) });
   assert.equal(analystCalls.n, 1, 'no second full analysis');

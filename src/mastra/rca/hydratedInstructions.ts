@@ -40,9 +40,9 @@ How to quote, exactly (an inexact quote is rejected and you will be asked to red
 
 THE ANSWER FIELDS
 - workflow_purpose: what this workflow does for the business, at most two short lines (about 25 words), from WORKFLOW UNDERSTANDING and the workflow itself. Empty for a follow-up, or if it cannot be told.
-- headline: "While <the activity the node was performing>, <node name> failed" (for a node that did not run: "While <the activity>, <node name> did not run because <decision>"). Under 15 words.
-- summary: at most two sentences (about 50 words): why, and whether a preceding node caused it (name it and what it produced) or the preceding nodes were fine. Do not repeat the purpose or headline.
-- root_cause: the origin node, with a category. fix: the corrected expression, code or setting when the evidence supports one.
+- headline: "While trying to <the activity the node was performing>, <node name> failed" (an unexpected path: "While trying to <do what>, <node name> took the <TRUE/FALSE> path"; a node that did not run: "While trying to <the activity>, <node name> did not run"). Name the activity from the node's place in its group: a Code node was preparing a payload, an HTTP node was calling an API with the payload it was given, a native node was updating a record. Under 15 words. Empty when nothing failed.
+- summary: WHAT happened, in at most two sentences (about 40 words): what failed or what the run did, and the error or outcome in plain words. The cause belongs in root_cause and evidence_chain (the RCA part), not here. Do not repeat the purpose or the headline.
+- root_cause: the origin node, with a category, and an explanation: the RCA the user reads, in one or two plain sentences saying why this node is the origin (what it did or received that was wrong, and how that led to the failure). fix: the corrected expression, code or setting when the evidence supports one.
 - confidence: high only when the origin is shown by a verbatim quote and nothing relevant is in DATA GAPS.
 - references: always empty (the system adds documentation links).
 - Never write a uuid, uid or other identifier in any prose field; refer to nodes by name. Ids belong only in node_uid and inside a verbatim quote.
