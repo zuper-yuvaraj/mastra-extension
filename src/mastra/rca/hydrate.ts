@@ -37,6 +37,9 @@ export interface HydratedReference {
   /** The value at the referenced path, untruncated. Absent when the path did not resolve, and for variables. */
   value?: unknown;
   value_type?: string;
+  /** Set by the pack (not by hydration): `value` is dropped because it is identical to the one at this earlier
+   * node and expression ("Node > expression"). */
+  same_as?: string;
   /** Where the path broke, and which keys exist there: usually points straight at the right field. */
   failed_at?: string;
   available_keys?: string[];

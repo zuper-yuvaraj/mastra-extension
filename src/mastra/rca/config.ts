@@ -38,3 +38,12 @@ export const RCA_UNDERSTAND_TTL_MS = Number(process.env.RCA_UNDERSTAND_TTL_MS ??
 
 /** Node-data fetches in flight at once while hydrating an execution (stage 2 of the hydrated engine). */
 export const RCA_HYDRATE_CONCURRENCY = Number(process.env.RCA_HYDRATE_CONCURRENCY ?? 6);
+
+/** Stage 3 of the hydrated engine (rca/trim.ts): serialised-size budget for the data one node read or produced. */
+export const RCA_TRIM_NODE_CHARS = Number(process.env.RCA_TRIM_NODE_CHARS ?? 16000);
+
+/** The failed node's data may be this many times larger: it is the evidence the answer rests on. */
+export const RCA_TRIM_CRITICAL_FACTOR = Number(process.env.RCA_TRIM_CRITICAL_FACTOR ?? 3);
+
+/** Budget for the whole hydrated execution (about 40k tokens at the default). */
+export const RCA_PACK_CHARS = Number(process.env.RCA_PACK_CHARS ?? 160000);

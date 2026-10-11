@@ -1,11 +1,15 @@
-// Usage: npm run rca:hydrate -- [--fixture fixtures/rca/<name>.json] [--out hydrated.json] [--node "<name>"]
-// Runs stage 2 of the hydrated RCA engine (reference hydration) on a captured execution, offline: no token,
-// no network, no model. Prints per-node reference counts and how much data each carries, and, with --out,
-// writes the full hydrated JSON. --node prints one node's hydrated JSON.
+// Usage: npm run rca:hydrate -- [--fixture fixtures/rca/<name>.json] [--trim | --pack] [--out file] [--node "<name>"]
+// Runs stages 2 to 4 of the hydrated RCA engine (reference hydration, trimming, the pack) on a captured execution,
+// offline: no token, no network, no model. Prints per-node reference counts and how much data each carries, and,
+// with --out, writes the full hydrated JSON. --node prints one node's hydrated JSON. --trim applies the size
+// budgets (see rca/trim.ts) and lists every cut; --out and --node then show the trimmed result. --pack builds the
+// message the analysis model would be sent (rca/hydratedPack.ts), prints what it is made of, and with --out writes it.
 
 import { writeFileSync } from 'node:fs';
 import { executionContextFromFixture, loadFixture } from '../src/mastra/rca/fixture';
 import { hydrateExecution } from '../src/mastra/rca/hydrate';
+import { buildPack } from '../src/mastra/rca/hydratedPack';
+import { trimHydrated } from '../src/mastra/rca/trim';
 import { fakeExecution } from '../src/mastra/rca/__tests__/fakeExecution';
 
 function arg(name: string): string | undefined {
@@ -18,7 +22,9 @@ const fixture = fixturePath ? loadFixture(fixturePath) : null;
 const ctx = fixture ? executionContextFromFixture(fixture) : fakeExecution(true);
 
 const started = Date.now();
-const hydrated = await hydrateExecution(ctx);
+const full = await hydrateExecution(ctx);
+const trimmed = process.argv.includes('--trim') ? trimHydrated(full) : null;
+const hydrated = trimmed?.hydrated ?? full;
 const ms = Date.now() - started;
 const size = (value: unknown): number => JSON.stringify(value ?? null).length;
 
@@ -42,13 +48,27 @@ for (const node of hydrated.workflow.nodes) {
   );
 }
 
-console.log(`\ntotal hydrated size (untrimmed): ${size(hydrated)} B   (stored workflow: ${size(ctx.workflowData)} B)`);
+console.log(`\ntotal hydrated size: ${size(full)} B untrimmed   (stored workflow: ${size(ctx.workflowData)} B)`);
+if (trimmed) {
+  const { report } = trimmed;
+  console.log(`after trimming: ${report.after_chars} B${report.over_budget ? '  (STILL OVER BUDGET: only evidence is left to cut)' : ''}, ${report.trimmed.length} cut(s):`);
+  for (const cut of report.trimmed) console.log(`  ${cut.node.padEnd(22)} ${cut.kind.padEnd(7)} ${String(cut.removed).padStart(6)} of ${String(cut.total).padEnd(6)} ${cut.path.slice(0, 80)}`);
+}
 if (hydrated.data_gaps.length > 0) console.log(`data gaps:\n  ${hydrated.data_gaps.join('\n  ')}`);
 
 const only = arg('node');
 if (only) console.log(`\n${JSON.stringify(hydrated.workflow.nodes.find((n) => n.action_name === only) ?? 'no such node', null, 2)}`);
 const out = arg('out');
-if (out) {
+if (process.argv.includes('--pack')) {
+  const pack = buildPack({ hydrated: full, understanding: null, question: arg('question') ?? '' });
+  console.log(`
+pack: ${pack.report.chars} chars (about ${Math.round(pack.report.chars / 4)} tokens), ${pack.report.repeats} repeat(s) pointed at, ${pack.report.trim.trimmed.length} cut(s)`);
+  for (const [name, chars] of Object.entries(pack.report.sections)) console.log(`  ${name.padEnd(24)} ${chars} chars`);
+  if (out) {
+    writeFileSync(out, pack.message);
+    console.log(`wrote ${out}`);
+  }
+} else if (out) {
   writeFileSync(out, JSON.stringify(hydrated, null, 2));
   console.log(`wrote ${out}`);
 }
