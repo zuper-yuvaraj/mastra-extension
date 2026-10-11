@@ -26,3 +26,12 @@ export const RCA_VALUE_PREVIEW_CHARS = 300;
 
 /** How long a finished RCA verdict is reused for a terminal execution. */
 export const RCA_RESULT_TTL_MS = 10 * 60 * 1000;
+
+/** Stage 1 of the hydrated engine: one definition-only call that says what a workflow version is for and
+ * how its nodes group into activities. Cached per version, so a long TTL is safe. */
+export const RCA_UNDERSTAND_MODEL = process.env.RCA_UNDERSTAND_MODEL ?? 'openai/gpt-5.1';
+
+export const RCA_UNDERSTAND_EFFORT = process.env.RCA_UNDERSTAND_EFFORT ?? 'low';
+
+/** A workflow version never changes once it has run, so its understanding can be kept for a day. */
+export const RCA_UNDERSTAND_TTL_MS = Number(process.env.RCA_UNDERSTAND_TTL_MS ?? 24 * 60 * 60 * 1000);

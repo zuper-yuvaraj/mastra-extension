@@ -43,7 +43,7 @@ const FIELD_CHARS = 300;
 
 /** What the node is configured to do: a Code node's source, the expressions and literals of its other
  * fields. Empty defaults are left out. This is what lets the analysis say what the node was trying to do. */
-function configOf(formFields: unknown): Record<string, string> {
+export function configOf(formFields: unknown): Record<string, string> {
   const out: Record<string, string> = {};
   if (!formFields || typeof formFields !== 'object') return out;
   for (const [name, field] of Object.entries(formFields as Record<string, unknown>)) {
