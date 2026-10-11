@@ -64,20 +64,22 @@ function flowOrder(names: string[], connections: SlimWorkflow['connections']): s
   return [...order, ...names.filter((n) => !seen.has(n))];
 }
 
+/** The workflow's variable NAMES. Values are never read: a variable can be a secret (an API key). */
+export function variableNamesOf(workflowData: ExecutionContext['workflowData']): string[] {
+  const variables = (workflowData?.meta_data as { variables?: unknown } | undefined)?.variables;
+  if (Array.isArray(variables)) {
+    return variables.map((v) => (v && typeof v === 'object' ? String((v as { name?: unknown; key?: unknown }).name ?? (v as { key?: unknown }).key ?? '') : String(v))).filter(Boolean);
+  }
+  return variables && typeof variables === 'object' ? Object.keys(variables) : [];
+}
+
 export function slimWorkflowForUnderstanding(ctx: ExecutionContext): SlimWorkflow {
   const outline = buildWorkflowOutline(ctx);
   const byName = new Map((ctx.workflowData?.nodes ?? []).map((node) => [node.action_name ?? node.node_uid, node]));
-  const variables = (ctx.workflowData?.meta_data as { variables?: unknown } | undefined)?.variables;
-  const variableNames = Array.isArray(variables)
-    ? variables.map((v) => (v && typeof v === 'object' ? String((v as { name?: unknown; key?: unknown }).name ?? (v as { key?: unknown }).key ?? '') : String(v))).filter(Boolean)
-    : variables && typeof variables === 'object'
-      ? Object.keys(variables)
-      : [];
-
   return {
     name: outline.name,
     ...(outline.description ? { description: outline.description } : {}),
-    variables: variableNames,
+    variables: variableNamesOf(ctx.workflowData),
     nodes: flowOrder(
       outline.nodes.map((n) => n.name),
       outline.connections,

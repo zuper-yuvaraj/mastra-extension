@@ -35,3 +35,6 @@ export const RCA_UNDERSTAND_EFFORT = process.env.RCA_UNDERSTAND_EFFORT ?? 'low';
 
 /** A workflow version never changes once it has run, so its understanding can be kept for a day. */
 export const RCA_UNDERSTAND_TTL_MS = Number(process.env.RCA_UNDERSTAND_TTL_MS ?? 24 * 60 * 60 * 1000);
+
+/** Node-data fetches in flight at once while hydrating an execution (stage 2 of the hydrated engine). */
+export const RCA_HYDRATE_CONCURRENCY = Number(process.env.RCA_HYDRATE_CONCURRENCY ?? 6);

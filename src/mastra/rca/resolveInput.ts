@@ -4,6 +4,7 @@
 
 import { parseNodeExecution } from './nodeData';
 import { preview } from './preview';
+import { pathEndsAtSecret } from './sanitize';
 import { extractReferences, renderSegments, type ExtractedReference, type ReferenceKind, type Segment } from './references';
 
 /** What the resolver needs from a run. Kept narrow so it is testable without a live execution. */
@@ -50,6 +51,10 @@ export interface ResolvedInput {
   iteration?: number;
   /** Bounded JSON preview of the resolved value. */
   value?: string;
+  /** The resolved value itself, untruncated. Only present when the caller asked for it (`keepValue`): it can be
+   * huge, and ResolvedInput is serialised into prompts elsewhere, so it must never appear by default. Read-only:
+   * it is the cached node data, not a copy. */
+  rawValue?: unknown;
   valueType?: string;
   /** Path up to the point that broke, and the segment that was missing. */
   failedAt?: string;
@@ -178,6 +183,7 @@ async function resolveReference(
   ownerUid: string,
   env: ResolverEnv,
   iteration?: number,
+  keepValue = false,
 ): Promise<ResolvedInput> {
   const base = { field: ref.field, alias: ref.alias, expression: ref.raw, kind: ref.kind };
 
@@ -206,6 +212,30 @@ async function resolveReference(
     }
     if (!env.getNodeExecutionData(uid)) {
       return { ...base, status: 'target_not_run', target: { uid, name }, note: `This node acts on the record from "${name}", but "${name}" did not run.` };
+    }
+    if (keepValue) {
+      const iterations = env.iterationsOf(uid);
+      const wantedRun = iterations.length > 0 ? (iteration !== undefined && iterations.includes(iteration) ? iteration : iterations[iterations.length - 1]) : undefined;
+      const raw = await env.getNodeExecutionData(uid, wantedRun);
+      const failure = fetchFailure(raw);
+      if (failure) {
+        return {
+          ...base,
+          status: 'fetch_failed',
+          target: { uid, name },
+          iteration: wantedRun,
+          note: `This node acts on the record from "${name}", but its data could not be loaded (${failure}). Do not conclude anything about it.`,
+        };
+      }
+      const { wrapper } = toWrapper(raw);
+      return {
+        ...base,
+        status: 'resolved',
+        target: { uid, name },
+        iteration: wantedRun,
+        rawValue: isObject(wrapper) ? wrapper.data : undefined,
+        note: `Acts on the record supplied by "${name}" (selected as its record source); the value is that node's output. If that record is wrong or missing, the cause is upstream of this node.`,
+      };
     }
     return {
       ...base,
@@ -302,12 +332,14 @@ async function resolveReference(
   const root: unknown = wrapper;
 
   const walked = walkPath(root, segments);
+  const secretPath = pathEndsAtSecret(ref.raw);
   return {
     ...base,
     status: walked.status,
     target: { uid: targetUid, name: targetName },
     iteration: wanted,
-    value: walked.status === 'resolved' || walked.status === 'null' ? preview(walked.value) : undefined,
+    value: walked.status === 'resolved' || walked.status === 'null' ? (secretPath && walked.value !== null ? '"[REDACTED]"' : preview(walked.value)) : undefined,
+    ...(keepValue && (walked.status === 'resolved' || walked.status === 'null') ? { rawValue: secretPath && walked.value !== null ? '[REDACTED]' : walked.value } : {}),
     valueType: walked.status === 'resolved' ? typeOf(walked.value) : undefined,
     failedAt: walked.failedAt,
     segment: walked.segment,
@@ -324,6 +356,8 @@ export async function resolveNodeInputs(
   env: ResolverEnv,
   /** The loop iteration the reading node is running in, if any: looped sources are read at the same one. */
   iteration?: number,
+  /** `keepValue: true` also returns each resolved value untruncated as `rawValue` (see ResolvedInput). */
+  options: { keepValue?: boolean } = {},
 ): Promise<ResolvedInput[]> {
   const seen = new Set<string>();
   const refs = extractReferences(formFields).filter((ref) => {
@@ -332,5 +366,5 @@ export async function resolveNodeInputs(
     seen.add(key);
     return true;
   });
-  return Promise.all(refs.map((ref) => resolveReference(ref, nodeUid, env, iteration)));
+  return Promise.all(refs.map((ref) => resolveReference(ref, nodeUid, env, iteration, options.keepValue === true)));
 }
