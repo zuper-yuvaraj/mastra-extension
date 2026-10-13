@@ -1,0 +1,5 @@
+{
+  "name": "get_node_data",
+  "description": "Read the original data of a node, for something the pack does not show: a value inside a \"// ... removed\" comment, or a field that was cut. Each such comment gives the exact call to make; copy it. Paths start at the node's {node, data} wrapper, so a payload field is reached through `data` (e.g. \"data.data.value[7]\"). Use which=\"input\" for what the node RECEIVED. Do not call it for anything already in the pack. Each path returns at most about 3000 characters, so ask for one item or field, not a whole list.",
+  "parameters": "node: string; select: string[] (1-8, required); which?: \"output\"|\"input\"; iteration?: integer >= 0"
+}

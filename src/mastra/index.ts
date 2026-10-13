@@ -23,10 +23,15 @@ import { handleZuperExplain } from './routes/zuperExplainRoute';
 import { handleZuperRca } from './routes/zuperRcaRoute';
 import { handleRcaChat } from './routes/zuperRcaChatRoute';
 import { PG_SCHEMA, POOL_OPTIONS, postgresUrl } from './lib/postgres';
+import { chatEngineSelection } from './rca/engineSelection';
 
-// ZUPER_CHAT_ENGINE=rca (the default) serves /zuper/chat with the RCA investigator (conversational, one
-// agent for every question). Set it to 'legacy' to fall back to the old orchestrator if needed.
-const chatHandler = process.env.ZUPER_CHAT_ENGINE === 'legacy' ? handleZuperChat : handleRcaChat;
+// The RCA chat (conversational, one engine for every question) serves /zuper/chat by default. Set
+// ZUPER_CHAT_ENGINE=legacy to fall back to the old orchestrator; RCA_ENGINE picks the RCA engine (see
+// rca/engineSelection.ts). What is in effect is printed once at start-up, so a server that did not pick up
+// the .env, or that runs an old build, is visible at once.
+const engineSelection = chatEngineSelection(process.env);
+console.log(`[rca] ${engineSelection.summary}`);
+const chatHandler = engineSelection.handler === 'legacy' ? handleZuperChat : handleRcaChat;
 
 const onVercel = Boolean(process.env.VERCEL);
 

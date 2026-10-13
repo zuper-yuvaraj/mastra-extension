@@ -187,6 +187,9 @@ export async function runHydrated(input: HydratedPipelineInput): Promise<RcaResu
   // The links come from the documentation step, not from the model, so none can be invented.
   const focus = [raw.failed_node?.name, raw.root_cause?.name].filter((name): name is string => Boolean(name));
   const verdict = { ...verified, references: referenceLinks(kb, focus.length > 0 ? focus : ranNames.slice(0, 4)) };
+  console.log(
+    `[rca] hydrated engine answered: status=${verdict.status} confidence=${verdict.confidence} model=${RCA_ANALYSIS_MODEL} steps=${steps} tool_calls=${ledger.toolCalls() - docs.length} pack=${pack.report.chars} chars (${pack.report.trim.trimmed.length} cut, ${pack.report.repeats} repeat)`,
+  );
 
   return {
     verdict,

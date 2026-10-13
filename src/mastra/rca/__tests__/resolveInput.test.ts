@@ -39,7 +39,7 @@ test('resolves a value through the wrapper (.data.data for Get Record)', async (
   });
   const [r] = await resolve("{{ $.getLatestNodeData('Get Record').data.data.job_title }}", env);
   assert.equal(r?.status, 'resolved');
-  assert.equal(r?.value, '"Fix AC"');
+  assert.equal(r?.value, 'Fix AC');
   assert.equal(r?.target?.name, 'Get Record');
 });
 
@@ -105,7 +105,7 @@ test('a node inside a loop is read per iteration: getNodeData(...)[i] is the i-t
   const reads: Array<[string, number | undefined]> = [];
   const env = makeEnv({ body: { name: 'Loop Body', iterations: { 0: loopBody('first'), 1: loopBody('second') } } }, reads);
   const second = await resolve("{{ $.getNodeData('Loop Body')[1].data.v }}", env);
-  assert.equal(second[0]?.value, '"second"');
+  assert.equal(second[0]?.value, 'second');
   assert.equal(second[0]?.iteration, 1);
   assert.deepEqual(reads.at(-1), ['body', 1], 'asked the API for iteration 1');
 
@@ -118,17 +118,17 @@ test('a looped source is read at the SAME iteration as the node reading it, else
   const reads: Array<[string, number | undefined]> = [];
   const env = makeEnv({ body: { name: 'Loop Body', iterations: { 0: loopBody('a'), 1: loopBody('b') } } }, reads);
   const at0 = await resolveNodeInputs('self', { f: { type: 'EXPRESSION', value: "{{ $.getLatestNodeData('Loop Body').data.v }}" } }, env, 0);
-  assert.equal(at0[0]?.value, '"a"');
+  assert.equal(at0[0]?.value, 'a');
   const at1 = await resolveNodeInputs('self', { f: { type: 'EXPRESSION', value: "{{ $.getLatestNodeData('Loop Body').data.v }}" } }, env, 1);
-  assert.equal(at1[0]?.value, '"b"');
+  assert.equal(at1[0]?.value, 'b');
   const outside = await resolve("{{ $.getLatestNodeData('Loop Body').data.v }}", env);
-  assert.equal(outside[0]?.value, '"b"', 'a reader outside the loop sees the last iteration');
+  assert.equal(outside[0]?.value, 'b', 'a reader outside the loop sees the last iteration');
 });
 
 test('[$.getCurrentLoopIndex()] means "this iteration"; without one it cannot be resolved', async () => {
   const env = makeEnv({ body: { name: 'Loop Body', iterations: { 0: loopBody('a'), 1: loopBody('b') } } });
   const expr = { f: { type: 'EXPRESSION', value: "{{ $.getNodeData('Loop Body')[$.getCurrentLoopIndex()].data.v }}" } };
-  assert.equal((await resolveNodeInputs('self', expr, env, 1))[0]?.value, '"b"');
+  assert.equal((await resolveNodeInputs('self', expr, env, 1))[0]?.value, 'b');
   assert.equal((await resolveNodeInputs('self', expr, env))[0]?.status, 'dynamic', 'no iteration to substitute');
 });
 
@@ -147,7 +147,7 @@ test('an unreadable iteration is reported with its iteration number', async () =
 test('numeric string key indexes an array (custom_fields["14"])', async () => {
   const env = makeEnv({ up: { name: 'Get Job', data: wrap('x', { custom_fields: [{ label: 'a' }, { label: 'b' }] }) } });
   const [r] = await resolve("{{ $.getLatestNodeData('Get Job').data.custom_fields['1'].label }}", env);
-  assert.equal(r?.value, '"b"');
+  assert.equal(r?.value, 'b');
 });
 
 test('variables are reported, not resolved', async () => {
@@ -176,4 +176,22 @@ test('walkPath type mismatch on a primitive', () => {
     { kind: 'key', key: 'length2' },
   ]);
   assert.equal(r.status, 'type_mismatch');
+});
+
+test('an empty value is said to be empty, so quotation marks are not mistaken for part of it', async () => {
+  const read = async (data: unknown) => {
+    const env = makeEnv({ up: { name: 'GET HS deal', data: wrap('http_request', { data: { properties: { uid: data } } }) } });
+    const [r] = await resolve("{{ $.getLatestNodeData('GET HS deal').data.data.properties.uid }}", env);
+    return r!;
+  };
+  const empty = await read('');
+  assert.equal(empty.status, 'resolved');
+  assert.match(empty.note!, /EMPTY string/);
+  assert.match(empty.note!, /quotation marks .* only notation/);
+  assert.match((await read('   ')).note!, /blank/);
+  assert.match((await read(null)).note!, /null: nothing was set/);
+  assert.match((await read([])).note!, /empty list/);
+  assert.match((await read({})).note!, /empty object/);
+  assert.equal((await read('abc')).note, undefined, 'a value that holds something gets no note');
+  assert.equal((await read(0)).note, undefined, 'zero is a value');
 });

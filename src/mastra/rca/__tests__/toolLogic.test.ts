@@ -63,7 +63,7 @@ test('get_node_data without select returns shapes of what the node produced and 
 test('get_node_data with select reads exact values and reports misses with the real keys', async () => {
   const result: any = await getNodeData(failed, 'Get Job', ['data.data.job_uid', 'data.customer']);
   assert.equal(result.selected[0].status, 'resolved');
-  assert.equal(result.selected[0].value, '"job-1"');
+  assert.equal(result.selected[0].value, 'job-1');
   assert.equal(result.selected[1].status, 'undefined');
   assert.ok(result.selected[1].availableKeys.includes('data'), 'the real keys are offered');
 });
