@@ -36,11 +36,11 @@ export const verdictSchema = z.object({
     .describe('What this workflow does for the business, in at most two short lines (about 25 words), read from the node flow, e.g. "Receives a call webhook, fetches the call details and logs them against the customer." Empty string for a follow-up question, or when the purpose cannot be told from the nodes. Never guess.'),
   headline: z
     .string()
-    .describe('A short header (under 15 words) in the shape "While <the activity the failed node was performing>, <node name> failed", e.g. "While fetching the call details, Get Call details failed". For an unexpected branch: "While deciding <what>, <node name> took the <TRUE/FALSE> path". Empty string when nothing failed or the user asked an informational question. No ids.'),
+    .describe('A short header (under 15 words) in the shape "While trying to <the activity the failed node was performing>, <node name> failed", e.g. "While trying to fetch the call details, Get Call details failed". For an unexpected branch: "While trying to <do what>, <node name> took the <TRUE/FALSE> path". For a node that did not run: "While trying to <the activity>, <node name> did not run". Empty string when nothing failed or the user asked an informational question. No ids.'),
   summary: z
     .string()
     .describe(
-      'The body under the headline: at most TWO plain sentences, about 50 words, that DIRECTLY answer the question asked. For a failure: why that node failed (its own error, in words) and whether a preceding node caused it (name it and what it produced) or that the preceding nodes were checked and are fine. Do not repeat the workflow purpose or the headline here. Zuper terminology. NEVER include a uuid, uid or other identifier; refer to nodes by name. For a follow-up, answer the follow-up, not the original question again.',
+      'The body under the headline: at most TWO plain sentences, about 40 words, saying WHAT happened and DIRECTLY answering the question asked. For a failure: what failed and the error or outcome in plain words. The cause is shown separately (root_cause and the evidence), so do not explain why here. Do not repeat the workflow purpose or the headline. Zuper terminology. NEVER include a uuid, uid or other identifier; refer to nodes by name. For a follow-up, answer the follow-up, not the original question again.',
     ),
   failed_node: z
     .object({ uid: z.string().nullable(), name: z.string().nullable(), error: z.string().nullable() })
@@ -62,7 +62,9 @@ export const verdictSchema = z.object({
             'BRANCH_CONDITION: an If/Else condition or trigger filter evaluated differently than intended. ' +
             'PERMISSION: the user or API key is not allowed to do it. OTHER: none of these.',
         ),
-      explanation: z.string(),
+      explanation: z
+        .string()
+        .describe('WHY this node is the root cause, in one or two plain sentences: what it did or received that was wrong, and how that led to the failure. This is the RCA the user reads. No ids; refer to nodes by name.'),
     })
     .nullable(),
   evidence_chain: z

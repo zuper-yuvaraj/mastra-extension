@@ -21,13 +21,14 @@ function verdict(overrides: Partial<VerifiedVerdict> = {}): VerifiedVerdict {
   };
 }
 
-test('crisp is laid out under headers: purpose, headline, body, confidence, references', () => {
+test('crisp is the three parts under headers: what the workflow does, "While trying to...", and the RCA; then confidence', () => {
   assert.equal(
     renderCrisp(verdict({ workflow_purpose: 'Creates a job and fills its custom fields.', headline: 'While creating the job, Create Job failed' })),
     '<p><strong>What this workflow does</strong></p><p>Creates a job and fills its custom fields.</p>' +
       '<p><strong>While creating the job, Create Job failed</strong></p>' +
       '<p>Create Job failed because the payload had no customer.</p>' +
-      '<p><strong>Detailed RCA</strong></p><ul><li><strong>Payload for job</strong>: no customer key</li></ul>' +
+      '<p><strong>RCA</strong></p><p><strong>Root cause:</strong> Payload for job (code error) — it never sets customer</p>' +
+      '<ul><li><strong>Payload for job</strong>: no customer key</li></ul>' +
       '<p><strong>Confidence: High</strong></p><p>Every supporting detail was checked against the execution data.</p>',
   );
 });
@@ -139,4 +140,30 @@ test('references are links, escaped, and only https addresses become links', asy
   assert.ok(!odd.includes('<a href="javascript'), 'a non-https address is never a link');
   assert.ok(!odd.includes('"onmouseover="'), 'quotes in an address cannot break out of the attribute');
   assert.equal(renderReferences([]), '');
+});
+
+test('the RCA part states the root cause in words, then how it was reached', () => {
+  const html = renderCrisp(verdict({ root_cause: { node_uid: 'n1', name: 'Construct', category: 'WRONG_EXPRESSION_PATH', explanation: 'It builds the URL without the appointment id.' } }));
+  assert.match(html, /<p><strong>RCA<\/strong><\/p><p><strong>Root cause:<\/strong> Construct \(wrong expression path\) — It builds the URL without the appointment id\.<\/p><ul>/);
+  assert.ok(!html.includes('Detailed RCA'));
+});
+
+test('an unconfirmed cause is not stated as the root cause; only the labelled hypothesis is shown', () => {
+  const html = renderCrisp(
+    verdict({ status: 'insufficient_evidence', root_cause: null, evidence_chain: [], confidence: 'low', issues: ['Possible cause (not confirmed): Construct - builds the URL wrongly'] }),
+  );
+  assert.ok(!html.includes('<strong>RCA</strong>') && !html.includes('Root cause'));
+  assert.match(html, /Possible cause \(not confirmed\): Construct/);
+});
+
+test('the RCA part is left out when there is nothing to analyse, and shows the cause even if no line passed the check', () => {
+  assert.ok(!renderCrisp(verdict({ status: 'no_issue', root_cause: null, evidence_chain: [] })).includes('RCA'));
+  const unchecked = renderCrisp(verdict({ evidence_chain: [{ node_uid: 'n1', name: 'X', observation: 'o', quote: 'q', verified: false }] }));
+  assert.match(unchecked, /<strong>RCA<\/strong><\/p><p><strong>Root cause:<\/strong> Payload for job/);
+  assert.ok(!unchecked.includes('<li>'), 'an unchecked line is not shown as a finding');
+});
+
+test('the explanation and names in the RCA part are escaped', () => {
+  const html = renderCrisp(verdict({ root_cause: { node_uid: 'n1', name: 'A<b>', category: 'OTHER', explanation: 'x <script>alert(1)</script>' } }));
+  assert.ok(!html.includes('<script>') && !html.includes('<b>'));
 });

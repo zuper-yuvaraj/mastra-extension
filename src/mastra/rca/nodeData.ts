@@ -19,6 +19,7 @@
 // execution_data carries the actual error and HTTP status. So the node's runtime facts matter.
 
 import { preview } from './resolveInput';
+import { redactSecrets } from './sanitize';
 
 export interface ParsedNodeExecution {
   status: string | null;
@@ -54,26 +55,36 @@ const FIELD_PREVIEW_CHARS = 400;
 /** An HTML error page (an HTTP node that hit a 404 gets one) boiled down to its text. */
 function readableError(error: unknown): string | null {
   if (error === null || error === undefined || error === '') return null;
-  const text = typeof error === 'string' ? error : JSON.stringify(error);
+  // Redacted before truncation, so a token is never left half-cut and unrecognisable.
+  const text = typeof error === 'string' ? redactSecrets(error) : JSON.stringify(redactSecrets(error));
   const stripped = /<\s*(html|body|pre)\b/i.test(text)
     ? text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
     : text;
   return stripped.length <= ERROR_PREVIEW_CHARS ? stripped : `${stripped.slice(0, ERROR_PREVIEW_CHARS)}…(${stripped.length} chars)`;
 }
 
-/** Fields with a value: the node's resolved form_fields minus the dozens of empty defaults. */
-function resolvedFields(formFields: unknown): Record<string, string> | null {
+/** The values of the fields the node actually ran with (expressions already evaluated), minus the dozens of
+ * empty defaults. Untruncated, and the cached data itself (read-only). */
+export function resolvedFieldValues(formFields: unknown): Record<string, unknown> | null {
   if (!isObject(formFields)) return null;
-  const out: Record<string, string> = {};
+  const out: Record<string, unknown> = {};
   for (const [name, field] of Object.entries(formFields)) {
     const value = isObject(field) && 'value' in field ? field.value : field;
     const empty =
       value === '' || value === null || value === undefined || value === false ||
       (Array.isArray(value) && value.length === 0) ||
       (isObject(value) && Object.keys(value).length === 0);
-    if (!empty) out[name] = preview(value, FIELD_PREVIEW_CHARS);
+    if (!empty) out[name] = value;
   }
   return Object.keys(out).length > 0 ? out : null;
+}
+
+/** Fields with a value: the node's resolved form_fields minus the dozens of empty defaults. */
+function resolvedFields(formFields: unknown): Record<string, string> | null {
+  const values = resolvedFieldValues(formFields);
+  if (!values) return null;
+  const safe = redactSecrets(values);
+  return Object.fromEntries(Object.entries(safe).map(([name, value]) => [name, preview(value, FIELD_PREVIEW_CHARS)]));
 }
 
 export interface NodeRuntime {

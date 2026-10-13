@@ -32,17 +32,25 @@ const MAX_RCA_LINES = 4;
 /** A line about OUR reader failing is a limit on the analysis, not a finding about the run. */
 const READER_LIMIT = /fetch_failed|could not be loaded|"unavailable"/i;
 
-/** The backtrace in words, one line per node, failure first and the origin last. Only lines whose quote was
- * checked against the data are shown as findings. */
-function renderDetailedRca(v: VerifiedVerdict): string {
+const CATEGORY_WORDS = (category: string): string => category.replace(/_/g, ' ').toLowerCase();
+
+/** The third part of the answer: the root cause in words, then the backtrace one line per node (failure first,
+ * origin last). Only lines whose quote was checked against the data are shown as findings, and the root cause
+ * is stated only when the verifier confirmed it (an unconfirmed one is shown as a labelled hypothesis). */
+function renderRca(v: VerifiedVerdict): string {
   if (v.status !== 'failed' && v.status !== 'unexpected_branch') return '';
   const lines = v.evidence_chain.filter((e) => e.verified && !READER_LIMIT.test(e.quote)).slice(0, MAX_RCA_LINES);
-  if (lines.length === 0) return '';
-  return heading('Detailed RCA') + `<ul>${lines.map((e) => `<li><strong>${esc(e.name)}</strong>: ${esc(e.observation)}</li>`).join('')}</ul>`;
+  if (lines.length === 0 && !v.root_cause) return '';
+  const cause = v.root_cause
+    ? `<p><strong>Root cause:</strong> ${esc(v.root_cause.name)} (${esc(CATEGORY_WORDS(v.root_cause.category))}) — ${esc(v.root_cause.explanation.trim())}</p>`
+    : '';
+  const chain = lines.length > 0 ? `<ul>${lines.map((e) => `<li><strong>${esc(e.name)}</strong>: ${esc(e.observation)}</li>`).join('')}</ul>` : '';
+  return heading('RCA') + cause + chain;
 }
 
-/** The default chat answer, under plain headers: what the workflow does, what failed and why, how sure we
- * are, and the documentation relied on. Sections with nothing to say are left out. */
+/** The default chat answer, in three parts under plain headers: what the workflow does; "While trying to ...",
+ * what failed or happened; and the RCA, the root cause and how it was reached. Then how sure we are and the
+ * documentation relied on. Sections with nothing to say are left out. */
 export function renderCrisp(v: VerifiedVerdict): string {
   const parts: string[] = [];
   if (v.workflow_purpose.trim()) parts.push(heading('What this workflow does'), `<p>${esc(v.workflow_purpose.trim())}</p>`);
@@ -53,7 +61,7 @@ export function renderCrisp(v: VerifiedVerdict): string {
   const hypothesis = v.issues.find((i) => i.startsWith('Possible cause (not confirmed)') || i.startsWith('Unconfirmed hypothesis'));
   if (hypothesis) parts.push(`<p><em>${esc(hypothesis)}</em></p>`);
 
-  parts.push(renderDetailedRca(v));
+  parts.push(renderRca(v));
 
   // Confidence is always stated for a diagnosis; for other answers only when it is not high.
   // Canned answers (no execution, still running) have no analysis behind them, so they state none.

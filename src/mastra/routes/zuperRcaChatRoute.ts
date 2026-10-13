@@ -7,6 +7,7 @@ import { accountKey, ConversationStore, conversationKey } from '../rca/conversat
 import { definitionOnlyContext } from '../rca/definitionContext';
 import { AccountLimiter, RateLimitError } from '../rca/limits';
 import { extractBearerToken, httpFailure } from '../rca/request';
+import { runHydrated } from '../rca/hydratedPipeline';
 import { runPipelineViaWorkflow } from '../workflows/rcaPipelineWorkflow';
 
 const store = new ConversationStore();
@@ -58,13 +59,23 @@ export async function handleRcaChat(c: Context): Promise<Response> {
 
   const mastra = c.get('mastra');
   // RCA_ENGINE=pipeline (the default): the first question of a chat runs the evidence-complete workflow
-  // (rcaPipelineWorkflow). Set it to anything else to skip the pipeline and go straight to the investigator.
-  const pipeline: ConverseInput['pipeline'] =
-    process.env.RCA_ENGINE && process.env.RCA_ENGINE !== 'pipeline'
-      ? undefined
-      : (i) => runPipelineViaWorkflow(mastra, { ...i, analyst: mastra.getAgent('rcaAnalystAgent') });
+  // (rcaPipelineWorkflow). RCA_ENGINE=hydrated: the whole conversation runs on the hydrated engine
+  // (rca/hydratedPipeline.ts), which falls back to the pipeline if its pack cannot be built. Anything else
+  // skips the pipeline and goes straight to the investigator.
+  const engine = process.env.RCA_ENGINE;
+  const legacyPipeline: ConverseInput['pipeline'] = (i) => runPipelineViaWorkflow(mastra, { ...i, analyst: mastra.getAgent('rcaAnalystAgent') });
+  const hydrated: ConverseInput['pipeline'] = (i) =>
+    runHydrated({
+      ...i,
+      analyst: mastra.getAgent('rcaEvidenceAgent'),
+      understander: mastra.getAgent('rcaUnderstandAgent'),
+      // A follow-up must never repeat the full first-question analysis, so it falls back to the investigator.
+      fallback: i.conversation?.history ? undefined : legacyPipeline,
+    });
+  const pipeline: ConverseInput['pipeline'] = engine === 'hydrated' ? hydrated : engine && engine !== 'pipeline' ? undefined : legacyPipeline;
+  const followUp: ConverseInput['followUp'] = engine === 'hydrated' ? hydrated : undefined;
   const run = (onProgress: ((text: string) => void) | undefined, signal: AbortSignal) =>
-    answer(mastra.getAgent('rcaInvestigatorAgent'), pipeline, request, token, onProgress, signal);
+    answer(mastra.getAgent('rcaInvestigatorAgent'), pipeline, followUp, request, token, onProgress, signal);
 
   if (!request.stream) {
     try {
@@ -118,6 +129,7 @@ function publicData(result: ConverseResult) {
 async function answer(
   agent: Parameters<typeof converse>[0]['agent'],
   pipeline: ConverseInput['pipeline'],
+  followUp: ConverseInput['followUp'],
   request: ChatRequest,
   token: string,
   onProgress: ((text: string) => void) | undefined,
@@ -132,6 +144,7 @@ async function answer(
   return converse({
     agent,
     pipeline,
+    followUp,
     store,
     key: conversationKey(token, request.workflowUid, request.executionUid),
     turns: request.turns,
