@@ -509,3 +509,12 @@ test('real loop execution: the body reads the loop node at its own iteration', {
   assert.ok(refs.length > 0 && refs.every((r) => r.iteration === 1 && r.status === 'resolved'));
   assert.ok(h.data_gaps.length > 0, 'the capture has no data for most nodes, and says so');
 });
+
+test('a reference that resolves to an empty value carries the fact, not just ""', async () => {
+  const { ctx } = build(chain({}, { data: { job_uid: 'job-1', customer: { email: '' } }, status: 200 }));
+  const refs = node(await hydrateExecution(ctx), 'Send Email').references_node_data;
+  const email = refs["$.getLatestNodeData('Get Job')['data']['data']['customer']['email']"]!;
+  assert.equal(email.status, 'resolved');
+  assert.equal(email.value, '', 'the value itself is untouched');
+  assert.match(email.note ?? '', /EMPTY string/);
+});

@@ -263,6 +263,24 @@ Code builds everything; the model is called once, with a small bounded tool for 
   what the model is sent with `npm run rca:hydrate -- --fixture <file> --pack --out pack.txt`; compare with
   `npm run rca:eval -- --engine hydrated`; run the whole chat route offline with `npm run rca:chat-e2e`.
 
+#### The chat router: three kinds of answer, two audiences (hydrated engine only)
+
+Every message is routed first (`intent.ts`): rules for the clear cases (the chip texts, "root cause"/"RCA",
+"why did it fail"), then one small model call, then code guardrails (no run: chat only; model down or slow:
+explain on a failed run, else chat; audience business). Older engines are not routed and answer as before.
+
+| Type | Asked like | Answer |
+|---|---|---|
+| **explain** | "Why did this fail?", "what happened?" | what the workflow does / "While trying to…" (longer) / references, a confidence line, chip *Find the root cause (RCA)*. No RCA. |
+| **rca** | "root cause", "RCA", "find the reason", "in detail" | purpose / "While…" (short) / RCA / references, a confidence line, chips *Show evidence* and *Give me the fix* |
+| **chat** | a doubt about a step's data, "what does Construct do?", "what is a loop?", "thanks" | a free-form reply, no template, no chips. Questions about the run use the same pack; small talk and Workflow Builder help take a light, quick path with no run data. Unrelated topics are politely declined. |
+
+The **audience** is chosen per message. *Business* is the default: no step types, expressions, JSON, status codes
+or ids ("step", not "node"); a leak is sent back to the model once (`audience.ts`). *Technical* is chosen when the
+wording is technical (names fields, expressions, codes, APIs). The explain answer also computes the root cause,
+so the RCA chip re-renders from the stored result with no model call, when that was written for the same audience.
+Check the router with `npm run rca:intent-eval` (labelled messages in `fixtures/rca/intent-cases.json`).
+
 | Variable | Default | |
 |---|---|---|
 | `RCA_ENGINE` | `pipeline` | set `hydrated` to serve chat with this engine |
@@ -270,6 +288,8 @@ Code builds everything; the model is called once, with a small bounded tool for 
 | `RCA_ANALYSIS_EFFORT` | `medium` | its reasoning effort |
 | `RCA_EVIDENCE_MAX_STEPS` | `6` | model steps, counting the answer: at most this minus one tool rounds |
 | `RCA_QUOTE_REPAIRS` | `1` | times a bad quote may be sent back to the model (0 = off) |
+| `RCA_INTENT_MODEL` / `_EFFORT` / `_TIMEOUT_MS` | `openai/gpt-5-mini` / `low` / `8000` | the router's small call (only when the rules cannot decide) |
+| `RCA_CHAT_MODEL` / `_EFFORT` | the analysis model / `low` | the light chat call (small talk, Workflow Builder help) |
 | `RCA_UNDERSTAND_MODEL` / `_EFFORT` / `_TTL_MS` | `openai/gpt-5.1` / `low` / 24 h | the workflow summary |
 | `RCA_TRIM_NODE_CHARS` | `16000` | budget for the data one node read or produced |
 | `RCA_TRIM_CRITICAL_FACTOR` | `3` | the failed node's data may be this many times larger |

@@ -7,7 +7,9 @@ import { accountKey, ConversationStore, conversationKey } from '../rca/conversat
 import { definitionOnlyContext } from '../rca/definitionContext';
 import { AccountLimiter, RateLimitError } from '../rca/limits';
 import { extractBearerToken, httpFailure } from '../rca/request';
+import { chatEngineSelection } from '../rca/engineSelection';
 import { runHydrated } from '../rca/hydratedPipeline';
+import { routeIntent } from '../rca/intent';
 import { runPipelineViaWorkflow } from '../workflows/rcaPipelineWorkflow';
 
 const store = new ConversationStore();
@@ -61,21 +63,26 @@ export async function handleRcaChat(c: Context): Promise<Response> {
   // RCA_ENGINE=pipeline (the default): the first question of a chat runs the evidence-complete workflow
   // (rcaPipelineWorkflow). RCA_ENGINE=hydrated: the whole conversation runs on the hydrated engine
   // (rca/hydratedPipeline.ts), which falls back to the pipeline if its pack cannot be built. Anything else
-  // skips the pipeline and goes straight to the investigator.
-  const engine = process.env.RCA_ENGINE;
+  // skips the pipeline and goes straight to the investigator. The choice is made in rca/engineSelection.ts
+  // and logged on every request, so which engine answered is never a guess.
+  const selection = chatEngineSelection(process.env);
+  console.log(`[rca] request: ${selection.summary}`);
   const legacyPipeline: ConverseInput['pipeline'] = (i) => runPipelineViaWorkflow(mastra, { ...i, analyst: mastra.getAgent('rcaAnalystAgent') });
   const hydrated: ConverseInput['pipeline'] = (i) =>
     runHydrated({
       ...i,
       analyst: mastra.getAgent('rcaEvidenceAgent'),
       understander: mastra.getAgent('rcaUnderstandAgent'),
+      chat: mastra.getAgent('rcaChatAgent'),
       // A follow-up must never repeat the full first-question analysis, so it falls back to the investigator.
       fallback: i.conversation?.history ? undefined : legacyPipeline,
     });
-  const pipeline: ConverseInput['pipeline'] = engine === 'hydrated' ? hydrated : engine && engine !== 'pipeline' ? undefined : legacyPipeline;
-  const followUp: ConverseInput['followUp'] = engine === 'hydrated' ? hydrated : undefined;
+  const pipeline: ConverseInput['pipeline'] = selection.firstQuestion === 'hydrated' ? hydrated : selection.firstQuestion === 'pipeline' ? legacyPipeline : undefined;
+  const followUp: ConverseInput['followUp'] = selection.followUp === 'hydrated' ? hydrated : undefined;
+  // The router (what kind of answer, for whom) is part of the hydrated engine; the others answer as they always did.
+  const route: ConverseInput['route'] = selection.firstQuestion === 'hydrated' ? (r) => routeIntent({ ...r, classifier: mastra.getAgent('rcaIntentAgent') }) : undefined;
   const run = (onProgress: ((text: string) => void) | undefined, signal: AbortSignal) =>
-    answer(mastra.getAgent('rcaInvestigatorAgent'), pipeline, followUp, request, token, onProgress, signal);
+    answer(mastra.getAgent('rcaInvestigatorAgent'), pipeline, followUp, route, request, token, onProgress, signal);
 
   if (!request.stream) {
     try {
@@ -130,6 +137,7 @@ async function answer(
   agent: Parameters<typeof converse>[0]['agent'],
   pipeline: ConverseInput['pipeline'],
   followUp: ConverseInput['followUp'],
+  route: ConverseInput['route'],
   request: ChatRequest,
   token: string,
   onProgress: ((text: string) => void) | undefined,
@@ -145,6 +153,7 @@ async function answer(
     agent,
     pipeline,
     followUp,
+    route,
     store,
     key: conversationKey(token, request.workflowUid, request.executionUid),
     turns: request.turns,

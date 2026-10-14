@@ -102,6 +102,20 @@ function typeOf(value: unknown): string {
   return Array.isArray(value) ? 'array' : value === null ? 'null' : typeof value;
 }
 
+/** Says in words when a value that was read is empty. A model reading JSON can take `""` (or `"\"\""`, once a
+ * preview has been encoded again) for a value that CONTAINS quotation marks; an empty value is a different and far
+ * more common cause of "not found" than a malformed one, so it is stated, not left to be inferred. */
+function emptyValueNote(value: unknown): string | undefined {
+  if (value === null) return 'The value is null: nothing was set.';
+  if (typeof value === 'string') {
+    if (value === '') return 'The value is an EMPTY string: the field exists but holds nothing. The quotation marks around a string are only notation, never part of the value.';
+    if (value.trim() === '') return 'The value is blank: it holds only spaces.';
+  }
+  if (Array.isArray(value) && value.length === 0) return 'The value is an empty list.';
+  if (isObject(value) && Object.keys(value).length === 0) return 'The value is an empty object.';
+  return undefined;
+}
+
 interface WalkResult {
   status: 'resolved' | 'null' | 'undefined' | 'type_mismatch' | 'dynamic';
   value?: unknown;
@@ -338,14 +352,14 @@ async function resolveReference(
     status: walked.status,
     target: { uid: targetUid, name: targetName },
     iteration: wanted,
-    value: walked.status === 'resolved' || walked.status === 'null' ? (secretPath && walked.value !== null ? '"[REDACTED]"' : preview(walked.value)) : undefined,
+    value: walked.status === 'resolved' || walked.status === 'null' ? (secretPath && walked.value !== null ? '[REDACTED]' : preview(walked.value)) : undefined,
     ...(keepValue && (walked.status === 'resolved' || walked.status === 'null') ? { rawValue: secretPath && walked.value !== null ? '[REDACTED]' : walked.value } : {}),
     valueType: walked.status === 'resolved' ? typeOf(walked.value) : undefined,
     failedAt: walked.failedAt,
     segment: walked.segment,
     availableKeys: walked.availableKeys,
     shapeAssumed: assumed || undefined,
-    note: walked.note,
+    note: walked.note ?? (walked.status === 'resolved' || walked.status === 'null' ? emptyValueNote(walked.value) : undefined),
   };
 }
 

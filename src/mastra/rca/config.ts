@@ -64,3 +64,18 @@ export const RCA_EVIDENCE_MAX_STEPS = Number(process.env.RCA_EVIDENCE_MAX_STEPS 
  * asks to replace them with exact excerpts. Each costs one more model call, and only happens when a quote
  * failed. 0 turns it off. */
 export const RCA_QUOTE_REPAIRS = Number(process.env.RCA_QUOTE_REPAIRS ?? 1);
+
+/** The router (rca/intent.ts): decides which kind of answer a message needs and for whom. A small, cheap call,
+ * made only when the rules cannot decide. */
+export const RCA_INTENT_MODEL = process.env.RCA_INTENT_MODEL ?? 'openai/gpt-5-mini';
+
+export const RCA_INTENT_EFFORT = process.env.RCA_INTENT_EFFORT ?? 'low';
+
+/** How long the router may take before the rules' default is used instead. */
+export const RCA_INTENT_TIMEOUT_MS = Number(process.env.RCA_INTENT_TIMEOUT_MS ?? 8000);
+
+/** The light chat path (rca/chatLight.ts): small talk and general Workflow Builder help, answered without the
+ * run data. Defaults to the analysis model, at low effort. */
+export const RCA_CHAT_MODEL = process.env.RCA_CHAT_MODEL ?? RCA_ANALYSIS_MODEL;
+
+export const RCA_CHAT_EFFORT = process.env.RCA_CHAT_EFFORT ?? 'low';

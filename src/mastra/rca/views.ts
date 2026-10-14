@@ -2,9 +2,11 @@
 // verdict, so the "Explain in detail" / "Give me the fix" chips cost no model call, answer instantly, and can
 // never disagree with the first answer. Tags are limited to what the extension's sanitizer keeps.
 
+import { CHIP_RCA } from './intent';
 import { renderReferences, renderVerdictHtml, type VerifiedVerdict } from './verdict';
 
-export type ChatView = 'crisp' | 'detail' | 'fix';
+export { CHIP_RCA };
+export type ChatView = 'crisp' | 'detail' | 'fix' | 'rca';
 
 export const CHIP_DETAIL = 'Show evidence';
 export const CHIP_FIX = 'Give me the fix';
@@ -48,31 +50,89 @@ function renderRca(v: VerifiedVerdict): string {
   return heading('RCA') + cause + chain;
 }
 
-/** The default chat answer, in three parts under plain headers: what the workflow does; "While trying to ...",
- * what failed or happened; and the RCA, the root cause and how it was reached. Then how sure we are and the
- * documentation relied on. Sections with nothing to say are left out. */
+/**
+ * Plain text with a little structure, as HTML that uses only the tags the chat keeps: blank lines separate
+ * paragraphs, lines starting "- ", "* " or "1. " are a list, three backticks fence a code block, `code` and
+ * **bold** are inline. Everything is escaped first, so whatever a model wrote cannot add markup.
+ */
+export function chatTextToHtml(text: string): string {
+  const inline = (s: string): string => esc(s).replace(/`([^`\n]+)`/g, '<code>$1</code>').replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
+  const lines = text.replace(/\r\n/g, '\n').split('\n');
+  const isItem = (line: string): boolean => /^\s*(?:[-*•]|\d+[.)])\s+/.test(line);
+  const isFence = (line: string): boolean => line.trim().startsWith('```');
+  const blocks: string[] = [];
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i]!;
+    if (isFence(line)) {
+      const code: string[] = [];
+      for (i++; i < lines.length && !isFence(lines[i]!); i++) code.push(lines[i]!);
+      i++; // the closing fence (or the end of the text)
+      blocks.push(`<pre><code>${esc(code.join('\n'))}</code></pre>`);
+    } else if (isItem(line)) {
+      const items: string[] = [];
+      for (; i < lines.length && isItem(lines[i]!); i++) items.push(`<li>${inline(lines[i]!.replace(/^\s*(?:[-*•]|\d+[.)])\s+/, ''))}</li>`);
+      blocks.push(`<ul>${items.join('')}</ul>`);
+    } else if (!line.trim()) {
+      i++;
+    } else {
+      const paragraph: string[] = [];
+      for (; i < lines.length && lines[i]!.trim() && !isItem(lines[i]!) && !isFence(lines[i]!); i++) paragraph.push(lines[i]!.trim());
+      blocks.push(`<p>${inline(paragraph.join(' '))}</p>`);
+    }
+  }
+  return blocks.join('');
+}
+
+/** An answer that is not confirmed still shows the hypothesis, clearly labelled, so it is not lost. */
+const hypothesisOf = (v: VerifiedVerdict): string | undefined =>
+  v.issues.find((i) => i.startsWith('Possible cause (not confirmed)') || i.startsWith('Unconfirmed hypothesis'));
+
+/** How sure we are. Always stated for a diagnosis; for other answers only when it is not high. Canned answers
+ * (no execution, still running) have no analysis behind them, so they state none. */
+function renderConfidence(v: VerifiedVerdict, hypothesis: string | undefined): string {
+  const analysed = v.evidence_chain.length > 0 || v.root_cause !== null;
+  if (!analysed || !(DIAGNOSTIC.has(v.status) || v.confidence !== 'high')) return '';
+  const why = caveat(v);
+  return (
+    heading(`Confidence: ${LEVEL[v.confidence]}`) +
+    (why && !hypothesis ? `<p>${esc(why.charAt(0).toUpperCase() + why.slice(1))}.</p>` : !why ? '<p>Every supporting detail was checked against the execution data.</p>' : '')
+  );
+}
+
+/** "Why did it fail?": what the workflow does, then "While trying to ...", told at more length, with no RCA. */
+function renderExplain(v: VerifiedVerdict): string {
+  const parts: string[] = [];
+  if (v.workflow_purpose.trim()) parts.push(heading('What this workflow does'), chatTextToHtml(v.workflow_purpose.trim()));
+  if (v.headline.trim()) parts.push(heading(v.headline.trim()));
+  parts.push(chatTextToHtml(v.summary));
+  const hypothesis = hypothesisOf(v);
+  if (hypothesis) parts.push(`<p><em>${esc(hypothesis)}</em></p>`);
+  parts.push(renderConfidence(v, hypothesis), renderReferences(v.references));
+  return parts.join('');
+}
+
+/** Anything else: the reply as it was written, with a note only when the evidence behind it is limited. */
+function renderChat(v: VerifiedVerdict): string {
+  const reply = (v.chat_reply ?? '').trim() || v.summary.trim();
+  const why = v.evidence_chain.length > 0 || v.issues.length > 0 ? caveat(v) : null;
+  return chatTextToHtml(reply) + (why ? `<p><em>Note: ${esc(why)}.</em></p>` : '') + renderReferences(v.references);
+}
+
+/** The default chat answer. By mode: explain (see renderExplain), chat (see renderChat), or the RCA layout, which
+ * is also what the older engines produce: what the workflow does; "While trying to ...", what failed or happened;
+ * the RCA, the root cause and how it was reached; then how sure we are and the documentation relied on. Sections
+ * with nothing to say are left out. */
 export function renderCrisp(v: VerifiedVerdict): string {
+  if (v.mode === 'chat') return renderChat(v);
+  if (v.mode === 'explain') return renderExplain(v);
   const parts: string[] = [];
   if (v.workflow_purpose.trim()) parts.push(heading('What this workflow does'), `<p>${esc(v.workflow_purpose.trim())}</p>`);
   if (v.headline.trim()) parts.push(heading(v.headline.trim()));
   parts.push(`<p>${esc(v.summary)}</p>`);
-
-  // An answer that is not confirmed still shows the hypothesis, clearly labelled, so it is not lost.
-  const hypothesis = v.issues.find((i) => i.startsWith('Possible cause (not confirmed)') || i.startsWith('Unconfirmed hypothesis'));
+  const hypothesis = hypothesisOf(v);
   if (hypothesis) parts.push(`<p><em>${esc(hypothesis)}</em></p>`);
-
-  parts.push(renderRca(v));
-
-  // Confidence is always stated for a diagnosis; for other answers only when it is not high.
-  // Canned answers (no execution, still running) have no analysis behind them, so they state none.
-  const analysed = v.evidence_chain.length > 0 || v.root_cause !== null;
-  if (analysed && (DIAGNOSTIC.has(v.status) || v.confidence !== 'high')) {
-    const why = caveat(v);
-    parts.push(heading(`Confidence: ${LEVEL[v.confidence]}`));
-    if (why && !hypothesis) parts.push(`<p>${esc(why.charAt(0).toUpperCase() + why.slice(1))}.</p>`);
-    else if (!why) parts.push('<p>Every supporting detail was checked against the execution data.</p>');
-  }
-  parts.push(renderReferences(v.references));
+  parts.push(renderRca(v), renderConfidence(v, hypothesis), renderReferences(v.references));
   return parts.join('');
 }
 
@@ -98,13 +158,20 @@ export function renderFix(v: VerifiedVerdict): string {
 }
 
 export function renderView(v: VerifiedVerdict, view: ChatView): string {
+  if (view === 'rca') return renderCrisp({ ...v, mode: 'rca' });
   return view === 'detail' ? renderDetail(v) : view === 'fix' ? renderFix(v) : renderCrisp(v);
 }
 
-/** Quick-reply chips offered after an answer: only what has something to show. */
+/** Quick-reply chips offered after an answer: only what has something to show. A chat answer offers none; an
+ * explanation offers the root cause (already found, so it is shown instantly) and the fix. */
 export function chipsFor(v: VerifiedVerdict): string[] {
+  if (v.mode === 'chat') return [];
   const chips: string[] = [];
-  if (v.evidence_chain.length > 0 || v.root_cause) chips.push(CHIP_DETAIL);
+  if (v.mode === 'explain') {
+    if (v.root_cause) chips.push(CHIP_RCA);
+  } else if (v.evidence_chain.length > 0 || v.root_cause) {
+    chips.push(CHIP_DETAIL);
+  }
   if (v.fix) chips.push(CHIP_FIX);
   return chips;
 }
@@ -114,8 +181,10 @@ const DETAIL_REQUEST =
 const FIX_REQUEST =
   /^\s*(give\s+me\s+the\s+fix|(what('s|\s+is)\s+)?the\s+fix|how\s+(do|can|should)\s+i\s+fix(\s+it|\s+this)?|fix(\s+it|\s+this)?)\s*[.?!]*\s*$/i;
 
-/** Is this message just a click on (or a typed copy of) one of the chips? Those re-render, not re-investigate. */
-export function classifyChipRequest(message: string): 'detail' | 'fix' | null {
+/** Is this message just a click on (or a typed copy of) one of the chips? Those re-render, not re-investigate. The
+ * root-cause chip is matched only by its exact label; a typed "find the root cause" goes through the router. */
+export function classifyChipRequest(message: string): 'detail' | 'fix' | 'rca' | null {
+  if (message.trim() === CHIP_RCA) return 'rca';
   if (DETAIL_REQUEST.test(message)) return 'detail';
   if (FIX_REQUEST.test(message)) return 'fix';
   return null;

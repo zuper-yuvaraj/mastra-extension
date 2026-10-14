@@ -220,7 +220,7 @@ test('real node data: the real envelope is read, so paths resolve against what C
   const url = input.inputs.find((i: any) => i.field === 'url.value');
   assert.equal(url.status, 'resolved');
   assert.equal(url.target.name, 'Construct');
-  assert.match(url.value, /api\/appointments"$/, 'the URL ends at /appointments: no appointment uid');
+  assert.match(url.value, /api\/appointments$/, 'the URL ends at /appointments: no appointment uid');
   assert.equal(url.shapeAssumed, undefined, 'nothing is assumed about the shape any more');
 
   const data: any = await getNodeData(execution, 'Construct', { select: ['data.data.association_payload.url', 'data.data.appointment_update_payload.url'] });
@@ -279,8 +279,8 @@ test('real loop: the loop node\'s data is the current element, per iteration', l
   const execution = loopExecution();
   const first: any = await getNodeData(execution, 'Loop', { iteration: 0, select: ['data.service'] });
   const second: any = await getNodeData(execution, 'Loop', { iteration: 1, select: ['data.service'] });
-  assert.equal(first.selected[0].value, '"Roofing"');
-  assert.equal(second.selected[0].value, '"Gutters"');
+  assert.equal(first.selected[0].value, 'Roofing');
+  assert.equal(second.selected[0].value, 'Gutters');
   assert.equal(first.runtime.iteration, 0);
   assert.equal(first.runtime.total_iterations, 2);
   assert.equal(first.runtime.received_from, 'Construct', 'iteration 0 is fed by the node before the loop');
@@ -289,7 +289,7 @@ test('real loop: the loop node\'s data is the current element, per iteration', l
 
 test('real loop: which="input" on iteration 1 is the previous iteration\'s body result', loopOptions, async () => {
   const input: any = await getNodeData(loopExecution(), 'Loop', { iteration: 1, which: 'input', select: ['data.message'] });
-  assert.equal(input.selected[0].value, '"Appointment Created Successfully"');
+  assert.equal(input.selected[0].value, 'Appointment Created Successfully');
 });
 
 test('real loop: a body node resolves its sources at the SAME iteration', loopOptions, async () => {

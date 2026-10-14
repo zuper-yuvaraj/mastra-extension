@@ -129,9 +129,9 @@ test('a value read from a secret key is redacted; one read from a normal key is 
   const env = makeResolverEnv(fakeExecution(true));
   const [secret] = await resolveNodeInputs('u-mail', { f: { type: 'EXPRESSION', value: "{{ $.getLatestNodeData('Get Job').data.data.api_key }}" } }, env);
   assert.equal(secret!.status, 'resolved');
-  assert.equal(secret!.value, '"[REDACTED]"');
+  assert.equal(secret!.value, '[REDACTED]');
   const [plain] = await resolveNodeInputs('u-mail', { f: { type: 'EXPRESSION', value: "{{ $.getLatestNodeData('Get Job').data.data.job_uid }}" } }, env);
-  assert.equal(plain!.value, '"job-1"');
+  assert.equal(plain!.value, 'job-1');
 });
 
 test('pathEndsAtSecret looks at the key being read, not the node name', () => {

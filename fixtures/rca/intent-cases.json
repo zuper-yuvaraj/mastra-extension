@@ -1,0 +1,44 @@
+{
+  "description": "Labelled chat messages for the router (src/mastra/rca/intent.ts). `rules: true` means the cheap rules must decide it correctly with no model call (checked offline by intent.test.ts); `rules: false` means the rules must leave it to the model (also checked offline, so they cannot over-reach), and only `npm run rca:intent-eval` scores the model on it. `audience: null` means either audience is acceptable. `state` is the execution state the message arrives in.",
+  "nodes": ["On Webhook", "Get Job", "Send Email", "Get Record", "Construct", "update Appointment", "If/Else", "Loop"],
+  "cases": [
+    { "id": "why-fail", "question": "Why did this workflow fail?", "state": "failed", "rules": true, "expected": { "type": "explain", "audience": "business" } },
+    { "id": "why-fail-short", "question": "why did it fail", "state": "failed", "rules": true, "expected": { "type": "explain", "audience": "business" } },
+    { "id": "what-happened", "question": "What happened?", "state": "failed", "rules": true, "expected": { "type": "explain", "audience": "business" } },
+    { "id": "what-went-wrong", "question": "what went wrong here", "state": "failed", "rules": true, "expected": { "type": "explain", "audience": "business" } },
+    { "id": "error-out", "question": "Why did this execution error out?", "state": "failed", "rules": true, "expected": { "type": "explain", "audience": "business" } },
+    { "id": "what-problem", "question": "what is the problem", "state": "failed", "rules": true, "expected": { "type": "explain", "audience": "business" } },
+    { "id": "what-broke", "question": "what broke here?", "state": "failed", "rules": false, "expected": { "type": "explain", "audience": "business" } },
+    { "id": "job-no-appointment", "question": "Any idea why my job didn't get the appointment?", "state": "failed", "rules": false, "expected": { "type": "explain", "audience": "business" } },
+    { "id": "why-named-step", "question": "Why did Update Appointment fail?", "state": "failed", "rules": false, "expected": { "type": "explain", "audience": null } },
+
+    { "id": "root-cause-rca", "question": "Find the root cause (RCA) of this workflow's failure", "state": "failed", "rules": true, "expected": { "type": "rca", "audience": "business" } },
+    { "id": "find-reason", "question": "find the reason", "state": "failed", "rules": true, "expected": { "type": "rca", "audience": "business" } },
+    { "id": "find-cause", "question": "Find the cause of the failure", "state": "failed", "rules": true, "expected": { "type": "rca", "audience": "business" } },
+    { "id": "do-rca", "question": "do an RCA", "state": "failed", "rules": true, "expected": { "type": "rca", "audience": "business" } },
+    { "id": "dig-deeper", "question": "dig deeper into this failure", "state": "failed", "rules": true, "expected": { "type": "rca", "audience": "business" } },
+    { "id": "explain-detail", "question": "explain the failure in detail", "state": "failed", "rules": true, "expected": { "type": "rca", "audience": "business" } },
+    { "id": "rca-404", "question": "Find the RCA for the 404 on update Appointment", "state": "failed", "rules": true, "expected": { "type": "rca", "audience": "technical" } },
+    { "id": "why-that-happen", "question": "but why did that happen?", "state": "failed", "history": [{ "role": "user", "content": "why did it fail?" }, { "role": "assistant", "content": "<p>The step that updates the appointment was refused, so nothing after it ran.</p>" }], "rules": false, "expected": { "type": "rca", "audience": "business" } },
+    { "id": "what-caused", "question": "I need to know exactly what caused this", "state": "failed", "rules": false, "expected": { "type": "rca", "audience": "business" } },
+    { "id": "and-why", "question": "and why?", "state": "failed", "history": [{ "role": "user", "content": "why did it fail?" }, { "role": "assistant", "content": "<p>The email step had no address to send to.</p>" }], "rules": false, "expected": { "type": "rca", "audience": "business" } },
+
+    { "id": "get-job-return", "question": "What did Get Job return?", "state": "failed", "rules": false, "expected": { "type": "chat", "needsData": true, "audience": null } },
+    { "id": "email-filled", "question": "Is the customer's email filled in?", "state": "failed", "rules": false, "expected": { "type": "chat", "needsData": true, "audience": "business" } },
+    { "id": "what-construct-does", "question": "What does the Construct step do?", "state": "failed", "rules": false, "expected": { "type": "chat", "needsData": true, "audience": "business" } },
+    { "id": "which-after", "question": "Which step ran after Get Job?", "state": "completed", "rules": false, "expected": { "type": "chat", "needsData": true, "audience": null } },
+    { "id": "custom-fields-json", "question": "What value did custom_fields have in the job response JSON?", "state": "failed", "rules": false, "expected": { "type": "chat", "needsData": true, "audience": "technical" } },
+    { "id": "what-for", "question": "What does this workflow do for us?", "state": "completed", "rules": false, "expected": { "type": "chat", "needsData": true, "audience": "business" } },
+
+    { "id": "wait-node", "question": "How does a Wait node work?", "state": "failed", "rules": false, "expected": { "type": "chat", "needsData": false, "audience": null } },
+    { "id": "loop-node", "question": "what is a loop node", "state": "completed", "rules": false, "expected": { "type": "chat", "needsData": false, "audience": null } },
+    { "id": "every-monday", "question": "How do I run a workflow every Monday?", "state": "failed", "rules": false, "expected": { "type": "chat", "needsData": false, "audience": "business" } },
+    { "id": "thanks", "question": "thanks!", "state": "failed", "rules": true, "expected": { "type": "chat", "needsData": false, "audience": "business" } },
+    { "id": "hi", "question": "hi", "state": "completed", "rules": true, "expected": { "type": "chat", "needsData": false, "audience": "business" } },
+    { "id": "simpler-words", "question": "can you say that in simpler words?", "state": "failed", "history": [{ "role": "user", "content": "why did it fail?" }, { "role": "assistant", "content": "<p>The HTTP call returned 404.</p>" }], "rules": false, "expected": { "type": "chat", "needsData": false, "audience": "business" } },
+
+    { "id": "definition-why", "question": "Why did this fail?", "state": "definition", "rules": true, "expected": { "type": "chat", "needsData": false, "audience": "business" } },
+    { "id": "definition-rca", "question": "Find the root cause", "state": "definition", "rules": true, "expected": { "type": "chat", "needsData": false, "audience": "business" } },
+    { "id": "healthy-why", "question": "Why did it fail?", "state": "completed", "rules": true, "expected": { "type": "explain", "audience": "business" } }
+  ]
+}
