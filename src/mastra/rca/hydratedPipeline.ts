@@ -23,6 +23,7 @@ import { NO_ANSWER, runLightChat } from './chatLight';
 import { RCA_ANALYSIS_EFFORT, RCA_ANALYSIS_MODEL, RCA_EVIDENCE_MAX_STEPS, RCA_QUOTE_REPAIRS, RCA_STRUCTURING_EFFORT } from './config';
 import { MAX_EVIDENCE_CHARS } from './conversation';
 import { hydrateExecution, type HydratedExecution } from './hydrate';
+import { buildHydratedInstructions } from './hydratedInstructions';
 import { buildPack } from './hydratedPack';
 import { answerWithoutAgent, investigate, type InvestigationInput, type InvestigatorAgent, type RcaResult } from './investigate';
 import { docsForNodes, kbStep, referenceLinks, type KbStepDeps, type KbStepResult } from './kbStep';
@@ -30,6 +31,7 @@ import { EvidenceLedger, RCA_LEDGER_KEY } from './ledger';
 import { kbNodes } from './pipeline';
 import { progressText } from './progress';
 import { triage } from './seed';
+import { startTrace, type RcaTrace } from './trace';
 import { understandWorkflow } from './understand';
 import { HYDRATED_INSUFFICIENT, hydratedVerdictSchema, renderVerdictHtml, verdictSchema, type HydratedVerdict, type VerifiedVerdict } from './verdict';
 import { verifyVerdict } from './verify';
@@ -83,15 +85,36 @@ function leaksOf(v: VerifiedVerdict, type: string): Leak[] {
   });
 }
 
+/** Runs the engine; with RCA_TRACE on, also writes a file showing the steps, the prompt and the answers (rca/trace.ts). */
 export async function runHydrated(input: HydratedPipelineInput): Promise<RcaResult> {
+  const trace = startTrace(input.executionContext?.summary.workflow_execution?.execution_uid ?? 'no-execution');
+  try {
+    const result = await run(input, trace);
+    trace.step('Response', { meta: result.meta, verdict: result.verdict });
+    return result;
+  } catch (error) {
+    trace.step('Failed', error instanceof Error ? (error.stack ?? error.message) : String(error));
+    throw error;
+  } finally {
+    const file = await trace.save();
+    if (file) console.log(`[rca] trace written: ${file}`);
+  }
+}
+
+async function run(input: HydratedPipelineInput, trace: RcaTrace): Promise<RcaResult> {
   const { executionContext: ctx, question = '', conversation, onProgress, abortSignal, intent } = input;
   const say = (text: string) => onProgress?.({ text });
   const fallback = input.fallback ?? investigate;
+  trace.step('Query', { question, intent, history: conversation?.history, executionStatus: ctx?.summary.workflow_execution?.status ?? null });
 
-  if (!ctx) return investigate(input);
+  if (!ctx) {
+    trace.step('Route: no execution, using the investigator');
+    return investigate(input);
+  }
 
   // A chat that needs no run data (small talk, general help, or no run to look at) is one quick call.
   if (intent?.type === 'chat' && (!intent.needsData || ctx.definitionOnly)) {
+    trace.step(input.chat ? 'Route: light chat (no run data is sent)' : 'Route: chat without run data, using the investigator');
     return input.chat ? runLightChat({ ...input, chat: input.chat, intent }) : investigate(input);
   }
 
@@ -103,6 +126,7 @@ export async function runHydrated(input: HydratedPipelineInput): Promise<RcaResu
 
   if (!chatWithData) {
     const direct = answerWithoutAgent({ mode, execution: { status } });
+    trace.step(direct ? `Route: answered by code, no model call (mode ${mode})` : mode === 'WORKFLOW_QUESTION' ? 'Route: investigator (workflow question)' : `Route: hydrated analysis (mode ${mode})`);
     if (direct) {
       return {
         verdict: direct,
@@ -126,6 +150,7 @@ export async function runHydrated(input: HydratedPipelineInput): Promise<RcaResu
   } catch (error) {
     if (abortSignal?.aborted) throw error;
     console.warn('[rca] the hydrated pack could not be built, using the fallback:', error instanceof Error ? error.message : error);
+    trace.step('Pack could not be built, using the fallback', error instanceof Error ? error.message : String(error));
     return fallback(input);
   }
   const [{ understanding }, hydrated, kb] = gathered as [Awaited<ReturnType<typeof understandWorkflow>>, HydratedExecution, KbStepResult];
@@ -133,6 +158,9 @@ export async function runHydrated(input: HydratedPipelineInput): Promise<RcaResu
   const ranNames = hydrated.execution_flow.map((entry) => entry.name);
   const docs = docsForNodes(kb, ranNames);
   const pack = buildPack({ hydrated, understanding, question, history: conversation?.history, docs, intent: intent && { type: intent.type, audience: intent.audience } });
+  trace.step('Stages 1-4: understanding, hydration, docs, pack', { understanding, docs: docs.map((d) => d.title), nodesThatRan: ranNames, pack: pack.report });
+  trace.step('Prompt: system instructions', buildHydratedInstructions());
+  trace.step('Prompt: user message (the pack)', pack.message);
   const findings = conversation?.findings ? `\n\nALREADY ESTABLISHED (verified earlier in this conversation, JSON):\n${conversation.findings}` : '';
 
   // The ledger holds what the model is shown as EVIDENCE (the pack, and every tool result); documentation is
@@ -209,10 +237,15 @@ export async function runHydrated(input: HydratedPipelineInput): Promise<RcaResu
 
   say('Analysing');
   const first = { role: 'user' as const, content: `${pack.message}${findings}` };
+  if (findings) trace.step('Prompt: findings appended to the user message', findings);
+  // What the model answered, and any get_node_data calls it made on the way.
+  const traceAnswer = (title: string, r: { object?: unknown; steps?: unknown[] }) => trace.step(title, { answer: r.object, steps: r.steps });
   let response = await analyse([first]);
+  traceAnswer('Analysis: model answer', response);
   let steps = response.steps?.length ?? 0;
   let raw = read(response);
   let verified = check(raw);
+  trace.step('Verification', { failedQuotes: verified.evidence_chain.filter((e) => !e.verified).map((e) => ({ name: e.name, quote: e.quote })), leaks: leaks(verified), status: verified.status });
 
   // The model proposes, code checks. An answer that failed a check gets the model one bounded chance to put it
   // right, instead of being counted against a correct answer: a quote that is not a verbatim excerpt, and, for a
@@ -224,12 +257,16 @@ export async function runHydrated(input: HydratedPipelineInput): Promise<RcaResu
     if (abortSignal?.aborted) throw abortSignal.reason instanceof Error ? abortSignal.reason : new Error('ABORTED');
     say(leaked.length > 0 && failed.length === 0 ? 'Putting it in plainer words' : 'Checking the evidence');
     const why = failed.map((e) => ({ name: e.name, quote: e.quote, why: nodeUids.has(e.node_uid) ? ('quote' as const) : ('node' as const) }));
-    response = await analyse([first, { role: 'assistant', content: JSON.stringify(raw) }, { role: 'user', content: repairMessage(why, leaked) }]);
+    const repair = repairMessage(why, leaked);
+    trace.step(`Repair round ${round + 1}: message sent to the model`, repair);
+    response = await analyse([first, { role: 'assistant', content: JSON.stringify(raw) }, { role: 'user', content: repair }]);
+    traceAnswer(`Repair round ${round + 1}: model answer`, response);
     steps += response.steps?.length ?? 0;
     const repaired = read(response);
     if (repaired === HYDRATED_INSUFFICIENT) break; // an unusable second answer must not replace a usable first one
     raw = repaired;
     verified = check(raw);
+    trace.step(`Repair round ${round + 1}: verification`, { failedQuotes: verified.evidence_chain.filter((e) => !e.verified).length, leaks: leaks(verified).length });
   }
 
   // The links come from the documentation step, not from the model, so none can be invented. A chat reply shows none.
