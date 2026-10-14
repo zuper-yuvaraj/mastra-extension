@@ -8,6 +8,7 @@
 
 import type { BranchDecision } from '../lib/workflowGraph';
 import type { HydratedExecution, HydratedNode, HydratedReference } from './hydrate';
+import type { Audience, ResponseType } from './intent';
 import type { KbDoc } from './kbStep';
 import { referenceBase, toSelector, trimHydrated, type TrimOptions, type TrimReport } from './trim';
 import type { Understanding } from './understand';
@@ -27,6 +28,7 @@ export const PACK_LEGEND = [
   '- `execution.output` is the node\'s output when no other node reads it; otherwise `output_read_by` names the nodes whose references hold it. `output_same_as_input` means it passed its input through. For the failed node, `input_received` is what it received.',
   '- `[REDACTED]` replaces a credential. It is not a missing value.',
   '- Quotation marks around a string are JSON notation, never part of the value. `""` means the value is EMPTY: nothing was set, which is a very common cause of "not found". A value that really contains a quote character shows it escaped inside the string (`\\"`). Never say a value "has quotation marks" or is "wrapped in quotes" because of the notation, and a `note` on a reference that says a value is empty is the fact to use.',
+  '- RESPONSE MODE (explain, rca or chat) and AUDIENCE (business or technical), when present under QUESTION, say what kind of answer is wanted and for whom. Follow their definitions in the instructions. With none, answer as rca.',
   '- EXECUTION FLOW lists the nodes in the order they ran. A node absent from it did not run. BRANCH DECISIONS say which output an If/Else, Split or Loop took.',
   '- DATA GAPS are places where data could not be loaded. Anything that depends on them is unknown, not wrong.',
 ].join('\n');
@@ -121,6 +123,8 @@ export interface PackInput {
   /** Documentation excerpts for the workflow's modules (kbStep). Optional and small. */
   docs?: KbDoc[];
   trim?: TrimOptions;
+  /** What kind of answer is wanted and for whom (rca/intent.ts). Absent: the RCA layout, wording left to the model. */
+  intent?: { type: ResponseType; audience: Audience };
 }
 
 export interface PackReport {
@@ -168,6 +172,7 @@ export function buildPack(input: PackInput): Pack {
   const sizes: Record<string, number> = {};
   const parts = [
     `QUESTION: ${input.question.trim() || 'Why did this execution fail? Find the root cause.'}`,
+    ...(input.intent ? [`RESPONSE MODE: ${input.intent.type}`, `AUDIENCE: ${input.intent.audience}`] : []),
     ...(input.history ? ['', 'CONVERSATION SO FAR:', input.history] : []),
   ];
   const evidence: string[] = [];

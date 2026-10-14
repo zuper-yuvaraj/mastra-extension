@@ -7,7 +7,8 @@
 
 import type { WorkflowDetail } from '../lib/zuperWorkflowApi';
 import type { ExecutionContext } from '../lib/zuperExecutionApi';
-import { ConversationStore, findingsForPrompt, historyForPrompt, type ChatTurn } from './conversation';
+import { ConversationStore, findingsForPrompt, historyForPrompt, type ChatTurn, type ConversationState } from './conversation';
+import type { Audience, Intent, RouteInput } from './intent';
 import { investigate, type InvestigationInput, type InvestigatorAgent, type RcaResult } from './investigate';
 import type { ProgressEvent } from './progress';
 import type { VerifiedVerdict } from './verdict';
@@ -22,6 +23,9 @@ export interface ConverseInput {
   /** When set, follow-up questions run through this instead of `agent` (the hydrated engine answers them from
    * the same cached pack, so a follow-up is as well grounded as the first answer). */
   followUp?: (input: InvestigationInput) => Promise<RcaResult>;
+  /** The router (rca/intent.ts). When set, every message is classified first (what kind of answer, for whom) and
+   * the result goes to the engine as `intent`; the older engines are given none and answer as they always did. */
+  route?: (input: RouteInput) => Promise<Intent>;
   store: ConversationStore;
   /** See conversationKey: account + workflow + execution. */
   key: string;
@@ -51,13 +55,32 @@ function lastUserMessage(turns: ChatTurn[]): string {
   return '';
 }
 
+/** The stored diagnosis, when it can answer a request for the root cause as it stands: it found one, and it was
+ * written for the same audience (a business explanation cannot stand in for a technical RCA). */
+function reusableRca(state: ConversationState | null, audience?: Audience): VerifiedVerdict | null {
+  const primary = state?.primary;
+  if (!primary?.root_cause) return null;
+  if (audience && primary.audience && primary.audience !== audience) return null;
+  return primary;
+}
+
+/** The RCA of a stored diagnosis, shown with no model call. */
+function showRca(primary: VerifiedVerdict, question: string): ConverseResult {
+  const verdict: VerifiedVerdict = { ...primary, mode: 'rca' };
+  return { reply: withoutIds(renderView(verdict, 'rca'), question), suggestions: chipsFor(verdict), verdict, view: 'rca', fromCache: true };
+}
+
 export async function converse(input: ConverseInput): Promise<ConverseResult> {
   const { store, key, turns } = input;
   const question = lastUserMessage(turns);
   const state = store.get(key);
 
   const chip = classifyChipRequest(question);
-  if (chip && state) {
+  if (chip === 'rca') {
+    const primary = reusableRca(state);
+    if (primary) return showRca(primary, question);
+    // Nothing stored to show (it expired, or the server restarted): the router treats the chip text as a request for the RCA.
+  } else if (chip && state) {
     const verdict = state.primary ?? state.last;
     const used = chip === 'detail' ? CHIP_DETAIL : CHIP_FIX;
     return {
@@ -67,6 +90,16 @@ export async function converse(input: ConverseInput): Promise<ConverseResult> {
       view: chip,
       fromCache: true,
     };
+  }
+
+  // What this message needs, and for whom (hydrated engine only). A typed request for the root cause is answered
+  // from the stored diagnosis too, when it found one for the same audience.
+  const intent = input.route
+    ? await input.route({ question, turns, executionContext: input.executionContext, signal: input.signal, onProgress: input.onProgress })
+    : undefined;
+  if (intent?.type === 'rca') {
+    const primary = reusableRca(state, intent.audience);
+    if (primary) return showRca(primary, question);
   }
 
   const firstQuestion = !turns.some((t) => t.role === 'assistant');
@@ -81,17 +114,21 @@ export async function converse(input: ConverseInput): Promise<ConverseResult> {
     conversation: { history: historyForPrompt(turns), findings: findingsForPrompt(state), priorEvidence: state?.evidence ?? [] },
     onProgress: input.onProgress,
     abortSignal: input.signal,
+    intent,
   });
 
   // Answers that needed no investigation ("nothing to analyse", "still running") say nothing about the
-  // run worth remembering, and must not displace a real diagnosis the chips refer to.
+  // run worth remembering, and must not displace a real diagnosis the chips refer to. (A chat answer is stored
+  // as the latest answer, but only a diagnosis becomes the one the chips refer to: see ConversationStore.)
   const investigated = result.meta.model !== null;
   const next = investigated ? store.record(key, result.verdict, result.evidence) : state;
   const chipTarget = next ? (next.primary ?? next.last) : result.verdict;
 
   return {
     reply: withoutIds(renderCrisp(result.verdict), question),
-    suggestions: chipsFor(chipTarget),
+    // An answer from the hydrated engine offers what its own layout leaves to ask for (a chat answer offers none);
+    // the older engines offer chips for the stored diagnosis.
+    suggestions: result.verdict.mode ? chipsFor(result.verdict) : chipsFor(chipTarget),
     verdict: result.verdict,
     view: 'crisp',
     fromCache: false,

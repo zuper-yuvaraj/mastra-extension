@@ -9,6 +9,7 @@ import { AccountLimiter, RateLimitError } from '../rca/limits';
 import { extractBearerToken, httpFailure } from '../rca/request';
 import { chatEngineSelection } from '../rca/engineSelection';
 import { runHydrated } from '../rca/hydratedPipeline';
+import { routeIntent } from '../rca/intent';
 import { runPipelineViaWorkflow } from '../workflows/rcaPipelineWorkflow';
 
 const store = new ConversationStore();
@@ -72,13 +73,16 @@ export async function handleRcaChat(c: Context): Promise<Response> {
       ...i,
       analyst: mastra.getAgent('rcaEvidenceAgent'),
       understander: mastra.getAgent('rcaUnderstandAgent'),
+      chat: mastra.getAgent('rcaChatAgent'),
       // A follow-up must never repeat the full first-question analysis, so it falls back to the investigator.
       fallback: i.conversation?.history ? undefined : legacyPipeline,
     });
   const pipeline: ConverseInput['pipeline'] = selection.firstQuestion === 'hydrated' ? hydrated : selection.firstQuestion === 'pipeline' ? legacyPipeline : undefined;
   const followUp: ConverseInput['followUp'] = selection.followUp === 'hydrated' ? hydrated : undefined;
+  // The router (what kind of answer, for whom) is part of the hydrated engine; the others answer as they always did.
+  const route: ConverseInput['route'] = selection.firstQuestion === 'hydrated' ? (r) => routeIntent({ ...r, classifier: mastra.getAgent('rcaIntentAgent') }) : undefined;
   const run = (onProgress: ((text: string) => void) | undefined, signal: AbortSignal) =>
-    answer(mastra.getAgent('rcaInvestigatorAgent'), pipeline, followUp, request, token, onProgress, signal);
+    answer(mastra.getAgent('rcaInvestigatorAgent'), pipeline, followUp, route, request, token, onProgress, signal);
 
   if (!request.stream) {
     try {
@@ -133,6 +137,7 @@ async function answer(
   agent: Parameters<typeof converse>[0]['agent'],
   pipeline: ConverseInput['pipeline'],
   followUp: ConverseInput['followUp'],
+  route: ConverseInput['route'],
   request: ChatRequest,
   token: string,
   onProgress: ((text: string) => void) | undefined,
@@ -148,6 +153,7 @@ async function answer(
     agent,
     pipeline,
     followUp,
+    route,
     store,
     key: conversationKey(token, request.workflowUid, request.executionUid),
     turns: request.turns,

@@ -9,6 +9,7 @@ import type { ExecutionContext } from '../lib/zuperExecutionApi';
 import { ZUPER_CHAT_CONTEXT_KEY } from '../tools/zuperChatTools';
 import { RCA_MAX_STEPS, RCA_MODEL, RCA_REASONING_EFFORT, RCA_STRUCTURING_MODEL } from './config';
 import { MAX_EVIDENCE_CHARS } from './conversation';
+import type { Intent } from './intent';
 import { EvidenceLedger, RCA_LEDGER_KEY } from './ledger';
 import { progressText, type ProgressEvent } from './progress';
 import { redactSecrets } from './sanitize';
@@ -49,6 +50,9 @@ export interface InvestigationInput {
   onProgress?: (event: ProgressEvent) => void;
   /** Aborts the model call when the client goes away. */
   abortSignal?: AbortSignal;
+  /** What kind of answer this message needs and for whom (rca/intent.ts). Only the hydrated engine uses it; the
+   * others answer as they always did. */
+  intent?: Intent;
 }
 
 export interface RcaResult {

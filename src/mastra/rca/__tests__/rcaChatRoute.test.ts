@@ -115,18 +115,25 @@ test('an upstream failure is reported as a code, not a stack trace', async () =>
   }
 });
 
-test('RCA_ENGINE=hydrated serves the chat with the hydrated engine, which hands a definition-only chat to the investigator', async () => {
+test('RCA_ENGINE=hydrated routes the message, and a chat about the definition takes the light path', async () => {
   const requested: string[] = [];
-  const generated: string[] = [];
-  const agent = {
+  const asked: Record<string, string[]> = {};
+  const scripted = (name: string, reply: unknown) => ({
     generate: async (messages: any) => {
-      generated.push(String(messages[0].content).slice(0, 40));
-      return { object: answered, steps: [{}] };
+      (asked[name] ??= []).push(String(messages[0].content).slice(0, 60));
+      return { object: reply, steps: [{}] };
     },
+  });
+  const agents: Record<string, ReturnType<typeof scripted>> = {
+    rcaInvestigatorAgent: scripted('investigator', answered),
+    rcaEvidenceAgent: scripted('evidence', answered),
+    rcaUnderstandAgent: scripted('understand', { purpose: 'Sends an email after a webhook.', trigger: 'A webhook.', groups: [] }),
+    rcaIntentAgent: scripted('intent', { type: 'chat', audience: 'business', needs_data: true }),
+    rcaChatAgent: scripted('chat', { reply: 'Send Email runs after Get Job.' }),
   };
   const hono = new Hono();
   hono.use('*', async (c, next) => {
-    c.set('mastra' as never, { getAgent: (name: string) => (requested.push(name), agent) } as never);
+    c.set('mastra' as never, { getAgent: (name: string) => (requested.push(name), agents[name]) } as never);
     await next();
   });
   hono.post('/zuper/chat', handleRcaChat);
@@ -135,11 +142,29 @@ test('RCA_ENGINE=hydrated serves the chat with the hydrated engine, which hands 
   try {
     const res = await withWorkflowFetch(() => post(hono, body({ workflowUid: 'wf-route-0003' }), 'tok-hydrated'));
     assert.equal(res.status, 200);
-    assert.equal(((await res.json()) as { data: { reply: string } }).data.reply, '<p>Send Email runs after Get Job.</p>');
+    const json = (await res.json()) as { data: { reply: string; suggestions: string[] } };
+    assert.equal(json.data.reply, '<p>Send Email runs after Get Job.</p>');
+    assert.deepEqual(json.data.suggestions, [], 'a chat answer offers no chips');
   } finally {
     process.env.RCA_ENGINE = 'agent';
   }
-  for (const name of ['rcaInvestigatorAgent', 'rcaEvidenceAgent', 'rcaUnderstandAgent']) assert.ok(requested.includes(name), `${name} was wired in`);
-  assert.equal(generated.length, 1, 'no execution to hydrate, so only the investigator was asked');
-  assert.match(generated[0]!, /^MODE: WORKFLOW_QUESTION/);
+  for (const name of ['rcaInvestigatorAgent', 'rcaEvidenceAgent', 'rcaUnderstandAgent', 'rcaIntentAgent', 'rcaChatAgent']) assert.ok(requested.includes(name), `${name} was wired in`);
+  assert.equal(asked.intent?.length, 1, 'the question named a node, so the router was asked');
+  assert.equal(asked.chat?.length, 1, 'and the definition-only chat was answered by the light chat');
+  assert.equal(asked.evidence, undefined, 'no run to analyse');
+  assert.equal(asked.investigator, undefined);
+});
+
+test('without the hydrated engine the router is never asked and nothing changes', async () => {
+  const requested: string[] = [];
+  const agent = { generate: async () => ({ object: answered, steps: [{}] }) };
+  const hono = new Hono();
+  hono.use('*', async (c, next) => {
+    c.set('mastra' as never, { getAgent: (name: string) => (requested.push(name), agent) } as never);
+    await next();
+  });
+  hono.post('/zuper/chat', handleRcaChat);
+  const res = await withWorkflowFetch(() => post(hono, body({ workflowUid: 'wf-route-0004' }), 'tok-agent'));
+  assert.equal(res.status, 200);
+  assert.ok(!requested.includes('rcaIntentAgent'), 'the router belongs to the hydrated engine only');
 });

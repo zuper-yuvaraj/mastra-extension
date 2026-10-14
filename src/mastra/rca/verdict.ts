@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Audience, ResponseType } from './intent';
 
 export const ROOT_CAUSE_CATEGORIES = [
   'BAD_UPSTREAM_DATA',
@@ -104,6 +105,19 @@ export const INSUFFICIENT_VERDICT: RcaVerdict = {
   knowledge_used: [],
 };
 
+/** What the hydrated engine asks the model for: the same answer, plus the free-form reply of a chat answer. A
+ * separate schema, so the shared one (and every verdict the older engines and their tests build) is unchanged. */
+export const hydratedVerdictSchema = verdictSchema.extend({
+  chat_reply: z
+    .string()
+    .describe('Only for a chat answer (RESPONSE MODE: chat): the reply itself, in short paragraphs, "- " bullets where a list helps. Empty string for explain and rca. No ids.'),
+});
+
+export type HydratedVerdict = z.infer<typeof hydratedVerdictSchema>;
+
+/** Used when the hydrated engine's model produces nothing usable. */
+export const HYDRATED_INSUFFICIENT: HydratedVerdict = { ...INSUFFICIENT_VERDICT, chat_reply: '' };
+
 /** Shape of a verified verdict, for workflow step output. */
 export const verifiedVerdictSchema = verdictSchema.omit({ evidence_chain: true }).extend({
   evidence_chain: z.array(evidenceItemSchema.extend({ verified: z.boolean() })),
@@ -126,6 +140,12 @@ export interface VerifiedVerdict extends Omit<RcaVerdict, 'evidence_chain'> {
   adjustments?: string[];
   /** Problems found by verification (unknown nodes, unverifiable quotes). Empty when clean. */
   issues: string[];
+  /** The kind of answer this is, and who it was written for. Set by code, never by the model. Undefined for the
+   * older engines, which keep the RCA layout. */
+  mode?: ResponseType;
+  audience?: Audience;
+  /** The free-form reply of a chat answer (mode "chat"). */
+  chat_reply?: string;
 }
 
 export function esc(text: string): string {

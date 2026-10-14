@@ -9,7 +9,7 @@ import { repairMessage, runHydrated } from '../hydratedPipeline';
 import type { InvestigatorAgent } from '../investigate';
 import { EvidenceLedger, RCA_LEDGER_KEY } from '../ledger';
 import { resetUnderstandingCache, type Understanding } from '../understand';
-import { INSUFFICIENT_VERDICT, type RcaVerdict } from '../verdict';
+import { HYDRATED_INSUFFICIENT, INSUFFICIENT_VERDICT, type RcaVerdict } from '../verdict';
 import { fakeExecution } from './fakeExecution';
 
 const understanding: Understanding = {
@@ -114,7 +114,7 @@ test('the model call is bounded: a step cap, no tools on the last step, structur
   for (let step = 0; step < RCA_EVIDENCE_MAX_STEPS - 1; step++) assert.equal(options.prepareStep({ stepNumber: step }), undefined, `step ${step} may use the tool`);
   assert.deepEqual(options.prepareStep({ stepNumber: RCA_EVIDENCE_MAX_STEPS - 1 }), { toolChoice: 'none' }, 'the last step must answer');
   assert.equal(options.structuredOutput.errorStrategy, 'fallback');
-  assert.deepEqual(options.structuredOutput.fallbackValue, INSUFFICIENT_VERDICT);
+  assert.deepEqual(options.structuredOutput.fallbackValue, HYDRATED_INSUFFICIENT);
   assert.ok(options.requestContext.getRaw(RCA_LEDGER_KEY) instanceof EvidenceLedger);
 });
 
