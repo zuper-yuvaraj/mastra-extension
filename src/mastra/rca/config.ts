@@ -79,3 +79,9 @@ export const RCA_INTENT_TIMEOUT_MS = Number(process.env.RCA_INTENT_TIMEOUT_MS ??
 export const RCA_CHAT_MODEL = process.env.RCA_CHAT_MODEL ?? RCA_ANALYSIS_MODEL;
 
 export const RCA_CHAT_EFFORT = process.env.RCA_CHAT_EFFORT ?? 'low';
+
+/** Writes a Markdown trace of every hydrated-engine query (prompt, steps, model answers, response) to RCA_TRACE_DIR
+ * (rca/trace.ts). For understanding and debugging only: traces contain customer workflow data. */
+export const RCA_TRACE = ['1', 'true', 'on'].includes((process.env.RCA_TRACE ?? '').toLowerCase());
+
+export const RCA_TRACE_DIR = process.env.RCA_TRACE_DIR ?? 'rca-traces';
